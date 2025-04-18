@@ -2,15 +2,16 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
+import { getCurtainById, updateCurtain } from '@/lib/api';
 
 export default function EditCurtain({ params }) {
   const router = useRouter();
   const { id } = params;
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -36,27 +37,9 @@ export default function EditCurtain({ params }) {
   const fetchCurtainData = async () => {
     try {
       setIsLoading(true);
+      setError(null);
       
-      // Trong thực tế sẽ gọi API để lấy dữ liệu
-      // const response = await axios.get(`/api/curtains/${id}`);
-      // const curtain = response.data;
-      
-      // Giả lập dữ liệu
-      const curtainData = {
-        _id: id,
-        name: 'Rèm cửa chống nắng',
-        description: 'Rèm cửa chống nắng chất lượng cao, phù hợp với mọi không gian nội thất.',
-        price: 850000,
-        category: 'Blackout',
-        material: 'Polyester',
-        color: 'Xám',
-        size: {
-          width: 150,
-          height: 250
-        },
-        image: 'https://example.com/curtain1.jpg',
-        inStock: true
-      };
+      const curtainData = await getCurtainById(id);
       
       // Cập nhật state với dữ liệu lấy được
       setFormData({
@@ -66,9 +49,9 @@ export default function EditCurtain({ params }) {
         category: curtainData.category,
         material: curtainData.material,
         color: curtainData.color,
-        width: curtainData.size.width,
-        height: curtainData.size.height,
-        image: curtainData.image,
+        width: curtainData.size?.width || '',
+        height: curtainData.size?.height || '',
+        image: curtainData.image || '',
         inStock: curtainData.inStock
       });
       
@@ -76,7 +59,7 @@ export default function EditCurtain({ params }) {
     } catch (error) {
       console.error('Error fetching curtain data:', error);
       setIsLoading(false);
-      alert('Không thể tải dữ liệu sản phẩm');
+      setError('Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau.');
     }
   };
 
@@ -90,6 +73,7 @@ export default function EditCurtain({ params }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     
     // Validate form
     if (
@@ -100,37 +84,36 @@ export default function EditCurtain({ params }) {
       !formData.material ||
       !formData.color ||
       !formData.width ||
-      !formData.height ||
-      !formData.image
+      !formData.height
     ) {
-      alert('Vui lòng điền đầy đủ thông tin sản phẩm');
+      setError('Vui lòng điền đầy đủ thông tin sản phẩm');
       return;
     }
     
     try {
       setIsSubmitting(true);
       
-      // Trong thực tế sẽ gọi API để cập nhật sản phẩm
-      // await axios.put(`/api/curtains/${id}`, {
-      //   ...formData,
-      //   price: parseFloat(formData.price),
-      //   size: {
-      //     width: parseFloat(formData.width),
-      //     height: parseFloat(formData.height)
-      //   }
-      // });
+      // Chuẩn bị dữ liệu gửi đến API
+      const curtainData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        size: {
+          width: parseFloat(formData.width),
+          height: parseFloat(formData.height)
+        }
+      };
       
-      // Giả lập API thành công
-      setTimeout(() => {
-        setIsSubmitting(false);
-        alert('Cập nhật sản phẩm thành công!');
-        router.push('/admin/curtains');
-      }, 1000);
+      // Gọi API để cập nhật sản phẩm
+      await updateCurtain(id, curtainData);
+      
+      setIsSubmitting(false);
+      alert('Cập nhật sản phẩm thành công!');
+      router.push('/admin/curtains');
       
     } catch (error) {
       console.error('Error updating curtain:', error);
       setIsSubmitting(false);
-      alert('Có lỗi xảy ra khi cập nhật sản phẩm');
+      setError('Có lỗi xảy ra khi cập nhật sản phẩm. Vui lòng thử lại sau.');
     }
   };
 
@@ -138,6 +121,26 @@ export default function EditCurtain({ params }) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <p>Đang tải dữ liệu...</p>
+      </div>
+    );
+  }
+
+  if (error && !formData.name) {
+    return (
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <div className="text-red-500 mb-4">{error}</div>
+        <button 
+          onClick={fetchCurtainData} 
+          className="bg-blue-600 text-white px-4 py-2 rounded-md"
+        >
+          Thử lại
+        </button>
+        <Link 
+          href="/admin/curtains" 
+          className="ml-2 bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
+        >
+          Quay lại danh sách
+        </Link>
       </div>
     );
   }
@@ -153,6 +156,12 @@ export default function EditCurtain({ params }) {
         </Link>
         <h1 className="text-2xl font-bold">Chỉnh Sửa Rèm Cửa</h1>
       </div>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
       
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={handleSubmit}>
@@ -274,7 +283,7 @@ export default function EditCurtain({ params }) {
             {/* Hình ảnh */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                URL Hình ảnh <span className="text-red-500">*</span>
+                URL Hình ảnh
               </label>
               <input
                 type="text"
@@ -282,7 +291,6 @@ export default function EditCurtain({ params }) {
                 className="w-full p-2 border border-gray-300 rounded-md"
                 value={formData.image}
                 onChange={handleChange}
-                required
               />
             </div>
             
@@ -317,17 +325,16 @@ export default function EditCurtain({ params }) {
             ></textarea>
           </div>
           
-          {/* Submit button */}
-          <div className="mt-8 flex justify-end">
-            <Link 
+          <div className="mt-6 flex justify-end">
+            <Link
               href="/admin/curtains"
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2"
+              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2"
             >
               Hủy
             </Link>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Đang xử lý...' : 'Cập nhật sản phẩm'}
