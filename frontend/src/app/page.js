@@ -6,17 +6,20 @@ import Link from 'next/link';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
 
 import { useEffect, useState } from 'react';
-import { getCurtains, getBanners } from '@/lib/api';
+import { getCurtains, getBanners, getCategories } from '@/lib/api';
 import CurtainCard from '@/components/CurtainCard';
 import BannerSlider from '@/components/BannerSlider';
 
 export default function Home() {
   const [featuredCurtains, setFeaturedCurtains] = useState([]);
   const [banners, setBanners] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadingBanners, setLoadingBanners] = useState(true);
   const [error, setError] = useState(null);
   const [bannerError, setBannerError] = useState(null);
+  const [categoryError, setCategoryError] = useState(null);
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -48,6 +51,19 @@ export default function Home() {
 
     fetchFeatured();
     fetchBanners();
+    
+    const fetchCategories = async () => {
+      try {
+        setLoadingCategories(true);
+        const data = await getCategories();
+        setCategories(data);
+      } catch (err) {
+        setCategoryError('Không thể tải danh mục sản phẩm');
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
   }, []);
 
   return (
@@ -94,62 +110,85 @@ export default function Home() {
       <section className="py-16 bg-[#f3e6d8]">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Danh Mục Sản Phẩm</h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-              <div className="relative h-64">
-                <Image
-                  src="/images/blackout-curtains.jpg"
-                  alt="Rèm cửa chống nắng"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">Rèm Chống Nắng</h3>
-                <p className="text-gray-600 mb-4">Bảo vệ không gian của bạn khỏi ánh nắng gay gắt và tia UV có hại</p>
-                <Link href="/products?category=Blackout" className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
-                  Xem thêm <FaArrowRight className="ml-1" />
-                </Link>
-              </div>
+          {loadingCategories ? (
+            <div className="text-center py-12">Đang tải danh mục...</div>
+          ) : categoryError ? (
+            <div className="text-center text-red-500 py-12">{categoryError}</div>
+          ) : categories.length === 0 ? (
+            <div className="text-center py-12">Chưa có danh mục nào.</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {categories.map((cat) => {
+                // Mapping tên hiển thị và ảnh minh họa cho từng category
+                let displayName = cat;
+                let image = "/images/curtain-placeholder.jpg";
+                let description = "";
+                switch (cat) {
+                  case "Blackout":
+                    displayName = "Rèm Chống Nắng";
+                    image = "/images/blackout-curtains.jpg";
+                    description = "Bảo vệ không gian của bạn khỏi ánh nắng gay gắt và tia UV có hại";
+                    break;
+                  case "Sheer":
+                    displayName = "Rèm Voan";
+                    image = "/images/sheer-curtains.jpg";
+                    description = "Tạo không gian nhẹ nhàng, thoáng đãng và đầy ánh sáng tự nhiên";
+                    break;
+                  case "Roller":
+                    displayName = "Rèm Cuốn";
+                    image = "/images/roller-curtains.jpg";
+                    description = "Giải pháp hiện đại, tiết kiệm không gian cho mọi căn phòng";
+                    break;
+                  case "Vertical":
+                    displayName = "Rèm Lá Dọc";
+                    image = "/images/vertical-curtains.jpg";
+                    description = "Phù hợp cho văn phòng và không gian hiện đại";
+                    break;
+                  case "Roman":
+                    displayName = "Rèm Roman";
+                    image = "/images/roman-curtains.jpg";
+                    description = "Phong cách sang trọng, gọn gàng";
+                    break;
+                  case "Bamboo":
+                    displayName = "Rèm Tre";
+                    image = "/images/bamboo-curtains.jpg";
+                    description = "Mang thiên nhiên vào không gian sống";
+                    break;
+                  case "Venetian":
+                    displayName = "Rèm Sáo Nhôm";
+                    image = "/images/venetian-curtains.jpg";
+                    description = "Điều chỉnh ánh sáng linh hoạt, bền bỉ";
+                    break;
+                  case "Honeycomb":
+                    displayName = "Rèm Tổ Ong";
+                    image = "/images/honeycomb-curtains.jpg";
+                    description = "Cách nhiệt, tiết kiệm năng lượng";
+                    break;
+                  default:
+                    break;
+                }
+                return (
+                  <div key={cat} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
+                    <div className="relative h-64">
+                      <Image
+                        src={image}
+                        alt={displayName}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold mb-2">{displayName}</h3>
+                      {description && <p className="text-gray-600 mb-4">{description}</p>}
+                      <Link href={`/products?category=${cat}`} className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
+                        Xem thêm <FaArrowRight className="ml-1" />
+                      </Link>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            
-            <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-              <div className="relative h-64">
-                <Image
-                  src="/images/sheer-curtains.jpg"
-                  alt="Rèm voan"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">Rèm Voan</h3>
-                <p className="text-gray-600 mb-4">Tạo không gian nhẹ nhàng, thoáng đãng và đầy ánh sáng tự nhiên</p>
-                <Link href="/products?category=Sheer" className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
-                  Xem thêm <FaArrowRight className="ml-1" />
-                </Link>
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-              <div className="relative h-64">
-                <Image
-                  src="/images/roller-curtains.jpg"
-                  alt="Rèm cuốn"
-                  fill
-                  style={{ objectFit: 'cover' }}
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-semibold mb-2">Rèm Cuốn</h3>
-                <p className="text-gray-600 mb-4">Giải pháp hiện đại, tiết kiệm không gian cho mọi căn phòng</p>
-                <Link href="/products?category=Roller" className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
-                  Xem thêm <FaArrowRight className="ml-1" />
-                </Link>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </section>
       
