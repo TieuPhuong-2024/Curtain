@@ -1,0 +1,218 @@
+'use client';
+
+import { useState } from 'react';
+import { FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock } from 'react-icons/fa';
+
+export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+  
+  const [formStatus, setFormStatus] = useState({
+    submitted: false,
+    success: false,
+    message: ''
+  });
+  
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    // Validate form
+    if (!formData.name || !formData.email || !formData.phone || !formData.message) {
+      setFormStatus({
+        submitted: true,
+        success: false,
+        message: 'Vui lòng điền đầy đủ thông tin bắt buộc'
+      });
+      return;
+    }
+    
+    // For demo purposes, just simulate a successful submission
+    setFormStatus({
+      submitted: true,
+      success: true,
+      message: 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.'
+    });
+    
+    // Reset form after successful submission
+    setFormData({
+      name: '',
+      email: '',
+      phone: '',
+      subject: '',
+      message: ''
+    });
+    
+    // In a real app, you would send the form data to a server here
+  };
+  
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-2">Liên Hệ Với Chúng Tôi</h1>
+      <p className="text-gray-600 mb-8">Chúng tôi luôn sẵn sàng hỗ trợ bạn với mọi thắc mắc và yêu cầu</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Contact Information */}
+        <div className="md:col-span-1">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Thông Tin Liên Hệ</h2>
+            
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <FaMapMarkerAlt className="text-indigo-600 mt-1 mr-3" size={20} />
+                <div>
+                  <h3 className="font-medium">Địa chỉ</h3>
+                  <p className="text-gray-600">123 Đường ABC, Quận 1, TP.HCM</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <FaPhone className="text-indigo-600 mt-1 mr-3" size={20} />
+                <div>
+                  <h3 className="font-medium">Điện thoại</h3>
+                  <p className="text-gray-600">+84 123 456 789</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <FaEnvelope className="text-indigo-600 mt-1 mr-3" size={20} />
+                <div>
+                  <h3 className="font-medium">Email</h3>
+                  <p className="text-gray-600">info@curtainshop.com</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start">
+                <FaClock className="text-indigo-600 mt-1 mr-3" size={20} />
+                <div>
+                  <h3 className="font-medium">Giờ làm việc</h3>
+                  <p className="text-gray-600">Thứ Hai - Thứ Bảy: 8:00 - 20:00</p>
+                  <p className="text-gray-600">Chủ Nhật: 9:00 - 18:00</p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Map */}
+            <div className="mt-6 rounded-lg overflow-hidden h-64 bg-gray-200">
+              <div className="w-full h-full flex items-center justify-center text-gray-500">
+                Bản đồ Google Maps
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Contact Form */}
+        <div className="md:col-span-2">
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Gửi Yêu Cầu Tư Vấn</h2>
+            
+            {formStatus.submitted && (
+              <div className={`p-4 mb-4 rounded-md ${formStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                {formStatus.message}
+              </div>
+            )}
+            
+            <form onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="name" className="block mb-1 font-medium">
+                    Họ và tên <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="email" className="block mb-1 font-medium">
+                    Email <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label htmlFor="phone" className="block mb-1 font-medium">
+                    Số điện thoại <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    required
+                  />
+                </div>
+                
+                <div>
+                  <label htmlFor="subject" className="block mb-1 font-medium">
+                    Chủ đề
+                  </label>
+                  <input
+                    type="text"
+                    id="subject"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+              
+              <div className="mb-4">
+                <label htmlFor="message" className="block mb-1 font-medium">
+                  Nội dung tin nhắn <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  rows="5"
+                  className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  required
+                ></textarea>
+              </div>
+              
+              <button
+                type="submit"
+                className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-6 rounded-md"
+              >
+                Gửi yêu cầu
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 
