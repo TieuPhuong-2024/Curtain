@@ -4,7 +4,30 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
 
+import { useEffect, useState } from 'react';
+import { getCurtains } from '@/lib/api';
+import CurtainCard from '@/components/CurtainCard';
+
 export default function Home() {
+  const [featuredCurtains, setFeaturedCurtains] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        setLoading(true);
+        const data = await getCurtains();
+        setFeaturedCurtains(data.slice(0, 3)); // Lấy 3 sản phẩm đầu tiên
+      } catch (err) {
+        setError('Không thể tải sản phẩm nổi bật.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
+
   return (
     <div>
       {/* Hero Section */}
@@ -140,6 +163,24 @@ export default function Home() {
         </div>
       </section>
       
+      {/* Sản phẩm nổi bật */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">Sản Phẩm Nổi Bật</h2>
+          {loading ? (
+            <div className="text-center text-gray-500">Đang tải...</div>
+          ) : error ? (
+            <div className="text-center text-red-500">{error}</div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {featuredCurtains.map(curtain => (
+                <CurtainCard key={curtain._id} curtain={curtain} />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 bg-indigo-700 text-white">
         <div className="container mx-auto px-4 text-center">
