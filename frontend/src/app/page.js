@@ -1,5 +1,6 @@
 'use client';
 
+import './styles/cozy-theme.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
@@ -29,7 +30,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
+    <div className="cozy-bg min-h-screen">
       {/* Hero Section */}
       <section className="relative h-[70vh] flex items-center">
         <div className="absolute inset-0 z-0">
@@ -39,17 +40,18 @@ export default function Home() {
             fill
             style={{ objectFit: 'cover' }}
             priority
+            className="cozy-img w-full h-full"
           />
           <div className="absolute inset-0 bg-black opacity-40"></div>
         </div>
         
         <div className="container mx-auto px-4 z-10 text-white">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
+          <div className="max-w-2xl cozy-card bg-opacity-90">
+            <h1 className="cozy-title mb-4 text-4xl md:text-5xl">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
             <p className="text-xl mb-8">
               Khám phá bộ sưu tập rèm cửa đa dạng với chất lượng tốt nhất và giá cả hợp lý
             </p>
-            <Link href="/products" className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-md font-semibold inline-flex items-center">
+            <Link href="/products" className="cozy-btn font-semibold inline-flex items-center">
               Xem sản phẩm <FaArrowRight className="ml-2" />
             </Link>
           </div>
@@ -57,7 +59,7 @@ export default function Home() {
       </section>
       
       {/* Categories Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-[#f3e6d8]">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Danh Mục Sản Phẩm</h2>
           

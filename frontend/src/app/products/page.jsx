@@ -1,5 +1,6 @@
 'use client';
 
+import '../styles/cozy-theme.css';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getCurtains } from '@/lib/api';
