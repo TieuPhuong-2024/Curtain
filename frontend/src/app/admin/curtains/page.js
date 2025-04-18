@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import Link from 'next/link';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
+import { getCurtains, deleteCurtain } from '@/lib/api';
 
 export default function CurtainsList() {
   const [curtains, setCurtains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchCurtains();
@@ -17,43 +18,13 @@ export default function CurtainsList() {
   const fetchCurtains = async () => {
     try {
       setLoading(true);
-      // Trong thực tế, sẽ gọi API backend để lấy dữ liệu
-      // const response = await axios.get('/api/curtains');
-      // setCurtains(response.data);
-      
-      // Dữ liệu mẫu
-      setCurtains([
-        {
-          _id: '1',
-          name: 'Rèm cửa chống nắng',
-          category: 'Blackout',
-          price: 850000,
-          color: 'Xám',
-          inStock: true,
-          image: 'https://example.com/curtain1.jpg'
-        },
-        {
-          _id: '2',
-          name: 'Rèm Roman cao cấp',
-          category: 'Roman',
-          price: 1200000,
-          color: 'Xanh navy',
-          inStock: true,
-          image: 'https://example.com/curtain2.jpg'
-        },
-        {
-          _id: '3',
-          name: 'Rèm vải mỏng',
-          category: 'Sheer',
-          price: 550000,
-          color: 'Trắng',
-          inStock: false,
-          image: 'https://example.com/curtain3.jpg'
-        }
-      ]);
+      setError(null);
+      const data = await getCurtains();
+      setCurtains(data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching curtains:', error);
+      setError('Không thể tải dữ liệu rèm cửa. Vui lòng thử lại sau.');
       setLoading(false);
     }
   };
@@ -61,9 +32,9 @@ export default function CurtainsList() {
   const handleDelete = async (id) => {
     if (window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
       try {
-        // Trong thực tế sẽ gọi API
-        // await axios.delete(`/api/curtains/${id}`);
-        setCurtains(curtains.filter(curtain => curtain._id !== id));
+        await deleteCurtain(id);
+        // Cập nhật danh sách sau khi xóa thành công
+        fetchCurtains();
         alert('Xóa sản phẩm thành công!');
       } catch (error) {
         console.error('Error deleting curtain:', error);
@@ -73,8 +44,8 @@ export default function CurtainsList() {
   };
 
   const filteredCurtains = curtains.filter(curtain => 
-    curtain.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    curtain.category.toLowerCase().includes(searchTerm.toLowerCase())
+    curtain.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    curtain.category?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -105,6 +76,16 @@ export default function CurtainsList() {
 
       {loading ? (
         <div className="text-center py-8">Đang tải dữ liệu...</div>
+      ) : error ? (
+        <div className="text-center py-8 bg-white rounded-lg shadow">
+          <p className="text-red-500">{error}</p>
+          <button 
+            onClick={fetchCurtains}
+            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md"
+          >
+            Thử lại
+          </button>
+        </div>
       ) : (
         <>
           {filteredCurtains.length === 0 ? (
@@ -141,7 +122,7 @@ export default function CurtainsList() {
                           <div className="h-10 w-10 flex-shrink-0">
                             <img 
                               className="h-10 w-10 rounded-full object-cover" 
-                              src={curtain.image} 
+                              src={curtain.image || '/placeholder-curtain.jpg'} 
                               alt={curtain.name} 
                             />
                           </div>

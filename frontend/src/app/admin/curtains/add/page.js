@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
+import { createCurtain } from '@/lib/api';
 
 export default function AddCurtain() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -37,6 +38,7 @@ export default function AddCurtain() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
     
     // Validate form
     if (
@@ -47,37 +49,36 @@ export default function AddCurtain() {
       !formData.material ||
       !formData.color ||
       !formData.width ||
-      !formData.height ||
-      !formData.image
+      !formData.height
     ) {
-      alert('Vui lòng điền đầy đủ thông tin sản phẩm');
+      setError('Vui lòng điền đầy đủ thông tin sản phẩm');
       return;
     }
     
     try {
       setIsSubmitting(true);
       
-      // Trong thực tế, sẽ gọi API để thêm sản phẩm
-      // const response = await axios.post('/api/curtains', {
-      //   ...formData,
-      //   price: parseFloat(formData.price),
-      //   size: {
-      //     width: parseFloat(formData.width),
-      //     height: parseFloat(formData.height)
-      //   }
-      // });
+      // Chuẩn bị dữ liệu gửi đến API
+      const curtainData = {
+        ...formData,
+        price: parseFloat(formData.price),
+        size: {
+          width: parseFloat(formData.width),
+          height: parseFloat(formData.height)
+        }
+      };
       
-      // Giả lập gọi API thành công
-      setTimeout(() => {
-        setIsSubmitting(false);
-        alert('Thêm sản phẩm thành công!');
-        router.push('/admin/curtains');
-      }, 1000);
+      // Gọi API để tạo rèm cửa mới
+      await createCurtain(curtainData);
+      
+      setIsSubmitting(false);
+      alert('Thêm sản phẩm thành công!');
+      router.push('/admin/curtains');
       
     } catch (error) {
       console.error('Error adding curtain:', error);
       setIsSubmitting(false);
-      alert('Có lỗi xảy ra khi thêm sản phẩm');
+      setError('Có lỗi xảy ra khi thêm sản phẩm. Vui lòng thử lại sau.');
     }
   };
 
@@ -92,6 +93,12 @@ export default function AddCurtain() {
         </Link>
         <h1 className="text-2xl font-bold">Thêm Rèm Cửa Mới</h1>
       </div>
+      
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
       
       <div className="bg-white rounded-lg shadow-md p-6">
         <form onSubmit={handleSubmit}>
@@ -213,7 +220,7 @@ export default function AddCurtain() {
             {/* Hình ảnh */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                URL Hình ảnh <span className="text-red-500">*</span>
+                URL Hình ảnh
               </label>
               <input
                 type="text"
@@ -221,7 +228,6 @@ export default function AddCurtain() {
                 className="w-full p-2 border border-gray-300 rounded-md"
                 value={formData.image}
                 onChange={handleChange}
-                required
               />
             </div>
             
@@ -256,17 +262,16 @@ export default function AddCurtain() {
             ></textarea>
           </div>
           
-          {/* Submit button */}
-          <div className="mt-8 flex justify-end">
-            <Link 
+          <div className="mt-6 flex justify-end">
+            <Link
               href="/admin/curtains"
-              className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md mr-2"
+              className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2"
             >
               Hủy
             </Link>
             <button
               type="submit"
-              className="bg-blue-600 text-white px-4 py-2 rounded-md disabled:bg-blue-300"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Đang xử lý...' : 'Thêm sản phẩm'}
