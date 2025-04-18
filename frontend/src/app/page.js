@@ -6,57 +6,89 @@ import Link from 'next/link';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
 
 import { useEffect, useState } from 'react';
-import { getCurtains } from '@/lib/api';
+import { getCurtains, getBanners } from '@/lib/api';
 import CurtainCard from '@/components/CurtainCard';
+import BannerSlider from '@/components/BannerSlider';
 
 export default function Home() {
   const [featuredCurtains, setFeaturedCurtains] = useState([]);
+  const [banners, setBanners] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingBanners, setLoadingBanners] = useState(true);
   const [error, setError] = useState(null);
+  const [bannerError, setBannerError] = useState(null);
 
   useEffect(() => {
     const fetchFeatured = async () => {
       try {
         setLoading(true);
         const data = await getCurtains();
-        setFeaturedCurtains(data.slice(0, 3)); // Lấy 3 sản phẩm đầu tiên
+        // Lấy 3 sản phẩm đầu tiên hoặc sắp xếp theo tiêu chí khác nếu cần
+        setFeaturedCurtains(data.slice(0, 3));
       } catch (err) {
+        console.error('Error fetching curtains:', err);
         setError('Không thể tải sản phẩm nổi bật.');
       } finally {
         setLoading(false);
       }
     };
+
+    const fetchBanners = async () => {
+      try {
+        setLoadingBanners(true);
+        const data = await getBanners();
+        setBanners(data);
+      } catch (err) {
+        console.error('Error fetching banners:', err);
+        setBannerError('Không thể tải banner.');
+      } finally {
+        setLoadingBanners(false);
+      }
+    };
+
     fetchFeatured();
+    fetchBanners();
   }, []);
 
   return (
     <div className="cozy-bg min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[70vh] flex items-center">
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/hero-curtain.jpg"
-            alt="Rèm cửa cao cấp"
-            fill
-            style={{ objectFit: 'cover' }}
-            priority
-            className="cozy-img w-full h-full"
-          />
-          <div className="absolute inset-0 bg-black opacity-40"></div>
-        </div>
-        
-        <div className="container mx-auto px-4 z-10 text-white">
-          <div className="max-w-2xl cozy-card bg-opacity-90">
-            <h1 className="cozy-title mb-4 text-4xl md:text-5xl">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
-            <p className="text-xl mb-8">
-              Khám phá bộ sưu tập rèm cửa đa dạng với chất lượng tốt nhất và giá cả hợp lý
-            </p>
-            <Link href="/products" className="cozy-btn font-semibold inline-flex items-center">
-              Xem sản phẩm <FaArrowRight className="ml-2" />
-            </Link>
+      {/* Banner Slider Section */}
+      {loadingBanners ? (
+        <section className="relative h-[70vh] flex items-center justify-center bg-gray-200">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Đang tải banner...</p>
           </div>
-        </div>
-      </section>
+        </section>
+      ) : bannerError ? (
+        <section className="relative h-[70vh] flex items-center">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/hero-curtain.jpg"
+              alt="Rèm cửa cao cấp"
+              fill
+              style={{ objectFit: 'cover' }}
+              priority
+              className="cozy-img w-full h-full"
+            />
+            <div className="absolute inset-0 bg-black opacity-40"></div>
+          </div>
+          
+          <div className="container mx-auto px-4 z-10 text-white">
+            <div className="max-w-2xl cozy-card bg-opacity-90">
+              <h1 className="cozy-title mb-4 text-4xl md:text-5xl">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
+              <p className="text-xl mb-8">
+                Khám phá bộ sưu tập rèm cửa đa dạng với chất lượng tốt nhất và giá cả hợp lý
+              </p>
+              <Link href="/products" className="cozy-btn font-semibold inline-flex items-center">
+                Xem sản phẩm <FaArrowRight className="ml-2" />
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <BannerSlider banners={banners} />
+      )}
       
       {/* Categories Section */}
       <section className="py-16 bg-[#f3e6d8]">
@@ -170,14 +202,54 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Sản Phẩm Nổi Bật</h2>
           {loading ? (
-            <div className="text-center text-gray-500">Đang tải...</div>
+            <div className="flex justify-center items-center h-64">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Đang tải sản phẩm...</p>
+              </div>
+            </div>
           ) : error ? (
-            <div className="text-center text-red-500">{error}</div>
+            <div className="text-center py-12 bg-red-50 rounded-lg">
+              <p className="text-red-500 mb-4">{error}</p>
+              <button 
+                onClick={() => {
+                  setLoading(true);
+                  setError(null);
+                  getCurtains()
+                    .then(data => {
+                      setFeaturedCurtains(data.slice(0, 3));
+                      setLoading(false);
+                    })
+                    .catch(err => {
+                      setError('Không thể tải sản phẩm nổi bật.');
+                      setLoading(false);
+                    });
+                }}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition-colors"
+              >
+                Thử lại
+              </button>
+            </div>
+          ) : featuredCurtains.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <p className="text-gray-500 mb-2">Chưa có sản phẩm nổi bật</p>
+              <Link href="/products" className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
+                Xem tất cả sản phẩm <FaArrowRight className="ml-1" />
+              </Link>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {featuredCurtains.map(curtain => (
                 <CurtainCard key={curtain._id} curtain={curtain} />
               ))}
+              <div className="flex justify-center items-center col-span-1 md:col-span-3 mt-8">
+                <Link 
+                  href="/products" 
+                  className="px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors inline-flex items-center"
+                >
+                  Xem tất cả sản phẩm <FaArrowRight className="ml-2" />
+                </Link>
+              </div>
             </div>
           )}
         </div>
