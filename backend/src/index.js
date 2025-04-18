@@ -15,9 +15,11 @@ app.use(express.json());
 
 // Import routes
 const curtainRoutes = require('./routes/curtain.routes');
+const bannerRoutes = require('./routes/banner.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
+app.use('/api/banners', bannerRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
