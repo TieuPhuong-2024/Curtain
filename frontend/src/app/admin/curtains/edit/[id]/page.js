@@ -25,10 +25,20 @@ export default function EditCurtain({ params }) {
     inStock: true
   });
   
-  const categories = [
-    'Blackout', 'Sheer', 'Roller', 'Vertical', 
-    'Roman', 'Bamboo', 'Venetian', 'Honeycomb'
-  ];
+  const [categories, setCategories] = useState([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch('/api/categories');
+        const data = await res.json();
+        setCategories(data);
+      } catch (error) {
+        setCategories([]);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     fetchCurtainData();

@@ -16,9 +16,9 @@ const curtainSchema = new mongoose.Schema({
     min: 0
   },
   category: {
-    type: String,
-    required: true,
-    enum: ['Blackout', 'Sheer', 'Roller', 'Vertical', 'Roman', 'Bamboo', 'Venetian', 'Honeycomb']
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category',
+    required: true
   },
   material: {
     type: String,
