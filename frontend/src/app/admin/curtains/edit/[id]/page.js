@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaArrowLeft } from 'react-icons/fa';
@@ -8,7 +8,7 @@ import { getCurtainById, updateCurtain } from '@/lib/api';
 
 export default function EditCurtain({ params }) {
   const router = useRouter();
-  const { id } = params;
+  const { id } = use(params);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
