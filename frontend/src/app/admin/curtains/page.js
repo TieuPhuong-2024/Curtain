@@ -3,9 +3,15 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
-import { getCurtains, deleteCurtain } from '@/lib/api';
+import { getCurtains, deleteCurtain, getCategories } from '@/lib/api';
+import * as XLSX from 'xlsx';
 
 export default function CurtainsList() {
+  const [categories, setCategories] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   const [curtains, setCurtains] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -13,7 +19,17 @@ export default function CurtainsList() {
 
   useEffect(() => {
     fetchCurtains();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const data = await getCategories();
+      setCategories(Array.isArray(data) ? data : []);
+    } catch (error) {
+      setCategories([]);
+    }
+  };
 
   const fetchCurtains = async () => {
     try {
@@ -43,21 +59,73 @@ export default function CurtainsList() {
     }
   };
 
-  const filteredCurtains = curtains.filter(curtain => 
-    curtain.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    (typeof curtain.category === 'object' ? curtain.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) : curtain.category?.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredCurtains = curtains.filter(curtain => {
+    const matchesSearch = curtain.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      (typeof curtain.category === 'object' ? curtain.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) : curtain.category?.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesCategory = selectedCategory ? (typeof curtain.category === 'object' ? curtain.category?._id === selectedCategory : curtain.category === selectedCategory) : true;
+    return matchesSearch && matchesCategory;
+  });
+
+  const totalPages = Math.ceil(filteredCurtains.length / itemsPerPage);
+  const paginatedCurtains = filteredCurtains.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
+  const handleExportExcel = () => {
+    const dataToExport = filteredCurtains.map(curtain => ({
+      'Tên sản phẩm': curtain.name,
+      'Danh mục': typeof curtain.category === 'object' ? curtain.category?.name : curtain.category,
+      'Giá': curtain.price,
+      'Chất liệu': curtain.material,
+      'Màu sắc': curtain.color,
+      'Kích thước': curtain.size ? `${curtain.size.width} x ${curtain.size.height}` : '',
+      'Còn hàng': curtain.inStock ? 'Có' : 'Không',
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Curtains');
+    XLSX.writeFile(workbook, 'danh_sach_rem_cua.xlsx');
+  };
+
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
         <h1 className="text-2xl font-bold">Quản Lý Rèm Cửa</h1>
-        <Link 
-          href="/admin/curtains/add" 
-          className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center"
-        >
-          <FaPlus className="mr-2" /> Thêm Mới
-        </Link>
+        <div className="flex gap-2">
+          <button onClick={handleExportExcel} className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700 transition">
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 16v6M8 16v6m8-6a4 4 0 00-8 0m8 0H8"></path></svg>
+            Xuất Excel
+          </button>
+          <Link 
+            href="/admin/curtains/add" 
+            className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition"
+          >
+            <FaPlus className="mr-2" /> Thêm Mới
+          </Link>
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+        <div className="w-full md:w-1/3">
+          <select 
+            className="w-full p-3 rounded-md border border-gray-300" 
+            value={selectedCategory} 
+            onChange={e => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
+          >
+            <option value="">Tất cả danh mục</option>
+            {Array.isArray(categories) && categories.map(cat => (
+              <option key={cat._id} value={cat._id}>{cat.name}</option>
+            ))}
+          </select>
+        </div>
+        <div className="w-full md:w-2/3 relative">
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tên hoặc danh mục..."
+            className="w-full p-3 pl-10 rounded-md border border-gray-300"
+            value={searchTerm}
+            onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+          />
+          <FaSearch className="absolute left-3 top-3.5 text-gray-400" />
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -115,7 +183,7 @@ export default function CurtainsList() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredCurtains.map((curtain) => (
+                  {paginatedCurtains.map((curtain) => (
                     <tr key={curtain._id}>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
