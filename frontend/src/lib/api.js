@@ -9,6 +9,14 @@ const api = axios.create({
     },
 });
 
+// Create a separate instance for file uploads
+const uploadApi = axios.create({
+    baseURL: API_URL,
+    headers: {
+        'Content-Type': 'multipart/form-data',
+    },
+});
+
 export const getCurtains = async () => {
     try {
         const response = await api.get('/curtains');
@@ -135,6 +143,20 @@ export const deleteCategory = async (id) => {
         return response.data;
     } catch (error) {
         console.error(`Error deleting category with id ${id}:`, error);
+        throw error;
+    }
+};
+
+// Upload image from device
+export const uploadImage = async (imageFile) => {
+    try {
+        const formData = new FormData();
+        formData.append('image', imageFile);
+
+        const response = await uploadApi.post('/upload/from-device', formData);
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading image:', error);
         throw error;
     }
 };

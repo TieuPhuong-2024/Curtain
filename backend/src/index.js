@@ -17,11 +17,16 @@ app.use(express.json());
 const curtainRoutes = require('./routes/curtain.routes');
 const bannerRoutes = require('./routes/banner.routes');
 const categoryRoutes = require('./routes/category.routes');
+const uploadRoutes = require('./routes/upload.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Serve static files from the uploads directory
+app.use('/uploads', express.static('uploads'));
 
 // Basic route
 app.get('/', (req, res) => {
