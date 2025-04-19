@@ -3,7 +3,7 @@ const Curtain = require('../models/curtain.model');
 // Get all curtains
 exports.getAllCurtains = async (req, res) => {
   try {
-    const curtains = await Curtain.find();
+    const curtains = await Curtain.find().populate('category');
     res.status(200).json(curtains);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -13,7 +13,7 @@ exports.getAllCurtains = async (req, res) => {
 // Get a single curtain
 exports.getCurtainById = async (req, res) => {
   try {
-    const curtain = await Curtain.findById(req.params.id);
+    const curtain = await Curtain.findById(req.params.id).populate('category');
     if (!curtain) {
       return res.status(404).json({ message: 'Curtain not found' });
     }

@@ -45,7 +45,7 @@ export default function CurtainsList() {
 
   const filteredCurtains = curtains.filter(curtain => 
     curtain.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    curtain.category?.toLowerCase().includes(searchTerm.toLowerCase())
+    (typeof curtain.category === 'object' ? curtain.category?.name?.toLowerCase().includes(searchTerm.toLowerCase()) : curtain.category?.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   return (
@@ -133,7 +133,7 @@ export default function CurtainsList() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{curtain.category}</div>
+                        <div className="text-sm text-gray-900">{typeof curtain.category === 'object' ? curtain.category?.name : curtain.category}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
