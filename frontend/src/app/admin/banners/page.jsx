@@ -2,6 +2,7 @@
 
 import {useEffect, useState} from "react";
 import {createBanner, deleteBanner, getBanners, updateBanner,} from "@/lib/api";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function AdminBannerPage() {
     const [banners, setBanners] = useState([]);
@@ -113,17 +114,12 @@ export default function AdminBannerPage() {
                         onChange={handleChange}
                     />
                 </div>
-                <div>
-                    <label className="block font-medium mb-1">Ảnh (URL)</label>
-                    <input
-                        type="text"
-                        name="image"
-                        className="w-full border px-3 py-2 rounded"
-                        value={form.image}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
+                <ImageUploader 
+                    onImageSelected={(url) => {
+                        setForm(prev => ({...prev, image: url}));
+                    }}
+                    currentImage={form.image}
+                />
                 <div>
                     <label className="block font-medium mb-1">Link (URL, tùy chọn)</label>
                     <input

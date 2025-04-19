@@ -1,15 +1,18 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useRef} from 'react';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
-import {FaArrowLeft} from 'react-icons/fa';
-import {createCurtain} from '@/lib/api';
+import {FaArrowLeft, FaUpload} from 'react-icons/fa';
+import {createCurtain, uploadImage} from '@/lib/api';
 
 export default function AddCurtain() {
     const router = useRouter();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const fileInputRef = useRef(null);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -46,6 +49,24 @@ export default function AddCurtain() {
         });
     };
 
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+
+            // Create a preview URL for the selected image
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleFileButtonClick = () => {
+        fileInputRef.current.click();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -65,8 +86,28 @@ export default function AddCurtain() {
             return;
         }
 
+        // Validate image
+        if (!selectedFile && !formData.image) {
+            setError('Vui lòng chọn hình ảnh cho sản phẩm');
+            return;
+        }
+
         try {
             setIsSubmitting(true);
+            let imageUrl = formData.image;
+
+            // Upload image if a file is selected
+            if (selectedFile) {
+                try {
+                    const uploadResult = await uploadImage(selectedFile);
+                    imageUrl = uploadResult.url;
+                } catch (uploadError) {
+                    console.error('Error uploading image:', uploadError);
+                    setIsSubmitting(false);
+                    setError('Có lỗi xảy ra khi tải lên hình ảnh. Vui lòng thử lại sau.');
+                    return;
+                }
+            }
 
             // Chuẩn bị dữ liệu gửi đến API
             const curtainData = {
@@ -75,7 +116,8 @@ export default function AddCurtain() {
                 size: {
                     width: parseFloat(formData.width),
                     height: parseFloat(formData.height)
-                }
+                },
+                image: imageUrl
             };
 
             // Gọi API để tạo rèm cửa mới
@@ -230,15 +272,49 @@ export default function AddCurtain() {
                         {/* Hình ảnh */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                URL Hình ảnh
+                                Hình ảnh <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                name="image"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                value={formData.image}
-                                onChange={handleChange}
-                            />
+                            <div className="flex flex-col space-y-2">
+                                <div className="flex items-center">
+                                    <input
+                                        type="text"
+                                        name="image"
+                                        placeholder="URL hình ảnh (tùy chọn)"
+                                        className="flex-grow p-2 border border-gray-300 rounded-md"
+                                        value={formData.image}
+                                        onChange={handleChange}
+                                    />
+                                    <span className="mx-2 text-gray-500">hoặc</span>
+                                    <button
+                                        type="button"
+                                        onClick={handleFileButtonClick}
+                                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center"
+                                    >
+                                        <FaUpload className="mr-2" /> Tải lên
+                                    </button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
+                                </div>
+
+                                {/* Image preview */}
+                                {imagePreview && (
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-500 mb-1">Xem trước:</p>
+                                        <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden">
+                                            <img
+                                                src={imagePreview}
+                                                alt="Preview"
+                                                className="w-full h-full object-contain"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Tình trạng */}
