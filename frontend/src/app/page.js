@@ -226,16 +226,6 @@ export default function Home() {
                                 </li>
                             </ul>
                         </div>
-
-                        <div className="relative h-96">
-                            <Image
-                                src="/images/living-room-curtains.jpg"
-                                alt="Rèm cửa phòng khách"
-                                fill
-                                style={{objectFit: 'cover'}}
-                                className="rounded-lg"
-                            />
-                        </div>
                     </div>
                 </div>
             </section>

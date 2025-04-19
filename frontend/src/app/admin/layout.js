@@ -30,7 +30,7 @@ export default function AdminLayout({children}) {
                         </li>
                         <li>
                             <Link href="/admin/categories" className="block py-2 px-4 hover:bg-gray-700">
-                                Categories
+                                Danh mục sản phẩm
                             </Link>
                         </li>
                         <li>

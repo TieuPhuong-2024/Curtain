@@ -1,7 +1,7 @@
 'use client';
 
 import '../../styles/cozy-theme.css';
-import {useEffect, useState} from 'react';
+import {use, useEffect, useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {getCurtainById} from '@/lib/api';
