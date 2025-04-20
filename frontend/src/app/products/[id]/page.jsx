@@ -96,8 +96,8 @@ export default function ProductDetailPage({params}) {
                             <div className="flex justify-between items-start">
                                 <h1 className="cozy-title mb-2">{name}</h1>
                                 <span className="bg-yellow-100 text-yellow-800 text-sm px-3 py-1 rounded-full">
-                  {category}
-                </span>
+                                    {typeof category === 'object' ? category.name : category}
+                                </span>
                             </div>
                             <div className="text-2xl font-bold text-[#a67c52] mb-4">
                                 {new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(price)}
