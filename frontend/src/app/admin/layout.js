@@ -1,20 +1,44 @@
+'use client';
+
 import {Inter} from 'next/font/google';
 import Link from 'next/link';
+import { useAuth } from '@/lib/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 const inter = Inter({subsets: ['latin']});
 
-export const metadata = {
-    title: 'Admin Dashboard',
-    description: 'Admin Dashboard for Curtain Management',
-};
-
 export default function AdminLayout({children}) {
+    const { user, userRole, loading, logout } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        // Check if user is not an admin
+        if (!loading && (!user || userRole !== 'admin')) {
+            router.push('/');
+        }
+    }, [user, userRole, loading, router]);
+
+    // If still loading or no permission, show minimal loading UI
+    if (loading || !user || userRole !== 'admin') {
+        return <div className="flex justify-center items-center min-h-screen">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>;
+    }
+
+    // Handle logout
+    const handleLogout = async () => {
+        await logout();
+        router.push('/');
+    };
+
     return (
         <div className="flex min-h-screen">
             {/* Sidebar */}
             <div className="w-64 bg-gray-800 text-white">
                 <div className="p-4">
                     <h2 className="text-2xl font-bold">Admin</h2>
+                    <p className="text-sm text-gray-300">{user.email}</p>
                 </div>
                 <nav className="mt-4">
                     <ul>
@@ -42,6 +66,14 @@ export default function AdminLayout({children}) {
                             <Link href="/" className="block py-2 px-4 hover:bg-gray-700">
                                 Về Trang Chính
                             </Link>
+                        </li>
+                        <li>
+                            <button 
+                                onClick={handleLogout}
+                                className="w-full text-left block py-2 px-4 hover:bg-gray-700 text-red-300"
+                            >
+                                Đăng xuất
+                            </button>
                         </li>
                     </ul>
                 </nav>

@@ -2,12 +2,46 @@
 
 import Link from 'next/link';
 import {useState, useEffect} from 'react';
-import {FaBars, FaHome, FaInfoCircle, FaPhone, FaShoppingCart, FaTimes, FaSearch, FaUser, FaHeart} from 'react-icons/fa';
+import {FaBars, FaHome, FaInfoCircle, FaPhone, FaShoppingCart, FaTimes, FaSearch, FaUser, FaHeart, FaSignInAlt, FaSignOutAlt} from 'react-icons/fa';
+import { useAuth } from '@/lib/AuthContext';
+
+// Action Button Component
+const ActionButton = ({href, icon, label, badge, onClick}) => {
+    return (
+        <div className="relative">
+            {onClick ? (
+                <button 
+                    onClick={onClick}
+                    className="flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors"
+                >
+                    <span className="text-xl">{icon}</span>
+                    <span className="text-xs mt-1">{label}</span>
+                    {badge > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                            {badge}
+                        </span>
+                    )}
+                </button>
+            ) : (
+                <Link href={href} className="flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors">
+                    <span className="text-xl">{icon}</span>
+                    <span className="text-xs mt-1">{label}</span>
+                    {badge > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                            {badge}
+                        </span>
+                    )}
+                </Link>
+            )}
+        </div>
+    );
+};
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const { user, userRole, logout, isAdmin } = useAuth();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -35,6 +69,10 @@ export default function Navbar() {
         console.log('Searching for:', searchQuery);
     };
 
+    const handleLogout = async () => {
+        await logout();
+    };
+
     return (
         <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
             scrolled 
@@ -51,28 +89,42 @@ export default function Navbar() {
                             Curtain Shop
                         </Link>
 
-                        {/* Desktop navigation */}
-                        <div className="hidden md:flex items-center space-x-1">
-                            <NavLink href="/" icon={<FaHome size={16} />} text="Trang chủ" />
-                            <NavLink href="/products" icon={<FaShoppingCart size={16} />} text="Sản phẩm" />
-                            <NavLink href="/about" icon={<FaInfoCircle size={16} />} text="Giới thiệu" />
-                            <NavLink href="/contact" icon={<FaPhone size={16} />} text="Liên hệ" />
+                        {/* Desktop Navigation */}
+                        <div className="hidden md:flex space-x-6">
+                            <Link href="/" className="text-text-primary hover:text-primary transition-colors">
+                                Trang chủ
+                            </Link>
+                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
+                                Giới thiệu
+                            </Link>
+                            <Link href="/products" className="text-text-primary hover:text-primary transition-colors">
+                                Sản phẩm
+                            </Link>
+                            <Link href="/contact" className="text-text-primary hover:text-primary transition-colors">
+                                Liên hệ
+                            </Link>
+                            {isAdmin && (
+                                <Link href="/admin" className="text-text-primary hover:text-primary transition-colors">
+                                    Quản trị
+                                </Link>
+                            )}
                         </div>
                     </div>
 
+                    {/* Desktop Right Side (Search & Actions) */}
                     <div className="hidden md:flex items-center space-x-4">
-                        {/* Search box */}
+                        {/* Search form */}
                         <form onSubmit={handleSearch} className="relative">
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sản phẩm..."
+                                className="w-64 pl-4 pr-10 py-2 border rounded-full text-sm focus:outline-none focus:ring focus:border-blue-300"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-secondary py-2 pl-4 pr-10 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-primary transition-all w-40 focus:w-60"
                             />
-                            <button 
-                                type="submit" 
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary hover:text-primary-dark"
+                            <button
+                                type="submit"
+                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
                                 <FaSearch />
                             </button>
@@ -82,7 +134,27 @@ export default function Navbar() {
                         <div className="flex items-center space-x-3">
                             <ActionButton href="/favorites" icon={<FaHeart />} label="Yêu thích" badge={0} />
                             <ActionButton href="/cart" icon={<FaShoppingCart />} label="Giỏ hàng" badge={0} />
-                            <ActionButton href="/account" icon={<FaUser />} label="Tài khoản" />
+                            
+                            {user ? (
+                                <>
+                                    <ActionButton 
+                                        href="/account" 
+                                        icon={<FaUser />} 
+                                        label={userRole === 'admin' ? 'Admin' : 'Tài khoản'} 
+                                    />
+                                    <ActionButton 
+                                        onClick={handleLogout}
+                                        icon={<FaSignOutAlt />} 
+                                        label="Đăng xuất" 
+                                    />
+                                </>
+                            ) : (
+                                <ActionButton 
+                                    href="/login" 
+                                    icon={<FaSignInAlt />} 
+                                    label="Đăng nhập" 
+                                />
+                            )}
                         </div>
                     </div>
 
@@ -100,90 +172,64 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile menu */}
-            <div 
-                className={`fixed inset-0 bg-white z-40 transform transition-transform duration-300 ease-in-out ${
-                    isOpen ? 'translate-x-0' : 'translate-x-full'
-                } md:hidden`}
-                style={{ top: '64px' }} 
-            >
-                <div className="flex flex-col h-full">
-                    {/* Search for mobile */}
-                    <div className="p-4 border-b">
-                        <form onSubmit={handleSearch} className="relative">
-                            <input
-                                type="text"
-                                placeholder="Tìm kiếm sản phẩm..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="bg-secondary w-full py-2 pl-4 pr-10 rounded-full text-sm focus:outline-none"
-                            />
+            {/* Mobile Menu */}
+            <div className={`${isOpen ? 'block' : 'hidden'} md:hidden bg-white shadow-lg`}>
+                <div className="px-4 py-2 space-y-1">
+                    <Link href="/" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaHome className="mr-2" /> Trang chủ</span>
+                    </Link>
+                    <Link href="/about" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaInfoCircle className="mr-2" /> Giới thiệu</span>
+                    </Link>
+                    <Link href="/products" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaShoppingCart className="mr-2" /> Sản phẩm</span>
+                    </Link>
+                    <Link href="/contact" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaPhone className="mr-2" /> Liên hệ</span>
+                    </Link>
+                    {isAdmin && (
+                        <Link href="/admin" className="block py-2 text-text-primary hover:text-primary">
+                            <span className="inline-flex items-center"><FaUser className="mr-2" /> Quản trị</span>
+                        </Link>
+                    )}
+                    {user ? (
+                        <>
+                            <Link href="/account" className="block py-2 text-text-primary hover:text-primary">
+                                <span className="inline-flex items-center"><FaUser className="mr-2" /> Tài khoản</span>
+                            </Link>
                             <button 
-                                type="submit" 
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-primary"
+                                onClick={handleLogout}
+                                className="block w-full text-left py-2 text-text-primary hover:text-primary"
                             >
-                                <FaSearch />
+                                <span className="inline-flex items-center"><FaSignOutAlt className="mr-2" /> Đăng xuất</span>
                             </button>
-                        </form>
-                    </div>
+                        </>
+                    ) : (
+                        <Link href="/login" className="block py-2 text-text-primary hover:text-primary">
+                            <span className="inline-flex items-center"><FaSignInAlt className="mr-2" /> Đăng nhập</span>
+                        </Link>
+                    )}
+                </div>
 
-                    {/* Nav Links for mobile */}
-                    <div className="flex-1 overflow-y-auto py-4 px-8 space-y-6">
-                        <MobileNavLink href="/" icon={<FaHome size={20} />} text="Trang chủ" onClick={toggleMenu} />
-                        <MobileNavLink href="/products" icon={<FaShoppingCart size={20} />} text="Sản phẩm" onClick={toggleMenu} />
-                        <MobileNavLink href="/about" icon={<FaInfoCircle size={20} />} text="Giới thiệu" onClick={toggleMenu} />
-                        <MobileNavLink href="/contact" icon={<FaPhone size={20} />} text="Liên hệ" onClick={toggleMenu} />
-                        <div className="border-t border-gray-200 my-6"></div>
-                        <MobileNavLink href="/favorites" icon={<FaHeart size={20} />} text="Yêu thích" onClick={toggleMenu} />
-                        <MobileNavLink href="/cart" icon={<FaShoppingCart size={20} />} text="Giỏ hàng" onClick={toggleMenu} />
-                        <MobileNavLink href="/account" icon={<FaUser size={20} />} text="Tài khoản" onClick={toggleMenu} />
-                    </div>
+                {/* Mobile search */}
+                <div className="px-4 py-3 border-t">
+                    <form onSubmit={handleSearch} className="flex">
+                        <input
+                            type="text"
+                            placeholder="Tìm kiếm sản phẩm..."
+                            className="flex-grow pl-4 pr-3 py-2 border rounded-l-full text-sm focus:outline-none focus:ring focus:border-blue-300"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        <button
+                            type="submit"
+                            className="bg-gray-100 rounded-r-full px-4 text-gray-600 hover:bg-gray-200"
+                        >
+                            <FaSearch />
+                        </button>
+                    </form>
                 </div>
             </div>
         </nav>
-    );
-}
-
-// Component cho desktop navigation link
-function NavLink({ href, icon, text }) {
-    return (
-        <Link 
-            href={href} 
-            className="flex items-center px-3 py-2 text-text-primary hover:text-primary relative group"
-        >
-            <span className="mr-1">{icon}</span> {text}
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-primary group-hover:w-full transition-all duration-300"></span>
-        </Link>
-    );
-}
-
-// Component cho mobile navigation link
-function MobileNavLink({ href, icon, text, onClick }) {
-    return (
-        <Link 
-            href={href} 
-            className="flex items-center py-2 text-lg text-text-primary hover:text-primary transition-colors"
-            onClick={onClick}
-        >
-            <span className="mr-3">{icon}</span> {text}
-        </Link>
-    );
-}
-
-// Component cho action buttons (giỏ hàng, yêu thích, tài khoản)
-function ActionButton({ href, icon, label, badge }) {
-    return (
-        <Link 
-            href={href} 
-            className="relative p-2 text-text-primary hover:text-primary transition-colors rounded-full hover:bg-secondary"
-            title={label}
-        >
-            {icon}
-            {badge > 0 && (
-                <span className="absolute -top-1 -right-1 bg-error text-white text-xs w-4 h-4 flex items-center justify-center rounded-full">
-                    {badge}
-                </span>
-            )}
-        </Link>
     );
 } 
