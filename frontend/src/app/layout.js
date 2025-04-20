@@ -2,6 +2,7 @@ import {Quicksand} from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { AuthProvider } from '@/lib/AuthContext';
 
 const quicksand = Quicksand({
     subsets: ["latin"],
@@ -20,11 +21,13 @@ export default function RootLayout({children}) {
     return (
         <html lang="vi" className={quicksand.variable}>
         <body className={`${quicksand.className} flex flex-col min-h-screen`}>
-            <Navbar/>
-            <main className="flex-grow pt-24">
-                {children}
-            </main>
-            <Footer/>
+            <AuthProvider>
+                <Navbar/>
+                <main className="flex-grow pt-24">
+                    {children}
+                </main>
+                <Footer/>
+            </AuthProvider>
         </body>
         </html>
     );
