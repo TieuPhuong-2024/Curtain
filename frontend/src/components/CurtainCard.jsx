@@ -6,6 +6,9 @@ import {FaEye, FaShoppingCart} from 'react-icons/fa';
 
 export default function CurtainCard({curtain}) {
     const {_id, name, price, image, category, color} = curtain;
+    
+    // Xử lý trường hợp category có thể là object hoặc string
+    const categoryName = typeof category === 'object' ? category?.name : category;
 
     return (
         <div className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
@@ -22,13 +25,13 @@ export default function CurtainCard({curtain}) {
             <div className="p-4">
                 <div className="flex justify-between items-start mb-2">
                     <h3 className="text-lg font-semibold text-gray-800 truncate">{name}</h3>
-                    <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">{category}</span>
+                    <span className="bg-indigo-100 text-indigo-800 text-xs px-2 py-1 rounded">{categoryName}</span>
                 </div>
 
                 <div className="flex items-center mb-3">
                     <div
                         className="w-4 h-4 rounded-full mr-2"
-                        style={{backgroundColor: color.toLowerCase()}}
+                        style={{backgroundColor: color?.toLowerCase()}}
                         title={color}
                     />
                     <span className="text-sm text-gray-600">{color}</span>
