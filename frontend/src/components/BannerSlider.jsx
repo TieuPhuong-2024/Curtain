@@ -1,39 +1,80 @@
 'use client';
 
-import {useEffect, useState} from 'react';
+import {useEffect, useState, useCallback, useRef} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {FaArrowLeft, FaArrowRight} from 'react-icons/fa';
 
 export default function BannerSlider({banners}) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [transitioning, setTransitioning] = useState(false);
+    const timerRef = useRef(null);
+    const slideDuration = 6000; // Duration in ms for each slide
+
+    // Callback for changing slides with animation
+    const changeSlide = useCallback((newIndex) => {
+        if (transitioning || newIndex === currentIndex) return;
+        
+        setTransitioning(true);
+        setCurrentIndex(newIndex);
+        
+        // Reset transition state after animation completes
+        setTimeout(() => {
+            setTransitioning(false);
+        }, 700); // Slightly longer than the CSS transition
+    }, [currentIndex, transitioning]);
 
     // Auto-slide functionality
     useEffect(() => {
-        if (!banners || banners.length === 0) return;
+        if (!banners || banners.length <= 1) return;
 
-        const interval = setInterval(() => {
-            setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
-        }, 5000); // Change slide every 5 seconds
+        const startTimer = () => {
+            timerRef.current = setTimeout(() => {
+                const nextIndex = (currentIndex + 1) % banners.length;
+                changeSlide(nextIndex);
+            }, slideDuration);
+        };
 
-        return () => clearInterval(interval);
-    }, [banners]);
+        startTimer();
+
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
+    }, [banners, currentIndex, changeSlide]);
 
     // Handle manual navigation
-    const goToPrevious = () => {
-        if (!banners || banners.length === 0) return;
-        setCurrentIndex((prevIndex) => (prevIndex === 0 ? banners.length - 1 : prevIndex - 1));
-    };
+    const goToPrevious = useCallback(() => {
+        if (!banners || banners.length <= 1) return;
+        const newIndex = currentIndex === 0 ? banners.length - 1 : currentIndex - 1;
+        changeSlide(newIndex);
+    }, [banners, currentIndex, changeSlide]);
 
-    const goToNext = () => {
-        if (!banners || banners.length === 0) return;
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
-    };
+    const goToNext = useCallback(() => {
+        if (!banners || banners.length <= 1) return;
+        const newIndex = (currentIndex + 1) % banners.length;
+        changeSlide(newIndex);
+    }, [banners, currentIndex, changeSlide]);
+
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (e.key === 'ArrowLeft') {
+                goToPrevious();
+            } else if (e.key === 'ArrowRight') {
+                goToNext();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [goToNext, goToPrevious]);
 
     // If no banners, show a fallback
     if (!banners || banners.length === 0) {
         return (
-            <div className="relative h-[70vh] flex items-center">
+            <div className="relative h-[80vh] flex items-center overflow-hidden">
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/images/hero-curtain.jpg"
@@ -41,18 +82,18 @@ export default function BannerSlider({banners}) {
                         fill
                         style={{objectFit: 'cover'}}
                         priority
-                        className="cozy-img w-full h-full"
+                        className="scale-105"
                     />
-                    <div className="absolute inset-0 bg-black opacity-40"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
                 </div>
 
-                <div className="container mx-auto px-4 z-10 text-white">
-                    <div className="max-w-2xl cozy-card bg-opacity-90">
-                        <h1 className="cozy-title mb-4 text-4xl md:text-5xl">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
-                        <p className="text-xl mb-8">
+                <div className="container-custom z-10 text-white">
+                    <div className="max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/10 slide-up">
+                        <h1 className="text-gradient text-4xl md:text-5xl font-bold mb-6">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
+                        <p className="text-xl mb-8 opacity-90">
                             Khám phá bộ sưu tập rèm cửa đa dạng với chất lượng tốt nhất và giá cả hợp lý
                         </p>
-                        <Link href="/products" className="cozy-btn font-semibold inline-flex items-center">
+                        <Link href="/products" className="btn-primary inline-flex items-center">
                             Xem sản phẩm <FaArrowRight className="ml-2"/>
                         </Link>
                     </div>
@@ -64,27 +105,41 @@ export default function BannerSlider({banners}) {
     const currentBanner = banners[currentIndex];
 
     return (
-        <div className="relative h-[70vh] flex items-center">
-            <div className="absolute inset-0 z-0">
-                <Image
-                    src={currentBanner.image || "/images/hero-curtain.jpg"}
-                    alt={currentBanner.title || "Banner"}
-                    fill
-                    style={{objectFit: 'cover'}}
-                    priority
-                    className="cozy-img w-full h-full transition-opacity duration-500"
-                />
-                <div className="absolute inset-0 bg-black opacity-40"></div>
-            </div>
+        <div className="relative h-[80vh] flex items-center overflow-hidden">
+            {/* Banner images with transition effect */}
+            {banners.map((banner, index) => (
+                <div 
+                    key={banner._id || index}
+                    className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                        index === currentIndex ? 'opacity-100 z-0' : 'opacity-0 -z-10'
+                    }`}
+                >
+                    <Image
+                        src={banner.image || "/images/hero-curtain.jpg"}
+                        alt={banner.title || "Banner"}
+                        fill
+                        style={{
+                            objectFit: 'cover', 
+                            transform: index === currentIndex ? 'scale(1.05)' : 'scale(1)',
+                            transition: 'transform 10s ease'
+                        }}
+                        priority={index === currentIndex}
+                        className="w-full h-full"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
+                </div>
+            ))}
 
-            <div className="container mx-auto px-4 z-10 text-white">
-                <div className="max-w-2xl cozy-card bg-opacity-90">
-                    <h1 className="cozy-title mb-4 text-4xl md:text-5xl">{currentBanner.title}</h1>
+            <div className="container-custom z-10 text-white">
+                <div className={`max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/10 transition-all duration-700 ${
+                    transitioning ? 'opacity-0 transform translate-y-10' : 'opacity-100 transform translate-y-0'
+                }`}>
+                    <h1 className="text-gradient text-4xl md:text-5xl font-bold mb-6">{currentBanner.title}</h1>
                     {currentBanner.description && (
-                        <p className="text-xl mb-8">{currentBanner.description}</p>
+                        <p className="text-xl mb-8 opacity-90">{currentBanner.description}</p>
                     )}
                     {currentBanner.link && (
-                        <Link href={currentBanner.link} className="cozy-btn font-semibold inline-flex items-center">
+                        <Link href={currentBanner.link} className="btn-primary inline-flex items-center">
                             Xem thêm <FaArrowRight className="ml-2"/>
                         </Link>
                     )}
@@ -96,34 +151,46 @@ export default function BannerSlider({banners}) {
                 <>
                     <button
                         onClick={goToPrevious}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full z-20 transition-all"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
                         aria-label="Previous banner"
+                        disabled={transitioning}
                     >
-                        <FaArrowLeft/>
+                        <FaArrowLeft size={18} />
                     </button>
                     <button
                         onClick={goToNext}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black bg-opacity-50 hover:bg-opacity-70 text-white p-3 rounded-full z-20 transition-all"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
                         aria-label="Next banner"
+                        disabled={transitioning}
                     >
-                        <FaArrowRight/>
+                        <FaArrowRight size={18} />
                     </button>
                 </>
             )}
 
-            {/* Indicator dots */}
+            {/* Progress bar */}
             {banners.length > 1 && (
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
-                    {banners.map((_, index) => (
-                        <button
-                            key={index}
-                            onClick={() => setCurrentIndex(index)}
-                            className={`w-3 h-3 rounded-full transition-all ${
-                                index === currentIndex ? 'bg-white scale-110' : 'bg-white bg-opacity-50'
-                            }`}
-                            aria-label={`Go to banner ${index + 1}`}
-                        />
-                    ))}
+                <div className="absolute bottom-12 left-0 right-0 z-20 container-custom">
+                    <div className="flex space-x-3">
+                        {banners.map((_, index) => (
+                            <div 
+                                key={index} 
+                                className="flex-1 h-1.5 bg-white/30 overflow-hidden rounded-full"
+                            >
+                                <div 
+                                    className={`h-full rounded-full bg-white ${
+                                        index === currentIndex 
+                                            ? 'animate-progress w-full origin-left' 
+                                            : 'w-0'
+                                    }`}
+                                    style={{
+                                        animationDuration: `${slideDuration}ms`,
+                                        animationPlayState: transitioning ? 'paused' : 'running'
+                                    }}
+                                ></div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
