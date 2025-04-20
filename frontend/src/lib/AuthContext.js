@@ -18,6 +18,11 @@ import { useRouter } from 'next/navigation';
 // Create context
 const AuthContext = createContext();
 
+// Export the useAuth hook
+export const useAuth = () => {
+  return useContext(AuthContext);
+};
+
 // Auth provider component
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -36,13 +41,22 @@ export function AuthProvider({ children }) {
         return userDoc.data().role || 'user';
       } else {
         // If user document doesn't exist, create one with default role 'user'
-        await setDoc(userDocRef, { role: 'user' });
-        setUserRole('user');
-        return 'user';
+        try {
+          await setDoc(userDocRef, { role: 'user' });
+          setUserRole('user');
+          return 'user';
+        } catch (error) {
+          console.error("Error creating user document:", error);
+          // If we can't write to Firestore, still set the role locally
+          setUserRole('user');
+          return 'user';
+        }
       }
     } catch (error) {
       console.error("Error fetching user role:", error);
-      return 'user'; // Default to 'user' on error
+      // Default to 'user' on error and don't fail
+      setUserRole('user');
+      return 'user'; 
     }
   };
 
@@ -51,11 +65,17 @@ export function AuthProvider({ children }) {
     const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
         setUser(authUser);
-        const role = await fetchUserRole(authUser.uid);
-        
-        // Redirect based on role
-        if (window.location.pathname.startsWith('/admin') && role !== 'admin') {
-          router.push('/'); // Redirect to home if trying to access admin without permission
+        try {
+          const role = await fetchUserRole(authUser.uid);
+          
+          // Redirect based on role
+          if (window.location.pathname.startsWith('/admin') && role !== 'admin') {
+            router.push('/'); // Redirect to home if trying to access admin without permission
+          }
+        } catch (error) {
+          console.error("Error in auth state change:", error);
+          // Set default role even on error
+          setUserRole('user');
         }
       } else {
         setUser(null);
@@ -76,12 +96,18 @@ export function AuthProvider({ children }) {
   const login = async (email, password) => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const role = await fetchUserRole(userCredential.user.uid);
-      
-      // Redirect based on role
-      if (role === 'admin') {
-        router.push('/admin');
-      } else {
+      try {
+        const role = await fetchUserRole(userCredential.user.uid);
+        
+        // Redirect based on role
+        if (role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/');
+        }
+      } catch (roleError) {
+        console.error("Error fetching role:", roleError);
+        // Continue with login even if role fetch fails
         router.push('/');
       }
       
@@ -97,14 +123,21 @@ export function AuthProvider({ children }) {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       
       // Save user info in Firestore with default role
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email,
-        displayName,
-        role: 'user',
-        createdAt: new Date().toISOString()
-      });
+      try {
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          email,
+          displayName,
+          role: 'user',
+          createdAt: new Date().toISOString()
+        });
+        
+        setUserRole('user');
+      } catch (docError) {
+        console.error("Error creating user document:", docError);
+        // Continue even if document creation fails
+        setUserRole('user');
+      }
       
-      setUserRole('user');
       router.push('/');
       return { success: true };
     } catch (error) {
@@ -119,29 +152,42 @@ export function AuthProvider({ children }) {
       const uid = result.user.uid;
       
       // Check if user exists in Firestore
-      const userDocRef = doc(db, 'users', uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        // First time login, create a user document
-        await setDoc(userDocRef, {
-          email: result.user.email,
-          displayName: result.user.displayName,
-          role: 'user',
-          createdAt: new Date().toISOString()
-        });
+      try {
+        const userDocRef = doc(db, 'users', uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+          // First time login, create a user document
+          try {
+            await setDoc(userDocRef, {
+              email: result.user.email,
+              displayName: result.user.displayName,
+              role: 'user',
+              createdAt: new Date().toISOString()
+            });
+            setUserRole('user');
+          } catch (writeError) {
+            console.error("Error creating user document:", writeError);
+            // Continue even if document creation fails
+            setUserRole('user');
+          }
+          router.push('/');
+        } else {
+          // Existing user
+          const role = userDoc.data().role;
+          setUserRole(role);
+          
+          if (role === 'admin') {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
+        }
+      } catch (firestoreError) {
+        console.error("Error accessing Firestore:", firestoreError);
+        // Set default role and redirect even if Firestore access fails
         setUserRole('user');
         router.push('/');
-      } else {
-        // Existing user
-        const role = userDoc.data().role;
-        setUserRole(role);
-        
-        if (role === 'admin') {
-          router.push('/admin');
-        } else {
-          router.push('/');
-        }
       }
       
       return { success: true };
@@ -157,29 +203,42 @@ export function AuthProvider({ children }) {
       const uid = result.user.uid;
       
       // Check if user exists in Firestore
-      const userDocRef = doc(db, 'users', uid);
-      const userDoc = await getDoc(userDocRef);
-      
-      if (!userDoc.exists()) {
-        // First time login, create a user document
-        await setDoc(userDocRef, {
-          email: result.user.email,
-          displayName: result.user.displayName,
-          role: 'user',
-          createdAt: new Date().toISOString()
-        });
+      try {
+        const userDocRef = doc(db, 'users', uid);
+        const userDoc = await getDoc(userDocRef);
+        
+        if (!userDoc.exists()) {
+          // First time login, create a user document
+          try {
+            await setDoc(userDocRef, {
+              email: result.user.email,
+              displayName: result.user.displayName,
+              role: 'user',
+              createdAt: new Date().toISOString()
+            });
+            setUserRole('user');
+          } catch (writeError) {
+            console.error("Error creating user document:", writeError);
+            // Continue even if document creation fails
+            setUserRole('user');
+          }
+          router.push('/');
+        } else {
+          // Existing user
+          const role = userDoc.data().role;
+          setUserRole(role);
+          
+          if (role === 'admin') {
+            router.push('/admin');
+          } else {
+            router.push('/');
+          }
+        }
+      } catch (firestoreError) {
+        console.error("Error accessing Firestore:", firestoreError);
+        // Set default role and redirect even if Firestore access fails
         setUserRole('user');
         router.push('/');
-      } else {
-        // Existing user
-        const role = userDoc.data().role;
-        setUserRole(role);
-        
-        if (role === 'admin') {
-          router.push('/admin');
-        } else {
-          router.push('/');
-        }
       }
       
       return { success: true };
@@ -216,13 +275,4 @@ export function AuthProvider({ children }) {
       {!loading && children}
     </AuthContext.Provider>
   );
-}
-
-// Custom hook to use the auth context
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-}; 
+} 
