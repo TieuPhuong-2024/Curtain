@@ -4,7 +4,7 @@ import {use, useEffect, useState, useRef} from 'react';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
 import {FaArrowLeft, FaUpload} from 'react-icons/fa';
-import {getCurtainById, updateCurtain, uploadImage} from '@/lib/api';
+import {getCurtainById, updateCurtain, uploadImage, getCategories} from '@/lib/api';
 
 export default function EditCurtain({params}) {
     const router = useRouter();
@@ -33,10 +33,10 @@ export default function EditCurtain({params}) {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch('/api/categories');
-                const data = await res.json();
+                const data = await getCategories();
                 setCategories(data);
             } catch (error) {
+                console.error('Error fetching categories:', error);
                 setCategories([]);
             }
         };
@@ -251,8 +251,8 @@ export default function EditCurtain({params}) {
                             >
                                 <option value="">Chọn danh mục</option>
                                 {categories.map(category => (
-                                    <option key={category} value={category}>
-                                        {category}
+                                    <option key={category._id} value={category._id}>
+                                        {category.name}
                                     </option>
                                 ))}
                             </select>

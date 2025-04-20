@@ -120,77 +120,22 @@ export default function Home() {
                         <div className="text-center py-12">Chưa có danh mục nào.</div>
                     ) : (
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {categories.map((cat) => {
-                                // Mapping tên hiển thị và ảnh minh họa cho từng category
-                                let displayName = cat;
-                                let image = "/images/curtain-placeholder.jpg";
-                                let description = "";
-                                switch (cat) {
-                                    case "Blackout":
-                                        displayName = "Rèm Chống Nắng";
-                                        image = "/images/blackout-curtains.jpg";
-                                        description = "Bảo vệ không gian của bạn khỏi ánh nắng gay gắt và tia UV có hại";
-                                        break;
-                                    case "Sheer":
-                                        displayName = "Rèm Voan";
-                                        image = "/images/sheer-curtains.jpg";
-                                        description = "Tạo không gian nhẹ nhàng, thoáng đãng và đầy ánh sáng tự nhiên";
-                                        break;
-                                    case "Roller":
-                                        displayName = "Rèm Cuốn";
-                                        image = "/images/roller-curtains.jpg";
-                                        description = "Giải pháp hiện đại, tiết kiệm không gian cho mọi căn phòng";
-                                        break;
-                                    case "Vertical":
-                                        displayName = "Rèm Lá Dọc";
-                                        image = "/images/vertical-curtains.jpg";
-                                        description = "Phù hợp cho văn phòng và không gian hiện đại";
-                                        break;
-                                    case "Roman":
-                                        displayName = "Rèm Roman";
-                                        image = "/images/roman-curtains.jpg";
-                                        description = "Phong cách sang trọng, gọn gàng";
-                                        break;
-                                    case "Bamboo":
-                                        displayName = "Rèm Tre";
-                                        image = "/images/bamboo-curtains.jpg";
-                                        description = "Mang thiên nhiên vào không gian sống";
-                                        break;
-                                    case "Venetian":
-                                        displayName = "Rèm Sáo Nhôm";
-                                        image = "/images/venetian-curtains.jpg";
-                                        description = "Điều chỉnh ánh sáng linh hoạt, bền bỉ";
-                                        break;
-                                    case "Honeycomb":
-                                        displayName = "Rèm Tổ Ong";
-                                        image = "/images/honeycomb-curtains.jpg";
-                                        description = "Cách nhiệt, tiết kiệm năng lượng";
-                                        break;
-                                    default:
-                                        break;
-                                }
-                                return (
-                                    <div key={cat}
-                                         className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow">
-                                        <div className="relative h-64">
-                                            <Image
-                                                src={image}
-                                                alt={displayName}
-                                                fill
-                                                style={{objectFit: 'cover'}}
-                                            />
-                                        </div>
-                                        <div className="p-6">
-                                            <h3 className="text-xl font-semibold mb-2">{displayName}</h3>
-                                            {description && <p className="text-gray-600 mb-4">{description}</p>}
-                                            <Link href={`/products?category=${cat}`}
-                                                  className="text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center">
-                                                Xem thêm <FaArrowRight className="ml-1"/>
-                                            </Link>
-                                        </div>
+                            {categories.map(category => (
+                                <div key={category._id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+                                    <div className="p-6">
+                                        <h3 className="text-xl font-semibold text-gray-800 mb-3">{category.name}</h3>
+                                        {category.description && (
+                                            <p className="text-gray-600 mb-4">{category.description}</p>
+                                        )}
+                                        <Link
+                                            href={`/products?category=${category.name}`}
+                                            className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition-colors"
+                                        >
+                                            Xem sản phẩm
+                                        </Link>
                                     </div>
-                                );
-                            })}
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
