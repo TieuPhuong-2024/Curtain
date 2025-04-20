@@ -59,7 +59,7 @@ export default function EditCurtain({params}) {
                 name: curtainData.name,
                 description: curtainData.description,
                 price: curtainData.price,
-                category: curtainData.category,
+                category: typeof curtainData.category === 'object' ? curtainData.category._id : curtainData.category,
                 material: curtainData.material,
                 color: curtainData.color,
                 width: curtainData.size?.width || '',

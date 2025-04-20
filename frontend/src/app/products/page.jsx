@@ -3,7 +3,7 @@
 import '../styles/cozy-theme.css';
 import {useEffect, useState} from 'react';
 import {useSearchParams} from 'next/navigation';
-import {getCurtains} from '@/lib/api';
+import {getCurtains, getCategories} from '@/lib/api';
 import CurtainCard from '@/components/CurtainCard';
 import {FaFilter, FaTimes} from 'react-icons/fa';
 
@@ -20,10 +20,7 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState(categoryParam || '');
     const [selectedColors, setSelectedColors] = useState([]);
     const [priceRange, setPriceRange] = useState({min: 0, max: 10000000});
-
-    const categories = [
-        'Blackout', 'Sheer', 'Roller', 'Vertical', 'Roman', 'Bamboo', 'Venetian', 'Honeycomb'
-    ];
+    const [categories, setCategories] = useState([]);
 
     const colors = [
         'Trắng', 'Đen', 'Xám', 'Be', 'Nâu', 'Xanh dương', 'Xanh lá', 'Đỏ', 'Vàng', 'Hồng'
@@ -33,8 +30,12 @@ export default function ProductsPage() {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const data = await getCurtains();
-                setCurtains(data);
+                const [curtainsData, categoriesData] = await Promise.all([
+                    getCurtains(),
+                    getCategories()
+                ]);
+                setCurtains(curtainsData);
+                setCategories(categoriesData);
             } catch (err) {
                 setError('Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau.');
                 console.error(err);
@@ -48,9 +49,19 @@ export default function ProductsPage() {
 
     useEffect(() => {
         if (categoryParam) {
-            setSelectedCategory(categoryParam);
+            // Find if categoryParam matches a category ID
+            const categoryExists = categories.some(cat => cat._id === categoryParam);
+            if (categoryExists) {
+                setSelectedCategory(categoryParam);
+            } else {
+                // Find if categoryParam matches a category name
+                const category = categories.find(cat => cat.name === categoryParam);
+                if (category) {
+                    setSelectedCategory(category._id);
+                }
+            }
         }
-    }, [categoryParam]);
+    }, [categoryParam, categories]);
 
     const toggleColorFilter = (color) => {
         if (selectedColors.includes(color)) {
@@ -107,16 +118,16 @@ export default function ProductsPage() {
                         <h3 className="font-medium mb-2">Loại rèm</h3>
                         <div className="space-y-1">
                             {categories.map(category => (
-                                <div key={category} className="flex items-center">
+                                <div key={category._id} className="flex items-center">
                                     <input
                                         type="radio"
-                                        id={`category-${category}`}
+                                        id={`category-${category._id}`}
                                         name="category"
-                                        checked={selectedCategory === category}
-                                        onChange={() => setSelectedCategory(category)}
+                                        checked={selectedCategory === category._id}
+                                        onChange={() => setSelectedCategory(category._id)}
                                         className="mr-2"
                                     />
-                                    <label htmlFor={`category-${category}`}>{category}</label>
+                                    <label htmlFor={`category-${category._id}`}>{category.name}</label>
                                 </div>
                             ))}
                             <div className="flex items-center">
