@@ -7,11 +7,10 @@ export function middleware(request) {
   // Check if this is an admin route
   if (path.startsWith('/admin')) {
     // Get the auth session from cookies
-    const authCookie = request.cookies.get('firebase-auth');
     const userRoleCookie = request.cookies.get('user-role');
-    
+
     // If no auth cookie or role isn't admin, redirect to login
-    if (!authCookie || !userRoleCookie || userRoleCookie.value !== 'admin') {
+    if (!userRoleCookie || userRoleCookie.value !== 'admin') {
       return NextResponse.redirect(new URL('/login', request.url));
     }
   }
