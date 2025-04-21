@@ -4,7 +4,7 @@ import {useEffect, useState, useRef} from 'react';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
 import {FaArrowLeft, FaUpload, FaPlus, FaTimes} from 'react-icons/fa';
-import {createCurtain, uploadImage} from '@/lib/api';
+import {createCurtain, getCategories, uploadImage} from '@/lib/api';
 
 export default function AddCurtain() {
     const router = useRouter();
@@ -36,9 +36,8 @@ export default function AddCurtain() {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await fetch('/api/categories');
-                const data = await res.json();
-                setCategories(data);
+                const res = await getCategories();
+                setCategories(res);
             } catch (error) {
                 setCategories([]);
             }
