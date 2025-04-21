@@ -21,7 +21,7 @@ export default function AdminProjects() {
     const fetchProjects = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`);
+            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/projects`);
             setProjects(response.data);
             setLoading(false);
         } catch (error) {
@@ -33,7 +33,7 @@ export default function AdminProjects() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${id}`);
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`);
             toast.success('Xóa công trình thành công!');
             setConfirmDelete(null);
             fetchProjects();
