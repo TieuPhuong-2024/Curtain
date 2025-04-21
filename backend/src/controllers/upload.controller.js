@@ -1,24 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const fileController = require('./file.controller');
 
-// Configure storage for uploaded files
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const uploadDir = path.join(__dirname, '../../uploads');
-    // Create the directory if it doesn't exist
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    // Create a unique filename with the original extension
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, 'image-' + uniqueSuffix + ext);
-  }
-});
+// Configure in-memory storage for uploaded files
+const storage = multer.memoryStorage();
 
 // File filter to only allow image files
 const fileFilter = (req, file, cb) => {
@@ -30,7 +16,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 // Configure multer
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   fileFilter: fileFilter,
   limits: {
@@ -38,12 +24,12 @@ const upload = multer({
   }
 });
 
-// Upload image from device
+// Upload image from device and save to database
 exports.uploadImage = (req, res) => {
   // The upload middleware will handle the file
   const uploadSingle = upload.single('image');
-  
-  uploadSingle(req, res, function (err) {
+
+  uploadSingle(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       // A Multer error occurred when uploading
       return res.status(400).json({ message: 'File upload error', error: err.message });
@@ -51,23 +37,38 @@ exports.uploadImage = (req, res) => {
       // An unknown error occurred
       return res.status(500).json({ message: 'Unknown error', error: err.message });
     }
-    
+
     // Everything went fine, a file is uploaded
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
-    
-    // Create the URL for the uploaded file
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
-    const relativePath = `/uploads/${req.file.filename}`;
-    const fileUrl = `${baseUrl}${relativePath}`;
-    
-    // Return the URL of the uploaded file
-    res.status(200).json({ 
-      message: 'File uploaded successfully',
-      url: fileUrl,
-      filename: req.file.filename
-    });
+
+    try {
+      // Prepare file data for database
+      const fileData = {
+        filename: Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(req.file.originalname),
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        data: req.file.buffer,
+        size: req.file.size
+      };
+
+      // Save file to database
+      const savedFile = await fileController.saveFile(fileData);
+
+      // Return the URL for accessing the file
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const fileUrl = `${baseUrl}${savedFile.fileUrl}`;
+
+      res.status(200).json({
+        message: 'File uploaded successfully',
+        url: fileUrl,
+        fileId: savedFile._id
+      });
+    } catch (error) {
+      console.error('Error saving file to database:', error);
+      res.status(500).json({ message: 'Error saving file', error: error.message });
+    }
   });
 };
 
@@ -75,20 +76,20 @@ exports.uploadImage = (req, res) => {
 exports.saveImageFromUrl = async (req, res) => {
   try {
     const { imageUrl } = req.body;
-    
+
     if (!imageUrl) {
       return res.status(400).json({ message: 'Image URL is required' });
     }
-    
+
     // Validate URL format
     try {
       new URL(imageUrl);
     } catch (err) {
       return res.status(400).json({ message: 'Invalid URL format' });
     }
-    
-    // Return the provided URL
-    res.status(200).json({ 
+
+    // Return the provided URL (external URL)
+    res.status(200).json({
       message: 'URL saved successfully',
       url: imageUrl
     });
