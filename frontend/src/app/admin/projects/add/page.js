@@ -67,7 +67,7 @@ export default function AddProject() {
         
         try {
             setLoading(true);
-            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/projects`, formData);
+            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/projects`, formData);
             toast.success('Thêm công trình thành công!');
             router.push('/admin/projects');
         } catch (error) {

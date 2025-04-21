@@ -15,7 +15,7 @@ export default function ThiCongLapRemPage() {
         const fetchProjects = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/api/projects');
+                const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
                 setProjects(response.data);
                 
                 // Extract unique project types for filters
@@ -41,9 +41,9 @@ export default function ThiCongLapRemPage() {
             let response;
             
             if (filter === "all") {
-                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/api/projects');
+                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
             } else {
-                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + `/api/projects/type/${filter}`);
+                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + `/projects/type/${filter}`);
             }
             
             setProjects(response.data);

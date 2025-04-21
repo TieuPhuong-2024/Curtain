@@ -30,7 +30,7 @@ export default function EditProject({ params }) {
         const fetchProject = async () => {
             try {
                 setLoadingData(true);
-                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${id}`);
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`);
                 setFormData(response.data);
                 setLoadingData(false);
             } catch (error) {
@@ -87,7 +87,7 @@ export default function EditProject({ params }) {
         
         try {
             setLoading(true);
-            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${id}`, formData);
+            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, formData);
             toast.success('Cập nhật công trình thành công!');
             router.push('/admin/projects');
         } catch (error) {

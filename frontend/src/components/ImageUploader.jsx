@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 
-const ImageUploader = ({ onImageSelected, currentImage }) => {
+const ImageUploader = ({ onUpload, initialImages = [] }) => {
   const [uploadType, setUploadType] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState('');
-  const [preview, setPreview] = useState(currentImage || '');
+  const [previews, setPreviews] = useState([]);
 
   // Handle upload type selection
   const handleSelectUploadType = (type) => {
@@ -24,36 +24,48 @@ const ImageUploader = ({ onImageSelected, currentImage }) => {
 
   // Handle file selection
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setSelectedFile(file);
+    const files = Array.from(e.target.files);
+    if (files.length > 0) {
+      setSelectedFiles(files);
       setError('');
 
-      // Create a preview
-      const reader = new FileReader();
-      reader.onload = () => {
-        setPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      // Create previews for each file
+      const newPreviews = files.map(file => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = () => {
+            resolve(reader.result);
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      Promise.all(newPreviews).then(previewUrls => {
+        setPreviews(previewUrls);
+      });
     }
   };
 
-  // Upload image from device
+  // Upload images from device
   const uploadFromDevice = async () => {
-    if (!selectedFile) {
-      setError('Vui lòng chọn một tệp ảnh');
+    if (selectedFiles.length === 0) {
+      setError('Vui lòng chọn ít nhất một tệp ảnh');
       return;
     }
 
     setIsUploading(true);
     setError('');
 
-    const formData = new FormData();
-    formData.append('image', selectedFile);
-
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-      const response = await fetch(`${API_URL}/upload/from-device`, {
+      const formData = new FormData();
+      
+      // Append all files to formData with the name 'images'
+      selectedFiles.forEach(file => {
+        formData.append('images', file);
+      });
+      
+      const response = await fetch(`${API_URL}/upload/multiple-from-device`, {
         method: 'POST',
         body: formData,
       });
@@ -63,8 +75,10 @@ const ImageUploader = ({ onImageSelected, currentImage }) => {
       }
 
       const data = await response.json();
-      onImageSelected(data.url);
+      onUpload(data.urls);
       setUploadType(null);
+      setSelectedFiles([]);
+      setPreviews([]);
     } catch (err) {
       setError('Lỗi khi tải lên ảnh: ' + err.message);
     } finally {
@@ -97,8 +111,9 @@ const ImageUploader = ({ onImageSelected, currentImage }) => {
       }
 
       const data = await response.json();
-      onImageSelected(data.url);
+      onUpload([data.url]);
       setUploadType(null);
+      setImageUrl('');
     } catch (err) {
       setError('Lỗi khi lưu URL ảnh: ' + err.message);
     } finally {
@@ -109,42 +124,28 @@ const ImageUploader = ({ onImageSelected, currentImage }) => {
   // Cancel upload
   const handleCancel = () => {
     setUploadType(null);
-    setSelectedFile(null);
+    setSelectedFiles([]);
     setImageUrl('');
     setError('');
-  };
-
-  // Remove selected image
-  const handleRemoveImage = () => {
-    setPreview('');
-    setSelectedFile(null);
-    setError('');
-    // Notify parent component that image has been removed
-    onImageSelected('');
+    setPreviews([]);
   };
 
   return (
     <div className="mb-4">
       <label className="block font-medium mb-1">Ảnh</label>
 
-      {/* Preview image with remove button */}
-      {preview && (
-        <div className="mb-2 relative">
-          <div className="relative inline-block">
-            <img 
-              src={preview} 
-              alt="Preview" 
-              className="w-40 h-24 object-cover rounded border"
-            />
-            <button
-              type="button"
-              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-              onClick={handleRemoveImage}
-              title="Xóa ảnh"
-            >
-              ×
-            </button>
-          </div>
+      {/* Preview images */}
+      {previews.length > 0 && (
+        <div className="mb-2 flex flex-wrap gap-2">
+          {previews.map((preview, index) => (
+            <div key={index} className="relative inline-block">
+              <img 
+                src={preview} 
+                alt={`Preview ${index + 1}`} 
+                className="w-40 h-24 object-cover rounded border"
+              />
+            </div>
+          ))}
         </div>
       )}
 
@@ -176,13 +177,14 @@ const ImageUploader = ({ onImageSelected, currentImage }) => {
             accept="image/*"
             onChange={handleFileChange}
             className="mb-2"
+            multiple
           />
           <div className="flex space-x-2">
             <button
               type="button"
               className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
               onClick={uploadFromDevice}
-              disabled={isUploading || !selectedFile}
+              disabled={isUploading || selectedFiles.length === 0}
             >
               {isUploading ? 'Đang tải...' : 'Tải lên'}
             </button>
