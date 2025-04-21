@@ -6,9 +6,12 @@ import {FaEye, FaShoppingCart, FaHeart} from 'react-icons/fa';
 import { useState } from 'react';
 
 export default function CurtainCard({curtain}) {
-    const {_id, name, price, image, category, color} = curtain;
+    const {_id, name, price, mainImage, image, category, color} = curtain;
     const [isHovered, setIsHovered] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
+    
+    // Sử dụng mainImage hoặc fallback vào image cho tương thích ngược
+    const displayImage = mainImage || image || '/images/curtain-placeholder.jpg';
     
     // Xử lý trường hợp category có thể là object hoặc string
     const categoryName = typeof category === 'object' ? category?.name : category;
@@ -27,7 +30,7 @@ export default function CurtainCard({curtain}) {
         >
             <div className="relative h-64 w-full group">
                 <Image
-                    src={image || '/images/curtain-placeholder.jpg'}
+                    src={displayImage}
                     alt={name}
                     fill
                     style={{
@@ -63,49 +66,36 @@ export default function CurtainCard({curtain}) {
                 </div>
                 
                 {/* Category badge */}
-                <div className="absolute top-2 left-2 z-10">
-                    <span className="bg-primary-light text-primary px-3 py-1 rounded-full text-xs font-medium">
+                <div className="absolute top-2 left-2">
+                    <span className="bg-white bg-opacity-90 text-primary text-xs px-2 py-1 rounded-md">
                         {categoryName}
                     </span>
                 </div>
                 
                 {/* Favorite button */}
                 <button 
-                    className="absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow-md transition-transform duration-300 hover:scale-110"
+                    className="absolute top-2 right-2 z-10 bg-white bg-opacity-90 p-1.5 rounded-full text-gray-700 hover:text-red-500"
                     onClick={toggleFavorite}
                     title={isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
                 >
-                    <FaHeart 
-                        size={16} 
-                        className={isFavorite ? "text-error" : "text-gray-400"} 
-                    />
+                    <FaHeart size={16} className={isFavorite ? "text-red-500" : ""} />
                 </button>
             </div>
-
-            <div className="p-5">
-                <h3 className="text-lg font-semibold mb-2 text-text-primary hover:text-primary transition-colors duration-300 truncate">
-                    <Link href={`/products/${_id}`}>{name}</Link>
-                </h3>
-
-                <div className="flex items-center mb-3 opacity-80">
-                    <div
-                        className="w-4 h-4 rounded-full mr-2 border border-gray-200"
-                        style={{backgroundColor: color?.toLowerCase() || '#FFF'}}
+            
+            <div className="p-4">
+                <h3 className="font-medium text-gray-900 mb-1 truncate">{name}</h3>
+                <div className="flex justify-between items-center">
+                    <p className="font-bold text-primary">
+                        {new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                            currency: 'VND'
+                        }).format(price)}
+                    </p>
+                    <div 
+                        className="w-4 h-4 rounded-full border border-gray-300"
+                        style={{ backgroundColor: color?.toLowerCase() }}
                         title={color}
                     />
-                    <span className="text-sm text-text-secondary">{color || 'Không màu'}</span>
-                </div>
-
-                <div className="flex justify-between items-center mt-4">
-                    <span className="text-xl font-bold text-gradient">
-                        {new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(price)}
-                    </span>
-
-                    <button
-                        className="btn-primary text-sm py-2 px-4 inline-flex items-center"
-                    >
-                        <FaShoppingCart className="mr-2" /> Mua ngay
-                    </button>
                 </div>
             </div>
         </div>

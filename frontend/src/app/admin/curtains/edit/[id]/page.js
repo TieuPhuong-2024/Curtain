@@ -3,8 +3,8 @@
 import {use, useEffect, useState, useRef} from 'react';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
-import {FaArrowLeft, FaUpload} from 'react-icons/fa';
-import {getCurtainById, updateCurtain, uploadImage, getCategories} from '@/lib/api';
+import {FaArrowLeft, FaUpload, FaPlus, FaTimes} from 'react-icons/fa';
+import {getCurtainById, updateCurtain, uploadImage, getCategories, getImagesByCurtainId, addImageToCurtain, deleteImage} from '@/lib/api';
 
 export default function EditCurtain({params}) {
     const router = useRouter();
@@ -15,6 +15,11 @@ export default function EditCurtain({params}) {
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
+    
+    // Thêm state cho nhiều hình ảnh
+    const [imageList, setImageList] = useState([]);
+    const additionalFileInputRef = useRef(null);
+    
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -24,7 +29,7 @@ export default function EditCurtain({params}) {
         color: '',
         width: '',
         height: '',
-        image: '',
+        mainImage: '',
         inStock: true
     });
 
@@ -52,31 +57,40 @@ export default function EditCurtain({params}) {
             setIsLoading(true);
             setError(null);
 
+            // Fetch curtain data
             const curtainData = await getCurtainById(id);
-
-            // Cập nhật state với dữ liệu lấy được
+            
+            // Fetch images separately if not included in response
+            let images = curtainData.images || [];
+            if (!curtainData.images || !Array.isArray(curtainData.images) || curtainData.images.length === 0) {
+                try {
+                    images = await getImagesByCurtainId(id);
+                } catch (imgErr) {
+                    console.error('Error fetching images:', imgErr);
+                }
+            }
+            
+            setImageList(images);
+            
+            // Map the curtain data to the form
             setFormData({
-                name: curtainData.name,
-                description: curtainData.description,
-                price: curtainData.price,
-                category: typeof curtainData.category === 'object' ? curtainData.category._id : curtainData.category,
-                material: curtainData.material,
-                color: curtainData.color,
+                name: curtainData.name || '',
+                description: curtainData.description || '',
+                price: curtainData.price || '',
+                category: curtainData.category?._id || curtainData.category || '',
+                material: curtainData.material || '',
+                color: curtainData.color || '',
                 width: curtainData.size?.width || '',
                 height: curtainData.size?.height || '',
-                image: curtainData.image || '',
-                inStock: curtainData.inStock
+                mainImage: curtainData.mainImage || curtainData.image || '',
+                inStock: curtainData.inStock !== undefined ? curtainData.inStock : true
             });
-
-            // Reset file selection state
-            setSelectedFile(null);
-            setImagePreview(null);
 
             setIsLoading(false);
         } catch (error) {
-            console.error('Error fetching curtain data:', error);
+            console.error('Error fetching curtain:', error);
+            setError('Có lỗi xảy ra khi tải thông tin sản phẩm. Vui lòng thử lại sau.');
             setIsLoading(false);
-            setError('Không thể tải dữ liệu sản phẩm. Vui lòng thử lại sau.');
         }
     };
 
@@ -105,6 +119,80 @@ export default function EditCurtain({params}) {
     const handleFileButtonClick = () => {
         fileInputRef.current.click();
     };
+    
+    // Xử lý thêm hình ảnh phụ
+    const handleAdditionalFileButtonClick = () => {
+        additionalFileInputRef.current.click();
+    };
+    
+    const handleAdditionalFileChange = async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        setIsSubmitting(true);
+        
+        try {
+            // Upload each file and add to curtain
+            for (const file of files) {
+                // Upload the file first
+                const uploadResult = await uploadImage(file);
+                
+                // Add the image to the curtain
+                const imageData = {
+                    url: uploadResult.url,
+                    isMain: false
+                };
+                
+                const savedImage = await addImageToCurtain(id, imageData);
+                
+                // Add to image list with local preview
+                setImageList(prev => [
+                    ...prev, 
+                    {
+                        ...savedImage,
+                        preview: URL.createObjectURL(file)
+                    }
+                ]);
+            }
+            
+            alert('Đã thêm hình ảnh thành công!');
+        } catch (error) {
+            console.error('Error uploading additional images:', error);
+            setError('Có lỗi xảy ra khi tải lên hình ảnh. Vui lòng thử lại sau.');
+        } finally {
+            setIsSubmitting(false);
+            e.target.value = null; // Reset file input
+        }
+    };
+    
+    const handleRemoveImage = async (imageId) => {
+        if (!imageId) return;
+        
+        if (!confirm('Bạn có chắc chắn muốn xóa hình ảnh này?')) {
+            return;
+        }
+        
+        setIsSubmitting(true);
+        
+        try {
+            await deleteImage(imageId);
+            // Refresh image list
+            setImageList(prev => prev.filter(img => img._id !== imageId));
+            alert('Đã xóa hình ảnh thành công!');
+        } catch (error) {
+            console.error('Error deleting image:', error);
+            setError('Có lỗi xảy ra khi xóa hình ảnh. Vui lòng thử lại sau.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+    
+    const handleSetMainImage = async (imageUrl) => {
+        setFormData({
+            ...formData,
+            mainImage: imageUrl
+        });
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -126,20 +214,20 @@ export default function EditCurtain({params}) {
         }
 
         // Validate image
-        if (!selectedFile && !formData.image) {
-            setError('Vui lòng chọn hình ảnh cho sản phẩm');
+        if (!selectedFile && !formData.mainImage) {
+            setError('Vui lòng chọn hình ảnh chính cho sản phẩm');
             return;
         }
 
         try {
             setIsSubmitting(true);
-            let imageUrl = formData.image;
+            let mainImageUrl = formData.mainImage;
 
             // Upload image if a file is selected
             if (selectedFile) {
                 try {
                     const uploadResult = await uploadImage(selectedFile);
-                    imageUrl = uploadResult.url;
+                    mainImageUrl = uploadResult.url;
                 } catch (uploadError) {
                     console.error('Error uploading image:', uploadError);
                     setIsSubmitting(false);
@@ -156,7 +244,7 @@ export default function EditCurtain({params}) {
                     width: parseFloat(formData.width),
                     height: parseFloat(formData.height)
                 },
-                image: imageUrl
+                mainImage: mainImageUrl
             };
 
             // Gọi API để cập nhật sản phẩm
@@ -175,42 +263,19 @@ export default function EditCurtain({params}) {
 
     if (isLoading) {
         return (
-            <div className="flex justify-center items-center min-h-[400px]">
-                <p>Đang tải dữ liệu...</p>
-            </div>
-        );
-    }
-
-    if (error && !formData.name) {
-        return (
-            <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="text-red-500 mb-4">{error}</div>
-                <button
-                    onClick={fetchCurtainData}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md"
-                >
-                    Thử lại
-                </button>
-                <Link
-                    href="/admin/curtains"
-                    className="ml-2 bg-gray-300 text-gray-800 px-4 py-2 rounded-md"
-                >
-                    Quay lại danh sách
-                </Link>
+            <div className="container mx-auto px-4 py-8 flex justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className="flex items-center mb-6">
-                <Link
-                    href="/admin/curtains"
-                    className="mr-4 text-gray-500 hover:text-gray-700"
-                >
-                    <FaArrowLeft/>
+        <div className="container mx-auto px-4 py-8">
+            <div className="mb-4 flex items-center">
+                <Link href="/admin/curtains" className="text-blue-500 flex items-center mr-4">
+                    <FaArrowLeft className="mr-1"/> Quay lại
                 </Link>
-                <h1 className="text-2xl font-bold">Chỉnh Sửa Rèm Cửa</h1>
+                <h1 className="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
             </div>
 
             {error && (
@@ -219,7 +284,7 @@ export default function EditCurtain({params}) {
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow p-6">
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Tên sản phẩm */}
@@ -250,7 +315,7 @@ export default function EditCurtain({params}) {
                                 required
                             >
                                 <option value="">Chọn danh mục</option>
-                                {categories.map(category => (
+                                {categories.map((category) => (
                                     <option key={category._id} value={category._id}>
                                         {category.name}
                                     </option>
@@ -261,7 +326,7 @@ export default function EditCurtain({params}) {
                         {/* Giá */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Giá (VND) <span className="text-red-500">*</span>
+                                Giá (VNĐ) <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -336,19 +401,19 @@ export default function EditCurtain({params}) {
                             />
                         </div>
 
-                        {/* Hình ảnh */}
+                        {/* Hình ảnh chính */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Hình ảnh <span className="text-red-500">*</span>
+                                Hình ảnh chính <span className="text-red-500">*</span>
                             </label>
                             <div className="flex flex-col space-y-2">
                                 <div className="flex items-center">
                                     <input
                                         type="text"
-                                        name="image"
+                                        name="mainImage"
                                         placeholder="URL hình ảnh (tùy chọn)"
                                         className="flex-grow p-2 border border-gray-300 rounded-md"
-                                        value={formData.image}
+                                        value={formData.mainImage}
                                         onChange={handleChange}
                                     />
                                     <span className="mx-2 text-gray-500">hoặc</span>
@@ -383,12 +448,12 @@ export default function EditCurtain({params}) {
                                 )}
 
                                 {/* Current image */}
-                                {!imagePreview && formData.image && (
+                                {!imagePreview && formData.mainImage && (
                                     <div className="mt-2">
-                                        <p className="text-sm text-gray-500 mb-1">Hình ảnh hiện tại:</p>
+                                        <p className="text-sm text-gray-500 mb-1">Hình ảnh chính hiện tại:</p>
                                         <div className="relative w-full h-40 border border-gray-300 rounded-md overflow-hidden">
                                             <img
-                                                src={formData.image}
+                                                src={formData.mainImage}
                                                 alt="Current"
                                                 className="w-full h-full object-contain"
                                             />
@@ -412,6 +477,83 @@ export default function EditCurtain({params}) {
                                 Còn hàng
                             </label>
                         </div>
+                    </div>
+                    
+                    {/* Hình ảnh phụ */}
+                    <div className="mt-6">
+                        <div className="flex justify-between items-center">
+                            <label className="block text-sm font-medium text-gray-700">
+                                Tất cả hình ảnh
+                            </label>
+                            <button
+                                type="button"
+                                onClick={handleAdditionalFileButtonClick}
+                                className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center text-sm"
+                            >
+                                <FaPlus className="mr-2" /> Thêm hình ảnh
+                            </button>
+                            <input
+                                type="file"
+                                multiple
+                                ref={additionalFileInputRef}
+                                onChange={handleAdditionalFileChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
+                        </div>
+                        
+                        {/* Hiển thị tất cả hình ảnh */}
+                        {imageList.length > 0 ? (
+                            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {imageList.map((img) => (
+                                    <div key={img._id} className="relative group">
+                                        <div 
+                                            className={`relative h-32 border rounded-md overflow-hidden ${
+                                                formData.mainImage === img.url ? 'border-2 border-blue-500' : 'border-gray-300'
+                                            }`}
+                                        >
+                                            <img 
+                                                src={img.preview || img.url} 
+                                                alt={img.isMain ? "Main Image" : "Additional Image"}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            {formData.mainImage === img.url && (
+                                                <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                                                    Chính
+                                                </div>
+                                            )}
+                                        </div>
+                                        
+                                        <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                            {formData.mainImage !== img.url && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleSetMainImage(img.url)}
+                                                    className="bg-blue-500 text-white rounded-full p-2 mx-1"
+                                                    title="Đặt làm ảnh chính"
+                                                >
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveImage(img._id)}
+                                                className="bg-red-500 text-white rounded-full p-2 mx-1"
+                                                title="Xóa ảnh này"
+                                            >
+                                                <FaTimes size={16} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="mt-3 border border-dashed border-gray-300 rounded-md p-4 text-center text-gray-500">
+                                Chưa có hình ảnh nào. Nhấn "Thêm hình ảnh" để thêm mới.
+                            </div>
+                        )}
                     </div>
 
                     {/* Mô tả sản phẩm */}

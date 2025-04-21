@@ -3,7 +3,7 @@
 import {useEffect, useState, useRef} from 'react';
 import {useRouter} from 'next/navigation';
 import Link from 'next/link';
-import {FaArrowLeft, FaUpload} from 'react-icons/fa';
+import {FaArrowLeft, FaUpload, FaPlus, FaTimes} from 'react-icons/fa';
 import {createCurtain, uploadImage} from '@/lib/api';
 
 export default function AddCurtain() {
@@ -13,6 +13,11 @@ export default function AddCurtain() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
+    
+    // Thêm state cho nhiều hình ảnh
+    const [additionalImages, setAdditionalImages] = useState([]);
+    const additionalFileInputRef = useRef(null);
+    
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -22,7 +27,7 @@ export default function AddCurtain() {
         color: '',
         width: '',
         height: '',
-        image: '',
+        mainImage: '',
         inStock: true
     });
 
@@ -66,6 +71,40 @@ export default function AddCurtain() {
     const handleFileButtonClick = () => {
         fileInputRef.current.click();
     };
+    
+    // Xử lý thêm hình ảnh phụ
+    const handleAdditionalFileButtonClick = () => {
+        additionalFileInputRef.current.click();
+    };
+    
+    const handleAdditionalFileChange = async (e) => {
+        const files = Array.from(e.target.files);
+        if (files.length === 0) return;
+        
+        setIsSubmitting(true);
+        
+        try {
+            // Upload each file and add to additional images
+            for (const file of files) {
+                const uploadResult = await uploadImage(file);
+                setAdditionalImages(prev => [...prev, {
+                    url: uploadResult.url,
+                    file: file,
+                    preview: URL.createObjectURL(file)
+                }]);
+            }
+        } catch (error) {
+            console.error('Error uploading additional images:', error);
+            setError('Có lỗi xảy ra khi tải lên hình ảnh. Vui lòng thử lại sau.');
+        } finally {
+            setIsSubmitting(false);
+            e.target.value = null; // Reset file input
+        }
+    };
+    
+    const handleRemoveAdditionalImage = (index) => {
+        setAdditionalImages(prev => prev.filter((_, i) => i !== index));
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -87,20 +126,20 @@ export default function AddCurtain() {
         }
 
         // Validate image
-        if (!selectedFile && !formData.image) {
-            setError('Vui lòng chọn hình ảnh cho sản phẩm');
+        if (!selectedFile && !formData.mainImage) {
+            setError('Vui lòng chọn hình ảnh chính cho sản phẩm');
             return;
         }
 
         try {
             setIsSubmitting(true);
-            let imageUrl = formData.image;
+            let mainImageUrl = formData.mainImage;
 
             // Upload image if a file is selected
             if (selectedFile) {
                 try {
                     const uploadResult = await uploadImage(selectedFile);
-                    imageUrl = uploadResult.url;
+                    mainImageUrl = uploadResult.url;
                 } catch (uploadError) {
                     console.error('Error uploading image:', uploadError);
                     setIsSubmitting(false);
@@ -117,7 +156,8 @@ export default function AddCurtain() {
                     width: parseFloat(formData.width),
                     height: parseFloat(formData.height)
                 },
-                image: imageUrl
+                mainImage: mainImageUrl,
+                additionalImages: additionalImages.map(img => img.url)
             };
 
             // Gọi API để tạo rèm cửa mới
@@ -135,15 +175,12 @@ export default function AddCurtain() {
     };
 
     return (
-        <div>
-            <div className="flex items-center mb-6">
-                <Link
-                    href="/admin/curtains"
-                    className="mr-4 text-gray-500 hover:text-gray-700"
-                >
-                    <FaArrowLeft/>
+        <div className="container mx-auto px-4 py-8">
+            <div className="mb-4 flex items-center">
+                <Link href="/admin/curtains" className="text-blue-500 flex items-center mr-4">
+                    <FaArrowLeft className="mr-1"/> Quay lại
                 </Link>
-                <h1 className="text-2xl font-bold">Thêm Rèm Cửa Mới</h1>
+                <h1 className="text-2xl font-bold">Thêm sản phẩm mới</h1>
             </div>
 
             {error && (
@@ -152,7 +189,7 @@ export default function AddCurtain() {
                 </div>
             )}
 
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white rounded-lg shadow p-6">
                 <form onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Tên sản phẩm */}
@@ -183,9 +220,9 @@ export default function AddCurtain() {
                                 required
                             >
                                 <option value="">Chọn danh mục</option>
-                                {categories.map(category => (
-                                    <option key={category} value={category}>
-                                        {category}
+                                {categories.map((category) => (
+                                    <option key={category._id} value={category._id}>
+                                        {category.name}
                                     </option>
                                 ))}
                             </select>
@@ -194,7 +231,7 @@ export default function AddCurtain() {
                         {/* Giá */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Giá (VND) <span className="text-red-500">*</span>
+                                Giá (VNĐ) <span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="number"
@@ -269,19 +306,19 @@ export default function AddCurtain() {
                             />
                         </div>
 
-                        {/* Hình ảnh */}
+                        {/* Hình ảnh chính */}
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Hình ảnh <span className="text-red-500">*</span>
+                                Hình ảnh chính <span className="text-red-500">*</span>
                             </label>
                             <div className="flex flex-col space-y-2">
                                 <div className="flex items-center">
                                     <input
                                         type="text"
-                                        name="image"
+                                        name="mainImage"
                                         placeholder="URL hình ảnh (tùy chọn)"
                                         className="flex-grow p-2 border border-gray-300 rounded-md"
-                                        value={formData.image}
+                                        value={formData.mainImage}
                                         onChange={handleChange}
                                     />
                                     <span className="mx-2 text-gray-500">hoặc</span>
@@ -316,7 +353,7 @@ export default function AddCurtain() {
                                 )}
                             </div>
                         </div>
-
+                        
                         {/* Tình trạng */}
                         <div className="flex items-center mt-4">
                             <input
@@ -331,6 +368,55 @@ export default function AddCurtain() {
                                 Còn hàng
                             </label>
                         </div>
+                    </div>
+                    
+                    {/* Hình ảnh phụ */}
+                    <div className="mt-6">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Hình ảnh phụ
+                        </label>
+                        <div className="mt-2">
+                            <button
+                                type="button"
+                                onClick={handleAdditionalFileButtonClick}
+                                className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center"
+                            >
+                                <FaPlus className="mr-2" /> Thêm hình ảnh phụ
+                            </button>
+                            <input
+                                type="file"
+                                multiple
+                                ref={additionalFileInputRef}
+                                onChange={handleAdditionalFileChange}
+                                accept="image/*"
+                                className="hidden"
+                            />
+                        </div>
+                        
+                        {/* Hiển thị hình ảnh phụ đã chọn */}
+                        {additionalImages.length > 0 && (
+                            <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {additionalImages.map((img, index) => (
+                                    <div key={index} className="relative group">
+                                        <div className="relative h-32 border rounded-md overflow-hidden">
+                                            <img 
+                                                src={img.preview || img.url} 
+                                                alt={`Additional ${index}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveAdditionalImage(index)}
+                                            className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:opacity-100"
+                                            title="Xóa ảnh này"
+                                        >
+                                            <FaTimes size={14} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Mô tả sản phẩm */}

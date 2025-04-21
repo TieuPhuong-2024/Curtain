@@ -201,7 +201,7 @@ export default function CurtainsList() {
                                                 <div className="h-10 w-10 flex-shrink-0">
                                                     <img
                                                         className="h-10 w-10 rounded-full object-cover"
-                                                        src={curtain.image || '/placeholder-curtain.jpg'}
+                                                        src={curtain.mainImage || curtain.image || '/placeholder-curtain.jpg'}
                                                         alt={curtain.name}
                                                     />
                                                 </div>

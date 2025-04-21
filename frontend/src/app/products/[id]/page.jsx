@@ -4,13 +4,15 @@ import '../../styles/cozy-theme.css';
 import {use, useEffect, useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {getCurtainById} from '@/lib/api';
+import {getCurtainById, getImagesByCurtainId} from '@/lib/api';
 import {FaArrowLeft, FaPalette, FaRuler, FaShoppingCart, FaTag} from 'react-icons/fa';
 
 export default function ProductDetailPage({params}) {
     const {id} = use(params);
 
     const [curtain, setCurtain] = useState(null);
+    const [images, setImages] = useState([]);
+    const [selectedImage, setSelectedImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
@@ -21,6 +23,22 @@ export default function ProductDetailPage({params}) {
                 setLoading(true);
                 const data = await getCurtainById(id);
                 setCurtain(data);
+                
+                // Set the main image as selected by default
+                setSelectedImage(data.mainImage);
+                
+                // Fetch additional images if available
+                if (data.images && data.images.length > 0) {
+                    setImages(data.images);
+                } else {
+                    // If images not included in the response, fetch separately
+                    try {
+                        const imagesData = await getImagesByCurtainId(id);
+                        setImages(imagesData);
+                    } catch (imgErr) {
+                        console.error('Error fetching images:', imgErr);
+                    }
+                }
             } catch (err) {
                 setError('Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.');
                 console.error(err);
@@ -35,6 +53,11 @@ export default function ProductDetailPage({params}) {
     const handleAddToCart = () => {
         alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
         // Implement cart functionality
+    };
+
+    // Chọn một hình ảnh
+    const handleSelectImage = (imageUrl) => {
+        setSelectedImage(imageUrl);
     };
 
     if (loading) {
@@ -66,7 +89,8 @@ export default function ProductDetailPage({params}) {
         );
     }
 
-    const {name, description, price, category, material, color, size, image, inStock} = curtain;
+    const {name, description, price, category, material, color, size, mainImage, inStock} = curtain;
+    const displayImage = selectedImage || mainImage || (images.length > 0 ? images[0].url : '/images/curtain-placeholder.jpg');
 
     return (
         <div className="cozy-bg min-h-screen py-8">
@@ -78,19 +102,64 @@ export default function ProductDetailPage({params}) {
                 </div>
                 <div className="cozy-card overflow-hidden">
                     <div className="md:flex">
-                        {/* Product Image */}
+                        {/* Product Image Gallery */}
                         <div className="md:w-1/2">
-                            <div className="relative h-96 md:h-full">
-                                <Image
-                                    src={image || '/images/curtain-placeholder.jpg'}
-                                    alt={name}
-                                    fill
-                                    style={{objectFit: 'cover'}}
-                                    className="cozy-img w-full h-full"
-                                    priority
-                                />
+                            <div className="flex flex-col">
+                                {/* Main displayed image */}
+                                <div className="relative h-96 md:h-[500px] overflow-hidden">
+                                    <Image
+                                        src={displayImage}
+                                        alt={name}
+                                        fill
+                                        style={{objectFit: 'cover'}}
+                                        className="cozy-img w-full h-full rounded-lg transition-transform duration-500 hover:scale-105"
+                                        priority
+                                    />
+                                </div>
+                                
+                                {/* Thumbnails for additional images */}
+                                {images.length > 1 && (
+                                    <div className="flex space-x-2 mt-4 overflow-x-auto py-2">
+                                        {/* Main image thumbnail */}
+                                        <div 
+                                            className={`relative w-20 h-20 min-w-[5rem] cursor-pointer rounded-md overflow-hidden border-2 ${
+                                                selectedImage === mainImage ? 'border-[#a67c52]' : 'border-transparent'
+                                            }`}
+                                            onClick={() => handleSelectImage(mainImage)}
+                                        >
+                                            <Image
+                                                src={mainImage}
+                                                alt={`${name} - Main`}
+                                                fill
+                                                style={{objectFit: 'cover'}}
+                                            />
+                                        </div>
+                                        
+                                        {/* Other image thumbnails */}
+                                        {images
+                                            .filter(img => img.url !== mainImage)
+                                            .map((image, index) => (
+                                                <div 
+                                                    key={index}
+                                                    className={`relative w-20 h-20 min-w-[5rem] cursor-pointer rounded-md overflow-hidden border-2 ${
+                                                        selectedImage === image.url ? 'border-[#a67c52]' : 'border-transparent'
+                                                    }`}
+                                                    onClick={() => handleSelectImage(image.url)}
+                                                >
+                                                    <Image
+                                                        src={image.url}
+                                                        alt={`${name} - ${index + 1}`}
+                                                        fill
+                                                        style={{objectFit: 'cover'}}
+                                                    />
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                )}
                             </div>
                         </div>
+                        
                         {/* Product Info */}
                         <div className="md:w-1/2 p-6">
                             <div className="flex justify-between items-start">
@@ -130,25 +199,25 @@ export default function ProductDetailPage({params}) {
                             </div>
                             {inStock ? (
                                 <div className="mb-4">
-                  <span className="text-green-700 flex items-center">
-                    <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clipRule="evenodd"/>
-                    </svg>
-                    Còn hàng
-                  </span>
+                                    <span className="text-green-700 flex items-center">
+                                        <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                                clipRule="evenodd"/>
+                                        </svg>
+                                        Còn hàng
+                                    </span>
                                 </div>
                             ) : (
                                 <div className="mb-4">
-                  <span className="text-red-600 flex items-center">
-                    <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                            clipRule="evenodd"/>
-                    </svg>
-                    Hết hàng
-                  </span>
+                                    <span className="text-red-600 flex items-center">
+                                        <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd"
+                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                                clipRule="evenodd"/>
+                                        </svg>
+                                        Hết hàng
+                                    </span>
                                 </div>
                             )}
                             {inStock && (
