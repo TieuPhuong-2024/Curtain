@@ -9,6 +9,7 @@ import {useEffect, useState} from 'react';
 import {getBanners, getCategories, getCurtains} from '@/lib/api';
 import CurtainCard from '@/components/CurtainCard';
 import BannerSlider from '@/components/BannerSlider';
+import CategoryScroll from '@/components/CategoryScroll';
 
 export default function Home() {
     const [featuredCurtains, setFeaturedCurtains] = useState([]);
@@ -20,14 +21,28 @@ export default function Home() {
     const [error, setError] = useState(null);
     const [bannerError, setBannerError] = useState(null);
     const [categoryError, setCategoryError] = useState(null);
+    const [productCounts, setProductCounts] = useState({});
 
     useEffect(() => {
         const fetchFeatured = async () => {
             try {
                 setLoading(true);
-                const data = await getCurtains();
+                const allProducts = await getCurtains();
                 // Lấy 3 sản phẩm đầu tiên hoặc sắp xếp theo tiêu chí khác nếu cần
-                setFeaturedCurtains(data.slice(0, 3));
+                setFeaturedCurtains(allProducts.slice(0, 3));
+                
+                // Calculate product counts per category
+                const counts = {};
+                allProducts.forEach(product => {
+                    const categoryId = typeof product.category === 'object' 
+                        ? product.category._id 
+                        : product.category;
+                    
+                    if (categoryId) {
+                        counts[categoryId] = (counts[categoryId] || 0) + 1;
+                    }
+                });
+                setProductCounts(counts);
             } catch (err) {
                 console.error('Error fetching curtains:', err);
                 setError('Không thể tải sản phẩm nổi bật.');
@@ -119,24 +134,7 @@ export default function Home() {
                     ) : categories.length === 0 ? (
                         <div className="text-center py-12">Chưa có danh mục nào.</div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {categories.map(category => (
-                                <div key={category._id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-                                    <div className="p-6">
-                                        <h3 className="text-xl font-semibold text-gray-800 mb-3">{category.name}</h3>
-                                        {category.description && (
-                                            <p className="text-gray-600 mb-4">{category.description}</p>
-                                        )}
-                                        <Link
-                                            href={`/products?category=${category.name}`}
-                                            className="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded transition-colors"
-                                        >
-                                            Xem sản phẩm
-                                        </Link>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        <CategoryScroll categories={categories} productCounts={productCounts} />
                     )}
                 </div>
             </section>

@@ -2,6 +2,7 @@
 import {useEffect, useState} from "react";
 import {useRouter} from "next/navigation";
 import {deleteCategory, getCategories} from '@/lib/api';
+import Image from "next/image";
 
 export default function CategoryListPage() {
     const [categories, setCategories] = useState([]);
@@ -96,7 +97,17 @@ export default function CategoryListPage() {
                                 fontWeight: 700,
                                 color: '#444',
                                 fontSize: 15,
-                                borderBottom: '2px solid #e5e7eb'
+                                borderBottom: '2px solid #e5e7eb',
+                                width: '60px'
+                            }}>Ảnh
+                            </th>
+                            <th style={{
+                                padding: '10px 8px',
+                                fontWeight: 700,
+                                color: '#444',
+                                fontSize: 15,
+                                borderBottom: '2px solid #e5e7eb',
+                                textAlign: 'left'
                             }}>Tên danh mục
                             </th>
                             <th style={{
@@ -112,7 +123,7 @@ export default function CategoryListPage() {
                         <tbody>
                         {categories.length === 0 ? (
                             <tr>
-                                <td colSpan={2} style={{textAlign: 'center', padding: 24, color: '#888'}}>Không có danh
+                                <td colSpan={3} style={{textAlign: 'center', padding: 24, color: '#888'}}>Không có danh
                                     mục nào
                                 </td>
                             </tr>
@@ -120,7 +131,17 @@ export default function CategoryListPage() {
                             categories.map((cat) => (
                                 <tr key={cat._id || cat}
                                     style={{borderBottom: '1px solid #e5e7eb', transition: 'background .2s'}}>
-                                    <td style={{padding: '10px 8px', fontSize: 15}}>{cat.name || cat}</td>
+                                    <td style={{padding: '10px 8px', fontSize: 15}}>
+                                        <div style={{position: 'relative', width: '40px', height: '40px', margin: '0 auto'}}>
+                                            <Image 
+                                                src={cat.image || '/images/curtain-placeholder.jpg'}
+                                                alt={cat.name}
+                                                fill
+                                                style={{objectFit: 'cover', borderRadius: '4px'}}
+                                            />
+                                        </div>
+                                    </td>
+                                    <td style={{padding: '10px 8px', fontSize: 15, textAlign: 'left'}}>{cat.name || cat}</td>
                                     <td style={{padding: '10px 8px'}}>
                                         <button
                                             onClick={() => handleEdit(cat._id || cat)}
