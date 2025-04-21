@@ -40,7 +40,7 @@ const curtainSchema = new mongoose.Schema({
       min: 0
     }
   },
-  image: {
+  mainImage: {
     type: String,
     required: true
   },
@@ -52,6 +52,16 @@ const curtainSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Ảo hóa để tự động lấy tất cả hình ảnh liên quan
+curtainSchema.virtual('images', {
+  ref: 'Image',
+  localField: '_id',
+  foreignField: 'curtain'
 });
 
 const Curtain = mongoose.model('Curtain', curtainSchema);
