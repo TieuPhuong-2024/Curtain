@@ -2,7 +2,7 @@
 
 import {useEffect, useState} from 'react';
 import Link from 'next/link';
-import {FaShoppingCart, FaWindowMaximize} from 'react-icons/fa';
+import {FaShoppingCart, FaWindowMaximize, FaImage, FaList, FaImages, FaBuilding} from 'react-icons/fa';
 import {getCurtains} from '@/lib/api';
 
 export default function AdminDashboard() {
@@ -122,6 +122,57 @@ export default function AdminDashboard() {
                                 </div>
                             </Link>
                         </div>
+                    </div>
+
+                    {/* Main admin cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <Link href="/admin/curtains" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="flex items-center">
+                                <div className="p-4 bg-blue-100 rounded-lg mr-4">
+                                    <FaImage className="text-blue-600 text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg text-gray-900">Quản lý Rèm Cửa</h3>
+                                    <p className="text-gray-600 mt-1">Thêm, sửa, xóa sản phẩm rèm cửa</p>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link href="/admin/categories" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="flex items-center">
+                                <div className="p-4 bg-green-100 rounded-lg mr-4">
+                                    <FaList className="text-green-600 text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg text-gray-900">Quản lý Danh Mục</h3>
+                                    <p className="text-gray-600 mt-1">Thêm, sửa, xóa danh mục rèm cửa</p>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link href="/admin/banners" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="flex items-center">
+                                <div className="p-4 bg-purple-100 rounded-lg mr-4">
+                                    <FaImages className="text-purple-600 text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg text-gray-900">Quản lý Banner</h3>
+                                    <p className="text-gray-600 mt-1">Thêm, sửa, xóa banner trang chủ</p>
+                                </div>
+                            </div>
+                        </Link>
+
+                        <Link href="/admin/projects" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="flex items-center">
+                                <div className="p-4 bg-yellow-100 rounded-lg mr-4">
+                                    <FaBuilding className="text-yellow-600 text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg text-gray-900">Quản lý Công Trình</h3>
+                                    <p className="text-gray-600 mt-1">Thêm, sửa, xóa công trình đã thi công</p>
+                                </div>
+                            </div>
+                        </Link>
                     </div>
                 </>
             )}

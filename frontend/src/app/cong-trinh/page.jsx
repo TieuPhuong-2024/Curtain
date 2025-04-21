@@ -1,8 +1,60 @@
-import React from "react";
+'use client';
+
+import React, { useState, useEffect } from "react";
 import ProjectCard from "@/components/ProjectCard";
-import { constructionProjects } from "./projects";
+import axios from "axios";
 
 export default function ThiCongLapRemPage() {
+    const [projects, setProjects] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [activeFilter, setActiveFilter] = useState("all");
+    const [projectTypes, setProjectTypes] = useState([]);
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/api/projects');
+                setProjects(response.data);
+                
+                // Extract unique project types for filters
+                const types = [...new Set(response.data.map(project => project.type))];
+                setProjectTypes(types);
+                
+                setLoading(false);
+            } catch (err) {
+                setError("Không thể tải dữ liệu công trình. Vui lòng thử lại sau.");
+                setLoading(false);
+                console.error("Error fetching projects:", err);
+            }
+        };
+
+        fetchProjects();
+    }, []);
+
+    const handleFilterChange = async (filter) => {
+        setActiveFilter(filter);
+        setLoading(true);
+        
+        try {
+            let response;
+            
+            if (filter === "all") {
+                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/api/projects');
+            } else {
+                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + `/api/projects/type/${filter}`);
+            }
+            
+            setProjects(response.data);
+            setLoading(false);
+        } catch (err) {
+            setError("Không thể lọc dữ liệu. Vui lòng thử lại sau.");
+            setLoading(false);
+            console.error("Error filtering projects:", err);
+        }
+    };
+    
     return (
         <main className="container mx-auto py-10 px-4">
             <div className="text-center mb-12">
@@ -14,31 +66,60 @@ export default function ThiCongLapRemPage() {
                 </p>
             </div>
 
-            {/* Filter options - có thể bổ sung sau */}
+            {/* Filter options */}
             <div className="mb-8 flex flex-wrap gap-2 justify-center">
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+                <button 
+                    className={`${activeFilter === "all" ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
+                    onClick={() => handleFilterChange("all")}
+                >
                     Tất cả
                 </button>
-                <button className="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition">
-                    Biệt thự
-                </button>
-                <button className="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition">
-                    Chung cư
-                </button>
-                <button className="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition">
-                    Văn phòng
-                </button>
-                <button className="bg-white text-blue-600 border border-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 transition">
-                    Khách sạn
-                </button>
-            </div>
-
-            {/* Projects grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-                {constructionProjects.map((project) => (
-                    <ProjectCard key={project.id} project={project} />
+                
+                {projectTypes.map((type) => (
+                    <button
+                        key={type}
+                        className={`${activeFilter === type ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
+                        onClick={() => handleFilterChange(type)}
+                    >
+                        {type}
+                    </button>
                 ))}
             </div>
+
+            {/* Loading and error states */}
+            {loading && (
+                <div className="text-center py-10">
+                    <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
+                    <p className="mt-2 text-gray-600">Đang tải dữ liệu...</p>
+                </div>
+            )}
+            
+            {error && (
+                <div className="text-center py-8 text-red-600">
+                    <p>{error}</p>
+                    <button 
+                        onClick={() => window.location.reload()}
+                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                    >
+                        Thử lại
+                    </button>
+                </div>
+            )}
+
+            {/* Projects grid */}
+            {!loading && !error && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    {projects.length > 0 ? (
+                        projects.map((project) => (
+                            <ProjectCard key={project._id} project={project} />
+                        ))
+                    ) : (
+                        <div className="col-span-2 text-center py-8 text-gray-600">
+                            <p>Không có công trình nào thuộc danh mục này.</p>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Installation process */}
             <section className="mb-12 bg-gray-50 p-8 rounded-lg shadow-sm">
