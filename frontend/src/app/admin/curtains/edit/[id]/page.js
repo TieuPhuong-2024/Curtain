@@ -116,6 +116,16 @@ export default function EditCurtain({params}) {
         }
     };
 
+    // Function to remove main image
+    const handleRemoveMainImage = () => {
+        setSelectedFile(null);
+        setImagePreview(null);
+        setFormData({
+            ...formData,
+            mainImage: ''
+        });
+    };
+
     const handleFileButtonClick = () => {
         fileInputRef.current.click();
     };
@@ -443,6 +453,14 @@ export default function EditCurtain({params}) {
                                                 alt="Preview"
                                                 className="w-full h-full object-contain"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveMainImage}
+                                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                                                title="Xóa ảnh"
+                                            >
+                                                <FaTimes />
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -457,6 +475,14 @@ export default function EditCurtain({params}) {
                                                 alt="Current"
                                                 className="w-full h-full object-contain"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveMainImage}
+                                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                                                title="Xóa ảnh"
+                                            >
+                                                <FaTimes />
+                                            </button>
                                         </div>
                                     </div>
                                 )}

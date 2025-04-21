@@ -114,18 +114,37 @@ const ImageUploader = ({ onImageSelected, currentImage }) => {
     setError('');
   };
 
+  // Remove selected image
+  const handleRemoveImage = () => {
+    setPreview('');
+    setSelectedFile(null);
+    setError('');
+    // Notify parent component that image has been removed
+    onImageSelected('');
+  };
+
   return (
     <div className="mb-4">
       <label className="block font-medium mb-1">Ảnh</label>
 
-      {/* Preview image */}
+      {/* Preview image with remove button */}
       {preview && (
-        <div className="mb-2">
-          <img 
-            src={preview} 
-            alt="Preview" 
-            className="w-40 h-24 object-cover rounded border"
-          />
+        <div className="mb-2 relative">
+          <div className="relative inline-block">
+            <img 
+              src={preview} 
+              alt="Preview" 
+              className="w-40 h-24 object-cover rounded border"
+            />
+            <button
+              type="button"
+              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
+              onClick={handleRemoveImage}
+              title="Xóa ảnh"
+            >
+              ×
+            </button>
+          </div>
         </div>
       )}
 

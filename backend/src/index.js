@@ -19,6 +19,7 @@ const bannerRoutes = require('./routes/banner.routes');
 const categoryRoutes = require('./routes/category.routes');
 const uploadRoutes = require('./routes/upload.routes');
 const imageRoutes = require('./routes/image.routes');
+const fileRoutes = require('./routes/file.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
@@ -26,9 +27,7 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/images', imageRoutes);
-
-// Serve static files from the uploads directory
-app.use('/uploads', express.static('uploads'));
+app.use('/api/files', fileRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
