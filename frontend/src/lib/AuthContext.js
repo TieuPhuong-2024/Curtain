@@ -99,6 +99,8 @@ export function AuthProvider({ children }) {
       try {
         const role = await fetchUserRole(userCredential.user.uid);
         
+        // Set user-role cookie
+        document.cookie = `user-role=${role}; path=/`;
         // Redirect based on role
         if (role === 'admin') {
           router.push('/admin');
@@ -107,6 +109,8 @@ export function AuthProvider({ children }) {
         }
       } catch (roleError) {
         console.error("Error fetching role:", roleError);
+        // Set user-role cookie mặc định là user nếu không lấy được role
+        document.cookie = `user-role=user; path=/`;
         // Continue with login even if role fetch fails
         router.push('/');
       }
@@ -171,12 +175,15 @@ export function AuthProvider({ children }) {
             // Continue even if document creation fails
             setUserRole('user');
           }
+          // Set user-role cookie
+          document.cookie = `user-role=user; path=/`;
           router.push('/');
         } else {
           // Existing user
           const role = userDoc.data().role;
           setUserRole(role);
-          
+          // Set user-role cookie
+          document.cookie = `user-role=${role}; path=/`;
           if (role === 'admin') {
             router.push('/admin');
           } else {
@@ -187,6 +194,8 @@ export function AuthProvider({ children }) {
         console.error("Error accessing Firestore:", firestoreError);
         // Set default role and redirect even if Firestore access fails
         setUserRole('user');
+        // Set user-role cookie mặc định là user nếu không lấy được role
+        document.cookie = `user-role=user; path=/`;
         router.push('/');
       }
       
