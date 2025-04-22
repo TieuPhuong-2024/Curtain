@@ -21,6 +21,7 @@ const uploadRoutes = require('./routes/upload.routes');
 const imageRoutes = require('./routes/image.routes');
 const fileRoutes = require('./routes/file.routes');
 const projectRoutes = require('./routes/project.routes');
+const favoriteRoutes = require('./routes/favorite.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
@@ -30,6 +31,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/images', imageRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/projects', projectRoutes);
+app.use('/api/favorites', favoriteRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

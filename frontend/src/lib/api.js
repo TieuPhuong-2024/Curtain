@@ -2,12 +2,24 @@ import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+import { auth } from './firebase';
+
 const api = axios.create({
     baseURL: API_URL,
     headers: {
         'Content-Type': 'application/json',
     },
 });
+
+// Interceptor: tự động đính Authorization header nếu user đã đăng nhập
+api.interceptors.request.use(async (config) => {
+    const user = auth.currentUser;
+    if (user) {
+        const idToken = await user.getIdToken();
+        config.headers['Authorization'] = `Bearer ${idToken}`;
+    }
+    return config;
+}, (error) => Promise.reject(error));
 
 // Create a separate instance for file uploads
 const uploadApi = axios.create({
@@ -199,5 +211,44 @@ export const deleteImage = async (imageId) => {
     } catch (error) {
         console.error(`Error deleting image ${imageId}:`, error);
         throw error;
+    }
+};
+
+export const favoriteService = {
+    getFavorites: async () => {
+        try {
+            const response = await api.get('/favorites');
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching favorites:', error);
+            throw error;
+        }
+    },
+    addFavorite: async (productId) => {
+        try {
+            const response = await api.post('/favorites', { productId });
+            return response.data;
+        } catch (error) {
+            console.error('Error adding favorite:', error);
+            throw error;
+        }
+    },
+    removeFavorite: async (productId) => {
+        try {
+            const response = await api.delete(`/favorites/${productId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error removing favorite:', error);
+            throw error;
+        }
+    },
+    countFavorites: async (id) => {
+        try {
+            const response = await api.get(`/favorites/count/${id}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error counting favorites:', error);
+            throw error;
+        }
     }
 };
