@@ -60,6 +60,15 @@ export default function AddProject() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
+        // Validate required fields
+        const requiredFields = ['title', 'description', 'location', 'type'];
+        const missingFields = requiredFields.filter(field => !formData[field]);
+        
+        if (missingFields.length > 0) {
+            toast.error(`Vui lòng điền đầy đủ thông tin: ${missingFields.join(', ')}`);
+            return;
+        }
+        
         if (formData.images.length === 0) {
             toast.error('Vui lòng thêm ít nhất một hình ảnh!');
             return;
@@ -67,12 +76,21 @@ export default function AddProject() {
         
         try {
             setLoading(true);
-            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/projects`, formData);
-            toast.success('Thêm công trình thành công!');
-            router.push('/admin/projects');
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/projects`, formData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.data) {
+                toast.success('Thêm công trình thành công!');
+                router.push('/admin/projects');
+            }
         } catch (error) {
-            console.error('Error adding project:', error);
-            toast.error('Lỗi khi thêm công trình!');
+            const errorMessage = error.response?.data?.message || 
+                               (error.response?.status === 413 ? 'Dữ liệu quá lớn!' : 'Lỗi khi thêm công trình!');
+            toast.error(errorMessage);
+        } finally {
             setLoading(false);
         }
     };
@@ -231,6 +249,9 @@ export default function AddProject() {
                             </>
                         )}
                     </button>
+                    <Link href="/admin/projects" className="bg-gray-500 text-white px-6 py-2 rounded-md flex items-center hover:bg-gray-600 transition ml-2">
+                        <FaTimesCircle className="mr-2" /> Hủy
+                    </Link>
                 </div>
             </form>
         </div>

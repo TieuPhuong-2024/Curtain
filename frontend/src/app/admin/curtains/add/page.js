@@ -105,6 +105,15 @@ export default function AddCurtain() {
         setAdditionalImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    const handleRemoveMainImage = () => {
+        setSelectedFile(null);
+        setImagePreview(null);
+        setFormData(prev => ({...prev, mainImage: ''}));
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
@@ -347,6 +356,14 @@ export default function AddCurtain() {
                                                 alt="Preview"
                                                 className="w-full h-full object-contain"
                                             />
+                                            <button
+                                                type="button"
+                                                onClick={handleRemoveMainImage}
+                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:opacity-100"
+                                                title="Xóa ảnh này"
+                                            >
+                                                <FaTimes size={14} />
+                                            </button>
                                         </div>
                                     </div>
                                 )}
@@ -452,4 +469,4 @@ export default function AddCurtain() {
             </div>
         </div>
     );
-} 
+}
