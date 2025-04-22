@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationCircle } from 'react-icons/fa';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import { toast } from 'react-hot-toast';
 import ImageUploader from '@/components/ImageUploader';
 
 export default function EditProject({ params }) {
-    const { id } = params;
+    const { id } = use(params);
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
@@ -80,6 +80,15 @@ export default function EditProject({ params }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         
+        // Validate required fields
+        const requiredFields = ['title', 'description', 'location', 'type'];
+        const missingFields = requiredFields.filter(field => !formData[field]);
+        
+        if (missingFields.length > 0) {
+            toast.error(`Vui lòng điền đầy đủ thông tin: ${missingFields.join(', ')}`);
+            return;
+        }
+        
         if (formData.images.length === 0) {
             toast.error('Vui lòng thêm ít nhất một hình ảnh!');
             return;
@@ -87,12 +96,22 @@ export default function EditProject({ params }) {
         
         try {
             setLoading(true);
-            await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, formData);
-            toast.success('Cập nhật công trình thành công!');
-            router.push('/admin/projects');
+            const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.data) {
+                toast.success('Cập nhật công trình thành công!');
+                router.push('/admin/projects');
+            }
         } catch (error) {
             console.error('Error updating project:', error);
-            toast.error('Lỗi khi cập nhật công trình!');
+            const errorMessage = error.response?.data?.message || 
+                               (error.response?.status === 413 ? 'Dữ liệu quá lớn!' : 'Lỗi khi cập nhật công trình!');
+            toast.error(errorMessage);
+        } finally {
             setLoading(false);
         }
     };
@@ -278,8 +297,11 @@ export default function EditProject({ params }) {
                             </>
                         )}
                     </button>
+                    <Link href="/admin/projects" className="bg-gray-500 text-white px-6 py-2 rounded-md flex items-center hover:bg-gray-600 transition ml-2">
+                        <FaTimesCircle className="mr-2" /> Hủy
+                    </Link>
                 </div>
             </form>
         </div>
     );
-} 
+}

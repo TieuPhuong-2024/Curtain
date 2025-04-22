@@ -28,6 +28,12 @@ export default function AddCategoryPage() {
         setImageFile(file);
     };
 
+    // Handle removing the image
+    const handleRemoveImage = () => {
+        setImage("");
+        setImageFile(null);
+    };
+
     const handleImageUpload = async () => {
         if (!imageFile) return;
         
@@ -146,6 +152,30 @@ export default function AddCategoryPage() {
                                 fill
                                 style={{objectFit: 'cover', borderRadius: '8px'}}
                             />
+                            <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                style={{
+                                    position: 'absolute',
+                                    top: 10,
+                                    right: 10,
+                                    background: 'rgba(220, 38, 38, 0.8)',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '50%',
+                                    width: 30,
+                                    height: 30,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: 20,
+                                    cursor: 'pointer',
+                                    zIndex: 10
+                                }}
+                                title="Xóa ảnh"
+                            >
+                                ×
+                            </button>
                         </div>
                     )}
                 </div>
