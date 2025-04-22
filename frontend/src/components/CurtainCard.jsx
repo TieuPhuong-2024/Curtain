@@ -9,11 +9,11 @@ import { useAuth } from '@/lib/AuthContext';
 
 export default function CurtainCard({ curtain }) {
     const { user } = useAuth();
-    const [showLoginPopup, setShowLoginPopup] = useState(false);
     const { _id, name, price, mainImage, image, category, color } = curtain;
     const [isHovered, setIsHovered] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const [favoriteCount, setFavoriteCount] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     // Sử dụng mainImage hoặc fallback vào image cho tương thích ngược
     const displayImage = mainImage || image || '/images/curtain-placeholder.jpg';
@@ -41,8 +41,13 @@ export default function CurtainCard({ curtain }) {
     const fetchFavoriteCount = async () => {
         try {
             const res = await favoriteService.countFavorites(_id);
-            setFavoriteCount(res.data.count);
+            if (res.success && res.data) {
+                setFavoriteCount(res.data.count);
+            } else {
+                setFavoriteCount(0);
+            }
         } catch (err) {
+            console.error('Error fetching favorite count:', err);
             setFavoriteCount(0);
         }
     };
@@ -51,20 +56,30 @@ export default function CurtainCard({ curtain }) {
     const toggleFavorite = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        
         if (!user) {
-            setShowLoginPopup(true);
+            window.location.href = '/login';
             return;
         }
+
+        if (isLoading) return;
+
         try {
+            setIsLoading(true);
             if (isFavorite) {
                 await favoriteService.removeFavorite(_id);
+                setIsFavorite(false);
             } else {
-                await favoriteService.addFavorite(_id);
+                const response = await favoriteService.addFavorite(_id);
+                if (response.success) {
+                    setIsFavorite(true);
+                }
             }
-            setIsFavorite(!isFavorite);
-            fetchFavoriteCount();
+            await fetchFavoriteCount();
         } catch (err) {
-            // handle error
+            console.error('Error toggling favorite:', err);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -85,6 +100,22 @@ export default function CurtainCard({ curtain }) {
                     }}
                     className={`${isHovered ? 'scale-110' : 'scale-100'}`}
                 />
+                {/* Category badge */}
+                <div className="absolute top-2 left-2">
+                    <span className="bg-white bg-opacity-90 text-primary text-xs px-2 py-1 rounded-md">
+                        {categoryName}
+                    </span>
+                </div>
+                {/* Favorite button */}
+                <button
+                    className="absolute top-2 right-2 z-10 bg-white bg-opacity-90 p-1.5 rounded-full text-gray-700 hover:text-red-500 flex items-center"
+                    onClick={toggleFavorite}
+                    disabled={isLoading}
+                    title={isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
+                >
+                    <FaHeart size={16} className={`${isFavorite ? "text-red-500" : ""} ${isLoading ? "opacity-50" : ""}`} />
+                    <span className="ml-1 text-xs">{favoriteCount}</span>
+                </button>
                 {/* Overlay with actions on hover */}
                 <div
                     className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-3 transition-opacity duration-300 ${
@@ -109,21 +140,6 @@ export default function CurtainCard({ curtain }) {
                         <FaShoppingCart size={18} />
                     </button>
                 </div>
-                {/* Category badge */}
-                <div className="absolute top-2 left-2">
-                    <span className="bg-white bg-opacity-90 text-primary text-xs px-2 py-1 rounded-md">
-                        {categoryName}
-                    </span>
-                </div>
-                {/* Favorite button */}
-                <button
-                    className="absolute top-2 right-2 z-10 bg-white bg-opacity-90 p-1.5 rounded-full text-gray-700 hover:text-red-500 flex items-center"
-                    onClick={toggleFavorite}
-                    title={isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
-                >
-                    <FaHeart size={16} className={isFavorite ? "text-red-500" : ""} />
-                    <span className="ml-1 text-xs">{favoriteCount}</span>
-                </button>
             </div>
             <div className="p-4">
                 <h3 className="font-medium text-gray-900 mb-1 truncate">{name}</h3>
@@ -141,16 +157,6 @@ export default function CurtainCard({ curtain }) {
                     />
                 </div>
             </div>
-            {/* Popup yêu cầu đăng nhập */}
-            {showLoginPopup && (
-                <div style={{position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.3)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <div style={{background: 'white', padding: 24, borderRadius: 12, minWidth: 320, textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.2)'}}>
-                        <div style={{fontSize: 24, marginBottom: 12}}>Bạn cần đăng nhập để sử dụng tính năng Yêu thích!</div>
-                        <button onClick={() => window.location.href = '/login'} style={{marginRight: 12, background: '#6366f1', color: 'white', border: 'none', borderRadius: 6, padding: '8px 16px', fontWeight: 'bold'}}>Đăng nhập</button>
-                        <button onClick={() => setShowLoginPopup(false)} style={{background: '#eee', border: 'none', borderRadius: 6, padding: '8px 16px'}}>Đóng</button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 }

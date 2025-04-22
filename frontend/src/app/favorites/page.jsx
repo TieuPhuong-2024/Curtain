@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { favoriteService } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 import { useRouter } from 'next/navigation';
+import CurtainCard from '@/components/CurtainCard';
 
 export default function FavoritesPage() {
   const [favorites, setFavorites] = useState([]);
@@ -12,63 +13,82 @@ export default function FavoritesPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Nếu chưa đăng nhập và đã load xong trạng thái auth thì chuyển hướng sang /login
     if (!authLoading && !user) {
       router.push('/login');
     } else if (user) {
       fetchFavorites();
     }
-    // eslint-disable-next-line
-  }, [user, authLoading]);
+  }, [user, authLoading, router]);
 
   const fetchFavorites = async () => {
     setLoading(true);
     try {
-      // Sửa endpoint thành /api/favorites
-      const res = await favoriteService.getFavorites();
-      // Đảm bảo luôn setFavorites là array
-      let data = res.data;
-      if (!Array.isArray(data)) {
-        if (Array.isArray(data.data)) data = data.data;
-        else data = [];
-      }
-      setFavorites(data);
-    } catch (err) {
-      setFavorites([]);
-    }
-    setLoading(false);
-  };
-
-  const handleToggleFavorite = async (productId, isFavorite) => {
-    try {
-      if (isFavorite) {
-        await favoriteService.removeFavorite(productId);
+      const response = await favoriteService.getFavorites();
+      if (response.success && Array.isArray(response.data)) {
+        setFavorites(response.data);
       } else {
-        await favoriteService.addFavorite(productId);
+        setFavorites([]);
       }
-      fetchFavorites();
-    } catch (err) {}
+    } catch (err) {
+      console.error('Error fetching favorites:', err);
+      setFavorites([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (authLoading) return <div>Đang tải...</div>;
-  if (!user) return <div>Bạn cần đăng nhập để sử dụng tính năng này. <button onClick={() => router.push('/login')} style={{color: 'blue', textDecoration: 'underline'}}>Đăng nhập</button></div>;
-  if (loading) return <div>Đang tải...</div>;
-  if (!Array.isArray(favorites) || favorites.length === 0) return <div>Bạn chưa yêu thích sản phẩm nào.</div>;
+  if (authLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Đang tải...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <p className="mb-4">Bạn cần đăng nhập để xem sản phẩm yêu thích</p>
+          <button 
+            onClick={() => router.push('/login')} 
+            className="bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors"
+          >
+            Đăng nhập
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center">Đang tải danh sách yêu thích...</div>
+      </div>
+    );
+  }
 
   return (
-    <div>
-      <h1>Sản phẩm yêu thích</h1>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '24px' }}>
-        {favorites.map(product => (
-          <div key={product._id} style={{ border: '1px solid #eee', borderRadius: 8, padding: 16, width: 260 }}>
-            <img src={product.images?.[0]?.url || '/no-image.png'} alt={product.name} style={{ width: '100%', height: 180, objectFit: 'cover', borderRadius: 4 }} />
-            <h3>{product.name}</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <button onClick={() => handleToggleFavorite(product._id, true)} style={{ color: 'red', fontWeight: 'bold' }}>Bỏ yêu thích ♥</button>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-2xl font-bold mb-6">Sản phẩm yêu thích</h1>
+      {favorites.length === 0 ? (
+        <div className="text-center py-8">
+          <p>Bạn chưa có sản phẩm yêu thích nào.</p>
+          <button 
+            onClick={() => router.push('/products')} 
+            className="mt-4 bg-primary text-white px-4 py-2 rounded hover:bg-primary-dark transition-colors"
+          >
+            Xem sản phẩm
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {favorites.map(product => (
+            <CurtainCard key={product._id} curtain={product} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
