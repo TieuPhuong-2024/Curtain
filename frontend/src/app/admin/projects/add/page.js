@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationCircle } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast, Toaster } from 'react-hot-toast';
 import ImageUploader from '@/components/ImageUploader';
 import VideoUploader from '@/components/VideoUploader';
 
@@ -28,9 +28,17 @@ export default function AddProject() {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+
+    const handleVideoUrlChange = (e) => {
+        setVideoUrl(e.target.value);
+    };
     
     const handleAddVideo = () => {
         if (!videoUrl) return;
+        if (!videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
+            toast.error('URL video không hợp lệ!');
+            return;
+        }
         
         setFormData({
             ...formData,
@@ -105,6 +113,7 @@ export default function AddProject() {
     
     return (
         <div className="p-6">
+            <Toaster position="top-center" />
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Thêm Công Trình Mới</h1>
                 <Link href="/admin/projects" className="text-blue-600 hover:text-blue-800 flex items-center">
@@ -207,6 +216,23 @@ export default function AddProject() {
                         Video
                     </label>
                     <VideoUploader onUpload={handleVideoUpload} />
+
+                    <div className="mt-4 flex gap-2">
+                        <input
+                            type="text"
+                            value={videoUrl}
+                            onChange={handleVideoUrlChange}
+                            placeholder="Nhập URL video..."
+                            className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                            type="button"
+                            onClick={handleAddVideo}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center"
+                        >
+                            <FaPlus className="mr-2" /> Thêm
+                        </button>
+                    </div>
                     
                     {/* Display added videos */}
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
