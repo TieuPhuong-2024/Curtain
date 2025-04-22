@@ -7,6 +7,7 @@ import Link from 'next/link';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 import ImageUploader from '@/components/ImageUploader';
+import VideoUploader from '@/components/VideoUploader';
 
 export default function AddProject() {
     const router = useRouter();
@@ -55,6 +56,13 @@ export default function AddProject() {
         const newImages = [...formData.images];
         newImages.splice(index, 1);
         setFormData({ ...formData, images: newImages });
+    };
+
+    const handleVideoUpload = (uploadedVideos) => {
+        setFormData({
+            ...formData,
+            videos: [...formData.videos, ...uploadedVideos]
+        });
     };
     
     const handleSubmit = async (e) => {
@@ -196,34 +204,23 @@ export default function AddProject() {
                 
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Video (Youtube embed URL)
+                        Video
                     </label>
-                    <div className="flex space-x-2">
-                        <input
-                            type="text"
-                            value={videoUrl}
-                            onChange={(e) => setVideoUrl(e.target.value)}
-                            className="flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="https://www.youtube.com/embed/..."
-                        />
-                        <button
-                            type="button"
-                            onClick={handleAddVideo}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
-                        >
-                            <FaPlus />
-                        </button>
-                    </div>
+                    <VideoUploader onUpload={handleVideoUpload} />
                     
                     {/* Display added videos */}
-                    <div className="mt-4 space-y-2">
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {formData.videos.map((video, index) => (
-                            <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                                <div className="truncate flex-1">{video}</div>
+                            <div key={index} className="relative group rounded-md overflow-hidden border">
+                                <video
+                                    src={video}
+                                    className="w-full h-32 object-cover"
+                                    controls
+                                />
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveVideo(index)}
-                                    className="text-red-600 hover:text-red-800 p-1"
+                                    className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <FaTrash />
                                 </button>
