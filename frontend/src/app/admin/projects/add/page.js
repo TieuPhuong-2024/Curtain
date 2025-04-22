@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaSave, FaArrowLeft, FaPlus, FaTrash, FaCheckCircle, FaTimesCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaSave, FaArrowLeft, FaPlus, FaTrash } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
 import { toast, Toaster } from 'react-hot-toast';
@@ -12,7 +12,7 @@ import VideoUploader from '@/components/VideoUploader';
 export default function AddProject() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -21,9 +21,9 @@ export default function AddProject() {
         images: [],
         videos: []
     });
-    
+
     const [videoUrl, setVideoUrl] = useState('');
-    
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -32,34 +32,34 @@ export default function AddProject() {
     const handleVideoUrlChange = (e) => {
         setVideoUrl(e.target.value);
     };
-    
+
     const handleAddVideo = () => {
         if (!videoUrl) return;
         if (!videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
             toast.error('URL video không hợp lệ!');
             return;
         }
-        
+
         setFormData({
             ...formData,
             videos: [...formData.videos, videoUrl]
         });
         setVideoUrl('');
     };
-    
+
     const handleRemoveVideo = (index) => {
         const newVideos = [...formData.videos];
         newVideos.splice(index, 1);
         setFormData({ ...formData, videos: newVideos });
     };
-    
+
     const handleImageUpload = (uploadedImages) => {
         setFormData({
             ...formData,
             images: [...formData.images, ...uploadedImages]
         });
     };
-    
+
     const handleRemoveImage = (index) => {
         const newImages = [...formData.images];
         newImages.splice(index, 1);
@@ -72,24 +72,24 @@ export default function AddProject() {
             videos: [...formData.videos, ...uploadedVideos]
         });
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Validate required fields
         const requiredFields = ['title', 'description', 'location', 'type'];
         const missingFields = requiredFields.filter(field => !formData[field]);
-        
+
         if (missingFields.length > 0) {
             toast.error(`Vui lòng điền đầy đủ thông tin: ${missingFields.join(', ')}`);
             return;
         }
-        
+
         if (formData.images.length === 0) {
             toast.error('Vui lòng thêm ít nhất một hình ảnh!');
             return;
         }
-        
+
         try {
             setLoading(true);
             const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/projects`, formData, {
@@ -97,20 +97,20 @@ export default function AddProject() {
                     'Content-Type': 'application/json'
                 }
             });
-            
+
             if (response.data) {
                 toast.success('Thêm công trình thành công!');
                 router.push('/admin/projects');
             }
         } catch (error) {
-            const errorMessage = error.response?.data?.message || 
-                               (error.response?.status === 413 ? 'Dữ liệu quá lớn!' : 'Lỗi khi thêm công trình!');
+            const errorMessage = error.response?.data?.message ||
+                (error.response?.status === 413 ? 'Dữ liệu quá lớn!' : 'Lỗi khi thêm công trình!');
             toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
     };
-    
+
     return (
         <div className="p-6">
             <Toaster position="top-center" />
@@ -120,7 +120,7 @@ export default function AddProject() {
                     <FaArrowLeft className="mr-2" /> Quay lại
                 </Link>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -137,7 +137,7 @@ export default function AddProject() {
                             placeholder="Nhập tên công trình"
                         />
                     </div>
-                    
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Địa điểm <span className="text-red-500">*</span>
@@ -153,7 +153,7 @@ export default function AddProject() {
                         />
                     </div>
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Loại công trình <span className="text-red-500">*</span>
@@ -168,7 +168,7 @@ export default function AddProject() {
                         placeholder="Ví dụ: Biệt thự, Chung cư, Văn phòng, Khách sạn..."
                     />
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Mô tả <span className="text-red-500">*</span>
@@ -183,13 +183,13 @@ export default function AddProject() {
                         rows={4}
                     />
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Hình ảnh <span className="text-red-500">*</span>
                     </label>
                     <ImageUploader onUpload={handleImageUpload} />
-                    
+
                     {/* Display uploaded images */}
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {formData.images.map((img, index) => (
@@ -210,7 +210,7 @@ export default function AddProject() {
                         ))}
                     </div>
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Video
@@ -233,7 +233,7 @@ export default function AddProject() {
                             <FaPlus className="mr-2" /> Thêm
                         </button>
                     </div>
-                    
+
                     {/* Display added videos */}
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {formData.videos.map((video, index) => (
@@ -254,8 +254,14 @@ export default function AddProject() {
                         ))}
                     </div>
                 </div>
-                
+
                 <div className="mt-8 flex justify-end">
+                    <Link
+                        href="/admin/curtains"
+                        className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2"
+                    >
+                        Hủy
+                    </Link>
                     <button
                         type="submit"
                         disabled={loading}
@@ -272,9 +278,6 @@ export default function AddProject() {
                             </>
                         )}
                     </button>
-                    <Link href="/admin/projects" className="bg-gray-500 text-white px-6 py-2 rounded-md flex items-center hover:bg-gray-600 transition ml-2">
-                        <FaTimesCircle className="mr-2" /> Hủy
-                    </Link>
                 </div>
             </form>
         </div>
