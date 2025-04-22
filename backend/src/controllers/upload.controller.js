@@ -6,19 +6,46 @@ const fileController = require('./file.controller');
 // Configure in-memory storage for uploaded files
 const storage = multer.memoryStorage();
 
-// File filter to only allow image files
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype.startsWith('image/')) {
-    cb(null, true);
-  } else {
-    cb(new Error('Only image files are allowed!'), false);
-  }
+// File filter for images
+const imageFileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files are allowed!'), false);
+    }
 };
+
+// File filter for videos
+const videoFileFilter = (req, file, cb) => {
+    if (file.mimetype.startsWith('video/')) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only video files are allowed!'), false);
+    }
+};
+
+// Configure multer for images
+const uploadImage = multer({
+    storage: storage,
+    fileFilter: imageFileFilter,
+    limits: {
+        fileSize: 5 * 1024 * 1024 // 5MB limit
+    }
+});
+
+// Configure multer for videos
+const uploadVideo = multer({
+    storage: storage,
+    fileFilter: videoFileFilter,
+    limits: {
+        fileSize: 50 * 1024 * 1024 // 50MB limit
+    }
+});
 
 // Configure multer
 const upload = multer({
   storage: storage,
-  fileFilter: fileFilter,
+  fileFilter: imageFileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024 // 5MB limit
   }
@@ -171,4 +198,44 @@ exports.saveMultipleImageUrls = async (req, res) => {
     console.error('Error saving image URLs:', error);
     res.status(500).json({ message: 'Error saving image URLs', error: error.message });
   }
+};
+
+// Upload video from device and save to database
+exports.uploadVideo = (req, res) => {
+    const uploadSingle = uploadVideo.single('video');
+
+    uploadSingle(req, res, async function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(400).json({ message: 'File upload error', error: err.message });
+        } else if (err) {
+            return res.status(500).json({ message: 'Unknown error', error: err.message });
+        }
+
+        if (!req.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
+
+        try {
+            const fileData = {
+                filename: Date.now() + '-' + Math.round(Math.random() * 1E9) + path.extname(req.file.originalname),
+                originalname: req.file.originalname,
+                mimetype: req.file.mimetype,
+                data: req.file.buffer,
+                size: req.file.size
+            };
+
+            const savedFile = await fileController.saveFile(fileData);
+            const baseUrl = `${req.protocol}://${req.get('host')}`;
+            const fileUrl = `${baseUrl}${savedFile.fileUrl}`;
+
+            res.status(200).json({
+                message: 'Video uploaded successfully',
+                url: fileUrl,
+                fileId: savedFile._id
+            });
+        } catch (error) {
+            console.error('Error saving video to database:', error);
+            res.status(500).json({ message: 'Error saving video', error: error.message });
+        }
+    });
 };

@@ -14,4 +14,7 @@ router.post('/from-url', uploadController.saveImageFromUrl);
 // POST save multiple image URLs
 router.post('/multiple-from-url', uploadController.saveMultipleImageUrls);
 
+// POST upload video file
+router.post('/video', uploadController.uploadVideo);
+
 module.exports = router;
