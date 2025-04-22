@@ -15,7 +15,7 @@ const ActionButton = ({href, icon, label, badge, onClick}) => {
                     className="flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors"
                 >
                     <span className="text-xl">{icon}</span>
-                    <span className="text-xs mt-1">{label}</span>
+                    <span className="text-xs mt-1 whitespace-nowrap">{label}</span>
                     {badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                             {badge}
@@ -25,7 +25,7 @@ const ActionButton = ({href, icon, label, badge, onClick}) => {
             ) : (
                 <Link href={href} className="flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors">
                     <span className="text-xl">{icon}</span>
-                    <span className="text-xs mt-1">{label}</span>
+                    <span className="text-xs mt-1 whitespace-nowrap">{label}</span>
                     {badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                             {badge}
@@ -84,27 +84,27 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <Link 
                             href="/" 
-                            className="text-2xl font-bold text-gradient mr-8"
+                            className="text-2xl font-bold text-gradient mr-6"
                         >
                             Curtain Shop
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex space-x-6">
-                            <Link href="/" className="text-text-primary hover:text-primary transition-colors">
+                        <div className="hidden md:flex space-x-5">
+                            <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Trang chủ
                             </Link>
-                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors">
+                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Giới thiệu
                             </Link>
-                            <Link href="/products" className="text-text-primary hover:text-primary transition-colors">
+                            <Link href="/products" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Sản phẩm
                             </Link>
-                            <Link href="/contact" className="text-text-primary hover:text-primary transition-colors">
+                            <Link href="/contact" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Liên hệ
                             </Link>
                             {isAdmin && (
-                                <Link href="/admin" className="text-text-primary hover:text-primary transition-colors">
+                                <Link href="/admin" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                     Quản trị
                                 </Link>
                             )}
@@ -131,7 +131,7 @@ export default function Navbar() {
                         </form>
 
                         {/* Action buttons */}
-                        <div className="flex items-center space-x-3">
+                        <div className="flex items-center space-x-2">
                             <ActionButton href="/favorites" icon={<FaHeart />} label="Yêu thích" badge={0} />
                             <ActionButton href="/cart" icon={<FaShoppingCart />} label="Giỏ hàng" badge={0} />
                             
