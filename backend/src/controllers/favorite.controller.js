@@ -3,19 +3,19 @@ const Curtain = require('../models/curtain.model');
 
 exports.getFavoriteByUserId = async (req, res) => {
   try {
-    const { userId } = req.params; // Get user ID from auth middleware
+    const { userId } = req.params;
     const favorites = await Favorite.find({ user: userId })
       .populate('product')
       .lean();
     const transformedData = favorites.map(fav => ({
-      _id: fav.product._id,
-      ...fav.product,
-      favoriteId: fav._id,
+      _id: fav._id, // Trả về _id của favorite document
+      productId: fav.product._id, // Thêm productId để phân biệt
+      product: fav.product, // Giữ nguyên thông tin product
       createdAt: fav.createdAt
     }));
     res.json({ success: true, data: transformedData });
   } catch (err) {
-    console.error('Error in getFavoriteByUserId:', err); // Debug log
+    console.error('Error in getFavoriteByUserId:', err);
     res.status(500).json({ error: err.message });
   }
 };

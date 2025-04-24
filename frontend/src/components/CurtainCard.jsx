@@ -32,14 +32,17 @@ export default function CurtainCard({ curtain }) {
                 setIsFavorite(false);
                 return;
             }
-            const res = await favoriteService.getFavoriteByUserId(user._id);
+            const res = await favoriteService.getFavoriteByUserId(user.uid);
+            
             if (!res.success) {
                 setIsFavorite(false);
                 return;
             }
-            const favoriteIds = res.data.map(f => f._id);
-            setIsFavorite(favoriteIds.includes(_id));
+            
+            const productIds = res.data.map(f => f.productId);
+            setIsFavorite(productIds.includes(_id));
         } catch (err) {
+            console.error('Error fetching favorite status:', err);
             setIsFavorite(false);
         }
     };
@@ -74,6 +77,7 @@ export default function CurtainCard({ curtain }) {
         try {
             setIsLoading(true);
             if (isFavorite) {
+                console.log('Removing favorite:', _id); // Debug log
                 await favoriteService.removeFavorite(_id);
                 setIsFavorite(false);
             } else {
