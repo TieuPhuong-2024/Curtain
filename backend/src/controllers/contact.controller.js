@@ -10,10 +10,63 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Rate limit check function
+const isRateLimited = async (ipAddress) => {
+    const lastMinute = new Date(Date.now() - 60 * 1000); // 1 minute ago
+    const lastHour = new Date(Date.now() - 60 * 60 * 1000); // 1 hour ago
+    
+    const minuteCount = await Contact.countDocuments({
+        ipAddress,
+        createdAt: { $gte: lastMinute }
+    });
+    
+    const hourCount = await Contact.countDocuments({
+        ipAddress,
+        createdAt: { $gte: lastHour }
+    });
+    
+    return minuteCount >= 2 || hourCount >= 5;
+};
+
 // Create new contact request
 exports.createContact = async (req, res) => {
     try {
-        const contact = new Contact(req.body);
+        const ipAddress = req.ip || req.connection.remoteAddress;
+        
+        // Check rate limiting
+        const limited = await isRateLimited(ipAddress);
+        if (limited) {
+            return res.status(429).json({
+                success: false,
+                message: 'Vui lòng đợi một lát trước khi gửi yêu cầu mới'
+            });
+        }
+
+        // Check for spam indicators
+        const { name, email, phone, message } = req.body;
+        
+        // Simple spam checks
+        if (message.includes('http://') || message.includes('https://')) {
+            return res.status(400).json({
+                success: false,
+                message: 'Nội dung không được chứa liên kết'
+            });
+        }
+
+        if (message.toLowerCase().includes('spam') || 
+            message.toLowerCase().includes('marketing') ||
+            message.toLowerCase().includes('seo')) {
+            return res.status(400).json({
+                success: false,
+                message: 'Nội dung không hợp lệ'
+            });
+        }
+
+        const contact = new Contact({
+            ...req.body,
+            ipAddress
+        });
+        
         await contact.save();
 
         // Send email notification
@@ -32,7 +85,6 @@ exports.createContact = async (req, res) => {
             `
         };
 
-        // Send the email
         await transporter.sendMail(mailOptions);
 
         res.status(201).json({
@@ -44,8 +96,7 @@ exports.createContact = async (req, res) => {
         console.error('Error in createContact:', error);
         res.status(400).json({
             success: false,
-            message: 'Không thể gửi yêu cầu tư vấn',
-            error: error.message
+            message: error.message || 'Không thể gửi yêu cầu tư vấn',
         });
     }
 };
