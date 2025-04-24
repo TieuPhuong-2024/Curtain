@@ -6,6 +6,9 @@ const auth = require('../middleware/auth');
 // Get all favorites for the logged-in user
 router.get('/', auth, favoriteController.getFavorites);
 
+// Get favorites by user ID
+router.get('/user/:userId', favoriteController.getFavoriteByUserId);
+
 // Add a product to favorites
 router.post('/', auth, favoriteController.addFavorite);
 

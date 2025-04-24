@@ -1,23 +1,41 @@
 const Favorite = require('../models/favorite.model');
 const Curtain = require('../models/curtain.model');
 
-// Get all favorite products for a user
-exports.getFavorites = async (req, res) => {
+exports.getFavoriteByUserId = async (req, res) => {
   try {
-    const userId = req.user._id; // Using _id from auth middleware
-    console.log('Getting favorites for user:', userId); // Debug log
-    
+    const { userId } = req.params; // Get user ID from auth middleware
     const favorites = await Favorite.find({ user: userId })
       .populate('product')
       .lean();
-    
     const transformedData = favorites.map(fav => ({
       _id: fav.product._id,
       ...fav.product,
       favoriteId: fav._id,
       createdAt: fav.createdAt
     }));
-    
+    res.json({ success: true, data: transformedData });
+  } catch (err) {
+    console.error('Error in getFavoriteByUserId:', err); // Debug log
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Get all favorite products for a user
+exports.getFavorites = async (req, res) => {
+  try {
+    const userId = req.user._id; // Get user ID from auth middleware
+
+    const favorites = await Favorite.find({ user: userId })
+      .populate('product')
+      .lean();
+
+    const transformedData = favorites.map(fav => ({
+      _id: fav.product._id,
+      ...fav.product,
+      favoriteId: fav._id,
+      createdAt: fav.createdAt
+    }));
+
     res.json({ success: true, data: transformedData });
   } catch (err) {
     console.error('Error in getFavorites:', err); // Debug log
@@ -65,14 +83,14 @@ exports.removeFavorite = async (req, res) => {
   try {
     const userId = req.user._id; // Using _id from auth middleware
     const { productId } = req.params;
-    
+
     console.log('Removing favorite for user:', userId, 'product:', productId); // Debug log
-    
+
     const result = await Favorite.findOneAndDelete({ user: userId, product: productId });
     if (!result) {
       return res.status(404).json({ error: 'Favorite not found' });
     }
-    
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error in removeFavorite:', err); // Debug log
