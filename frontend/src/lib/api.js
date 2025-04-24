@@ -215,6 +215,15 @@ export const deleteImage = async (imageId) => {
 };
 
 export const favoriteService = {
+    getFavoriteByUserId: async (userId) => {
+        try {
+            const response = await api.get(`/favorites/user/${userId}`);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching favorites by user ID:', error);
+            throw error;
+        }
+    },
     getFavorites: async () => {
         try {
             const response = await api.get('/favorites');

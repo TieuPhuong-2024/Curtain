@@ -23,13 +23,20 @@ export default function CurtainCard({ curtain }) {
     useEffect(() => {
         fetchFavoriteStatus();
         fetchFavoriteCount();
-        // eslint-disable-next-line
     }, [_id]);
 
     // Kiểm tra sản phẩm này đã được user yêu thích chưa
     const fetchFavoriteStatus = async () => {
         try {
-            const res = await favoriteService.getFavorites();
+            if (!user) {
+                setIsFavorite(false);
+                return;
+            }
+            const res = await favoriteService.getFavoriteByUserId(user._id);
+            if (!res.success) {
+                setIsFavorite(false);
+                return;
+            }
             const favoriteIds = res.data.map(f => f._id);
             setIsFavorite(favoriteIds.includes(_id));
         } catch (err) {
@@ -56,7 +63,7 @@ export default function CurtainCard({ curtain }) {
     const toggleFavorite = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        
+
         if (!user) {
             window.location.href = '/login';
             return;
@@ -118,9 +125,8 @@ export default function CurtainCard({ curtain }) {
                 </button>
                 {/* Overlay with actions on hover */}
                 <div
-                    className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-3 transition-opacity duration-300 ${
-                        isHovered ? 'opacity-100' : 'opacity-0'
-                    }`}
+                    className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
+                        }`}
                 >
                     <Link
                         href={`/products/${_id}`}
