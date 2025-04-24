@@ -10,7 +10,8 @@ export default function ContactPage() {
         email: '',
         phone: '',
         subject: '',
-        message: ''
+        message: '',
+        website: '' // honeypot field
     });
 
     const [formStatus, setFormStatus] = useState({
@@ -30,6 +31,17 @@ export default function ContactPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        // Check honeypot field
+        if (formData.website) {
+            // If honeypot is filled, silently reject but appear successful
+            setFormStatus({
+                submitted: true,
+                success: true,
+                message: 'Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.'
+            });
+            return;
+        }
+
         // Validate form
         if (!formData.name || !formData.email || !formData.phone || !formData.message) {
             setFormStatus({
@@ -45,7 +57,6 @@ export default function ContactPage() {
             if (!response.ok) {
                 throw new Error('Có lỗi xảy ra khi gửi yêu cầu');
             }
-            // Parse the response data
             const data = await response.json();
 
             if (data.success) {
@@ -61,7 +72,8 @@ export default function ContactPage() {
                     email: '',
                     phone: '',
                     subject: '',
-                    message: ''
+                    message: '',
+                    website: ''
                 });
             } else {
                 throw new Error(data.message || 'Có lỗi xảy ra khi gửi yêu cầu');
@@ -85,7 +97,6 @@ export default function ContactPage() {
                 <div className="md:col-span-1">
                     <div className="bg-white rounded-lg shadow-md p-6">
                         <h2 className="text-xl font-semibold mb-4">Thông Tin Liên Hệ</h2>
-
                         <div className="space-y-4">
                             <div className="flex items-start">
                                 <FaMapMarkerAlt className="text-indigo-600 mt-1 mr-3" size={20}/>
@@ -120,19 +131,6 @@ export default function ContactPage() {
                                 </div>
                             </div>
                         </div>
-
-                        {/* Map */}
-                        <div className="mt-6 rounded-lg overflow-hidden h-64">
-                            <iframe 
-                                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d3919.3477285307!2d106.67761947460892!3d10.78626225901454!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zMTDCsDQ3JzEwLjYiTiAxMDbCsDQwJzQ1LjQiRQ!5e0!3m2!1svi!2s!4v1703730545669!5m2!1svi!2s" 
-                                width="100%" 
-                                height="100%" 
-                                style={{ border: 0 }} 
-                                allowFullScreen="" 
-                                loading="lazy" 
-                                referrerPolicy="no-referrer-when-downgrade"
-                            ></iframe>
-                        </div>
                     </div>
                 </div>
 
@@ -142,13 +140,24 @@ export default function ContactPage() {
                         <h2 className="text-xl font-semibold mb-4">Gửi Yêu Cầu Tư Vấn</h2>
 
                         {formStatus.submitted && (
-                            <div
-                                className={`p-4 mb-4 rounded-md ${formStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                            <div className={`p-4 mb-4 rounded-md ${formStatus.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                 {formStatus.message}
                             </div>
                         )}
 
                         <form onSubmit={handleSubmit}>
+                            {/* Honeypot field - hidden from real users */}
+                            <input
+                                type="text"
+                                id="website"
+                                name="website"
+                                value={formData.website}
+                                onChange={handleChange}
+                                style={{ display: 'none' }}
+                                tabIndex="-1"
+                                aria-hidden="true"
+                            />
+
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label htmlFor="name" className="block mb-1 font-medium">
