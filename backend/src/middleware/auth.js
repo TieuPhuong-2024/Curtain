@@ -1,9 +1,9 @@
 var admin = require("firebase-admin");
 
-var serviceAccount = require("../../serviceAccountKey.json");
+const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
 
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(credentials)
 });
 
 module.exports = async function (req, res, next) {
