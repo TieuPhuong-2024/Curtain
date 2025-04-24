@@ -35,14 +35,21 @@ exports.addFavorite = async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    const favorite = await Favorite.findOneAndUpdate(
-      { user: userId, product: productId },
-      { user: userId, product: productId },
-      { upsert: true, new: true }
-    );
+    // Create new favorite with both user and product
+    const favorite = new Favorite({
+      user: userId,
+      product: productId
+    });
+
+    // Save to database
+    await favorite.save();
 
     res.json({ success: true, data: favorite });
   } catch (err) {
+    // Check if error is a duplicate key error
+    if (err.code === 11000) {
+      return res.status(400).json({ error: 'Product already in favorites' });
+    }
     res.status(500).json({ error: err.message });
   }
 };
