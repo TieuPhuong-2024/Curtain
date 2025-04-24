@@ -22,6 +22,7 @@ const imageRoutes = require('./routes/image.routes');
 const fileRoutes = require('./routes/file.routes');
 const projectRoutes = require('./routes/project.routes');
 const favoriteRoutes = require('./routes/favorite.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
@@ -32,6 +33,7 @@ app.use('/api/images', imageRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/favorites', favoriteRoutes);
+app.use('/api/contacts', contactRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
@@ -51,4 +53,4 @@ mongoose.connect(MONGODB_URI)
   })
   .catch(err => {
     console.error('Failed to connect to MongoDB', err);
-  }); 
+  });

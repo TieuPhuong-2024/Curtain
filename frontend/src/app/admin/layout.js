@@ -63,6 +63,11 @@ export default function AdminLayout({children}) {
                             </Link>
                         </li>
                         <li>
+                            <Link href="/admin/contacts" className="block py-2 px-4 hover:bg-gray-700">
+                                Quản lý Liên hệ
+                            </Link>
+                        </li>
+                        <li>
                             <Link href="/admin/projects" className="block py-2 px-4 hover:bg-gray-700">
                                 Quản lý công trình
                             </Link>
@@ -92,4 +97,4 @@ export default function AdminLayout({children}) {
             </div>
         </div>
     );
-} 
+}
