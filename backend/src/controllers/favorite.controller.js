@@ -4,12 +4,13 @@ const Curtain = require('../models/curtain.model');
 // Get all favorite products for a user
 exports.getFavorites = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id; // Using _id from auth middleware
+    console.log('Getting favorites for user:', userId); // Debug log
+    
     const favorites = await Favorite.find({ user: userId })
       .populate('product')
       .lean();
     
-    // Transform data to include both favorite and product info
     const transformedData = favorites.map(fav => ({
       _id: fav.product._id,
       ...fav.product,
@@ -19,6 +20,7 @@ exports.getFavorites = async (req, res) => {
     
     res.json({ success: true, data: transformedData });
   } catch (err) {
+    console.error('Error in getFavorites:', err); // Debug log
     res.status(500).json({ error: err.message });
   }
 };
@@ -26,8 +28,10 @@ exports.getFavorites = async (req, res) => {
 // Add product to favorites
 exports.addFavorite = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id; // Using _id from auth middleware
     const { productId } = req.body;
+
+    console.log('Adding favorite for user:', userId, 'product:', productId); // Debug log
 
     // Check if product exists
     const product = await Curtain.findById(productId);
@@ -35,7 +39,7 @@ exports.addFavorite = async (req, res) => {
       return res.status(404).json({ error: 'Product not found' });
     }
 
-    // Create new favorite with both user and product
+    // Create new favorite
     const favorite = new Favorite({
       user: userId,
       product: productId
@@ -43,9 +47,11 @@ exports.addFavorite = async (req, res) => {
 
     // Save to database
     await favorite.save();
+    console.log('Favorite saved:', favorite); // Debug log
 
     res.json({ success: true, data: favorite });
   } catch (err) {
+    console.error('Error in addFavorite:', err); // Debug log
     // Check if error is a duplicate key error
     if (err.code === 11000) {
       return res.status(400).json({ error: 'Product already in favorites' });
@@ -57,8 +63,10 @@ exports.addFavorite = async (req, res) => {
 // Remove product from favorites
 exports.removeFavorite = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id; // Using _id from auth middleware
     const { productId } = req.params;
+    
+    console.log('Removing favorite for user:', userId, 'product:', productId); // Debug log
     
     const result = await Favorite.findOneAndDelete({ user: userId, product: productId });
     if (!result) {
@@ -67,6 +75,7 @@ exports.removeFavorite = async (req, res) => {
     
     res.json({ success: true });
   } catch (err) {
+    console.error('Error in removeFavorite:', err); // Debug log
     res.status(500).json({ error: err.message });
   }
 };
@@ -78,6 +87,7 @@ exports.getFavoriteCount = async (req, res) => {
     const count = await Favorite.countDocuments({ product: productId });
     res.json({ success: true, data: { productId, count } });
   } catch (err) {
+    console.error('Error in getFavoriteCount:', err); // Debug log
     res.status(500).json({ error: err.message });
   }
 };
