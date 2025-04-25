@@ -14,6 +14,7 @@ export default function CurtainCard({ curtain }) {
     const [isFavorite, setIsFavorite] = useState(false);
     const [favoriteCount, setFavoriteCount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
 
     // Sử dụng mainImage hoặc fallback vào image cho tương thích ngược
     const displayImage = mainImage || image || '/images/curtain-placeholder.jpg';
@@ -23,6 +24,18 @@ export default function CurtainCard({ curtain }) {
     useEffect(() => {
         fetchFavoriteStatus();
         fetchFavoriteCount();
+        
+        // Check if device is touch-enabled for better mobile experience
+        const checkTouch = () => {
+            setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+        };
+        
+        checkTouch();
+        window.addEventListener('touchstart', () => setIsTouchDevice(true), { once: true });
+        
+        return () => {
+            window.removeEventListener('touchstart', () => setIsTouchDevice(true));
+        };
     }, [_id]);
 
     // Kiểm tra sản phẩm này đã được user yêu thích chưa
@@ -94,17 +107,21 @@ export default function CurtainCard({ curtain }) {
         }
     };
 
+    // Touch devices (mobile) show action buttons always, while desktop/laptop shows on hover
+    const showActions = isTouchDevice || isHovered;
+
     return (
         <div
             className="bg-white rounded-lg overflow-hidden shadow-md card-hover"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+            onMouseEnter={() => !isTouchDevice && setIsHovered(true)}
+            onMouseLeave={() => !isTouchDevice && setIsHovered(false)}
         >
-            <div className="relative h-64 w-full group">
+            <div className="relative h-48 sm:h-56 md:h-64 w-full group">
                 <Image
                     src={displayImage}
                     alt={name}
                     fill
+                    sizes="(max-width: 576px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     style={{
                         objectFit: 'cover',
                         transition: 'transform 0.5s ease'
@@ -127,41 +144,46 @@ export default function CurtainCard({ curtain }) {
                     <FaHeart size={16} className={`${isFavorite ? "text-red-500" : ""} ${isLoading ? "opacity-50" : ""}`} />
                     <span className="ml-1 text-xs">{favoriteCount}</span>
                 </button>
-                {/* Overlay with actions on hover */}
+                {/* Overlay with actions - always visible on mobile, hover on desktop */}
                 <div
-                    className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-3 transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'
-                        }`}
+                    className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-3 transition-opacity duration-300 ${
+                        showActions ? 'opacity-100' : 'opacity-0'
+                    }`}
                 >
                     <Link
                         href={`/products/${_id}`}
-                        className="bg-white text-gray-700 px-3 py-2 rounded-md flex items-center gap-2 hover:bg-indigo-100 transition-colors duration-300"
+                        className="bg-white text-gray-700 p-2 sm:px-3 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 hover:bg-indigo-100 transition-colors duration-300"
                         title="Xem chi tiết"
                     >
-                        <FaEye size={18} />
+                        <FaEye size={16} className="sm:text-lg" />
+                        <span className="text-xs sm:text-sm hidden sm:inline">Chi tiết</span>
                     </Link>
                     <button
-                        className="bg-white text-gray-700 px-3 py-2 rounded-md flex items-center gap-2 hover:bg-indigo-100 transition-colors duration-300"
+                        className="bg-white text-gray-700 p-2 sm:px-3 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 hover:bg-indigo-100 transition-colors duration-300"
                         title="Thêm vào giỏ hàng"
                         onClick={(e) => {
                             e.preventDefault();
                             // Thêm logic để thêm vào giỏ hàng ở đây
                         }}
                     >
-                        <FaShoppingCart size={18} />
+                        <FaShoppingCart size={16} className="sm:text-lg" />
+                        <span className="text-xs sm:text-sm hidden sm:inline">Giỏ hàng</span>
                     </button>
                 </div>
             </div>
-            <div className="p-4">
-                <h3 className="font-medium text-gray-900 mb-1 truncate">{name}</h3>
+            <div className="p-3 sm:p-4">
+                <h3 className="font-medium text-sm sm:text-base text-gray-900 mb-1 truncate">
+                    {name}
+                </h3>
                 <div className="flex justify-between items-center">
-                    <p className="font-bold text-primary">
+                    <p className="font-bold text-sm sm:text-base text-primary">
                         {new Intl.NumberFormat('vi-VN', {
                             style: 'currency',
                             currency: 'VND'
                         }).format(price)}
                     </p>
                     <div
-                        className="w-4 h-4 rounded-full border border-gray-300"
+                        className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-gray-300"
                         style={{ backgroundColor: color?.toLowerCase() }}
                         title={color}
                     />

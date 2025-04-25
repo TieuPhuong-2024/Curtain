@@ -15,6 +15,7 @@ export const metadata = {
     title: "Curtain Shop - Rèm Cửa Cao Cấp",
     description: "Cửa hàng rèm cửa với đa dạng mẫu mã, chất liệu và màu sắc",
     keywords: "rèm cửa, rèm cửa cao cấp, rèm cửa sổ, rèm phòng khách, rèm phòng ngủ",
+    viewport: "width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no",
 };
 
 export default function RootLayout({children}) {
