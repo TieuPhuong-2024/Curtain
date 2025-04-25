@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import ProjectCard from "@/components/ProjectCard";
 import axios from "axios";
+import Link from "next/link";
 
 export default function ThiCongLapRemPage() {
     const [projects, setProjects] = useState([]);
@@ -17,11 +18,11 @@ export default function ThiCongLapRemPage() {
                 setLoading(true);
                 const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
                 setProjects(response.data);
-                
+
                 // Extract unique project types for filters
                 const types = [...new Set(response.data.map(project => project.type))];
                 setProjectTypes(types);
-                
+
                 setLoading(false);
             } catch (err) {
                 setError("Không thể tải dữ liệu công trình. Vui lòng thử lại sau.");
@@ -36,16 +37,16 @@ export default function ThiCongLapRemPage() {
     const handleFilterChange = async (filter) => {
         setActiveFilter(filter);
         setLoading(true);
-        
+
         try {
             let response;
-            
+
             if (filter === "all") {
                 response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
             } else {
                 response = await axios.get(process.env.NEXT_PUBLIC_API_URL + `/projects/type/${filter}`);
             }
-            
+
             setProjects(response.data);
             setLoading(false);
         } catch (err) {
@@ -54,27 +55,27 @@ export default function ThiCongLapRemPage() {
             console.error("Error filtering projects:", err);
         }
     };
-    
+
     return (
         <main className="container mx-auto py-10 px-4">
             <div className="text-center mb-12">
                 <h1 className="text-4xl font-bold mb-4 text-blue-900">Công Trình Đã Thi Công</h1>
                 <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-                    Chúng tôi tự hào giới thiệu những công trình rèm cửa đã thi công thực tế. 
-                    Dưới đây là bộ sưu tập các dự án tiêu biểu mà chúng tôi đã hoàn thành, 
+                    Chúng tôi tự hào giới thiệu những công trình rèm cửa đã thi công thực tế.
+                    Dưới đây là bộ sưu tập các dự án tiêu biểu mà chúng tôi đã hoàn thành,
                     giúp quý khách hàng có cái nhìn trực quan về chất lượng và phong cách làm việc của Curtain Shop.
                 </p>
             </div>
 
             {/* Filter options */}
             <div className="mb-8 flex flex-wrap gap-2 justify-center">
-                <button 
+                <button
                     className={`${activeFilter === "all" ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
                     onClick={() => handleFilterChange("all")}
                 >
                     Tất cả
                 </button>
-                
+
                 {projectTypes.map((type) => (
                     <button
                         key={type}
@@ -93,11 +94,11 @@ export default function ThiCongLapRemPage() {
                     <p className="mt-2 text-gray-600">Đang tải dữ liệu...</p>
                 </div>
             )}
-            
+
             {error && (
                 <div className="text-center py-8 text-red-600">
                     <p>{error}</p>
-                    <button 
+                    <button
                         onClick={() => window.location.reload()}
                         className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
                     >
@@ -181,9 +182,10 @@ export default function ThiCongLapRemPage() {
             <div className="text-center bg-blue-50 p-8 rounded-lg">
                 <h3 className="text-xl font-semibold mb-3 text-blue-800">Bạn muốn thi công rèm cho công trình của mình?</h3>
                 <p className="text-gray-700 mb-5">Hãy liên hệ với chúng tôi để được tư vấn và báo giá miễn phí!</p>
-                <button className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
+                <Link href="/contact"
+                    className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition font-medium">
                     Liên hệ ngay
-                </button>
+                </Link>
             </div>
         </main>
     );
