@@ -26,14 +26,18 @@ exports.getFavorites = async (req, res) => {
     const userId = req.user._id; // Get user ID from auth middleware
 
     const favorites = await Favorite.find({ user: userId })
-      .populate('product')
+      .populate({
+        path: 'product',
+        populate: { path: 'category', select: 'name' }
+      })
       .lean();
 
     const transformedData = favorites.map(fav => ({
       _id: fav.product._id,
       ...fav.product,
       favoriteId: fav._id,
-      createdAt: fav.createdAt
+      createdAt: fav.createdAt,
+      categoryName: fav.product.category?.name // Include category name
     }));
 
     res.json({ success: true, data: transformedData });
