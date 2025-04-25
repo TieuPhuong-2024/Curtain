@@ -13,7 +13,7 @@ const CategoryCard = ({ category, productCount = 0 }) => {
           alt={category.name}
           fill
           style={{ objectFit: 'cover' }}
-          className="group-hover:scale-105 transition-transform duration-500"
+          className="rounded-md group-hover:scale-105 transition-transform duration-500"
         />
       </div>
       <div className="p-5">
