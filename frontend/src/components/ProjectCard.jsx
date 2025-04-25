@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { FaMapMarkerAlt, FaImages, FaVideo, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
 import Lightbox from 'yet-another-react-lightbox';
-import Video from 'yet-another-react-lightbox/plugins/video';
 import 'yet-another-react-lightbox/styles.css';
 
 export default function ProjectCard({ project }) {
@@ -29,7 +28,26 @@ export default function ProjectCard({ project }) {
   // Gom cả ảnh và video vào một mảng slides
   const slides = [
     ...(images || []).map((src) => ({ type: 'image', src })),
-    ...(videos || []).map((src) => ({ type: 'video', src })),
+    ...(videos || []).map((src) => {
+      // Nếu là link YouTube, chuyển sang dạng embed
+      if (src.includes('youtube.com/watch?v=')) {
+        const videoId = src.split('v=')[1].split('&')[0];
+        return {
+          type: 'youtube',
+          videoId: videoId,
+          thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+        };
+      }
+      if (src.includes('youtu.be/')) {
+        const videoId = src.split('youtu.be/')[1].split('?')[0];
+        return {
+          type: 'youtube',
+          videoId: videoId,
+          thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+        };
+      }
+      return { type: 'video', src };
+    }),
   ];
 
   // Khi click xem ảnh hoặc video, xác định index trong slides
@@ -159,7 +177,51 @@ export default function ProjectCard({ project }) {
         close={handleCloseLightbox}
         slides={slides}
         index={lightboxIndex}
-        plugins={[Video]}
+        render={{
+          slide: ({ slide }) => {
+            if (slide.type === 'youtube') {
+              return (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${slide.videoId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1`}
+                    width="80%"
+                    height="80%"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="YouTube video player"
+                    frameBorder="0"
+                  />
+                </div>
+              );
+            }
+            if (slide.type === 'image') {
+              return (
+                <img
+                  src={slide.src}
+                  alt=""
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
+              );
+            }
+            if (slide.type === 'video') {
+              return (
+                <iframe
+                  src={slide.src}
+                  width="80%"
+                  height="80%"
+                  allow="autoplay; fullscreen"
+                  allowFullScreen
+                  style={{ background: 'black', border: 0 }}
+                />
+              );
+            }
+            return null;
+          }
+        }}
       />
     </div>
   );
