@@ -1,8 +1,8 @@
 'use client';
 
 import { createContact } from '@/lib/api';
-import {useState} from 'react';
-import {FaClock, FaEnvelope, FaMapMarkerAlt, FaPhone} from 'react-icons/fa';
+import { useState } from 'react';
+import { FaClock, FaEnvelope, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
 export default function ContactPage() {
     const [formData, setFormData] = useState({
@@ -21,7 +21,7 @@ export default function ContactPage() {
     });
 
     const handleChange = (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -99,7 +99,7 @@ export default function ContactPage() {
                         <h2 className="text-xl font-semibold mb-4">Thông Tin Liên Hệ</h2>
                         <div className="space-y-4">
                             <div className="flex items-start">
-                                <FaMapMarkerAlt className="text-indigo-600 mt-1 mr-3" size={20}/>
+                                <FaMapMarkerAlt className="text-indigo-600 mt-1 mr-3" size={20} />
                                 <div>
                                     <h3 className="font-medium">Địa chỉ</h3>
                                     <p className="text-gray-600">123 Đường ABC, Quận 1, TP.HCM</p>
@@ -107,7 +107,7 @@ export default function ContactPage() {
                             </div>
 
                             <div className="flex items-start">
-                                <FaPhone className="text-indigo-600 mt-1 mr-3" size={20}/>
+                                <FaPhone className="text-indigo-600 mt-1 mr-3" size={20} />
                                 <div>
                                     <h3 className="font-medium">Điện thoại</h3>
                                     <p className="text-gray-600">+84 123 456 789</p>
@@ -115,7 +115,7 @@ export default function ContactPage() {
                             </div>
 
                             <div className="flex items-start">
-                                <FaEnvelope className="text-indigo-600 mt-1 mr-3" size={20}/>
+                                <FaEnvelope className="text-indigo-600 mt-1 mr-3" size={20} />
                                 <div>
                                     <h3 className="font-medium">Email</h3>
                                     <p className="text-gray-600">info@curtainshop.com</p>
@@ -123,12 +123,24 @@ export default function ContactPage() {
                             </div>
 
                             <div className="flex items-start">
-                                <FaClock className="text-indigo-600 mt-1 mr-3" size={20}/>
+                                <FaClock className="text-indigo-600 mt-1 mr-3" size={20} />
                                 <div>
                                     <h3 className="font-medium">Giờ làm việc</h3>
                                     <p className="text-gray-600">Thứ Hai - Thứ Bảy: 8:00 - 20:00</p>
                                     <p className="text-gray-600">Chủ Nhật: 9:00 - 18:00</p>
                                 </div>
+                            </div>
+                            {/* Google Maps */}
+                            <div className="w-full h-[400px] rounded-lg overflow-hidden shadow-md">
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3919.325247630613!2d106.6926323!3d10.7825832!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTDCsDQ2JzU3LjMiTiAxMDbCsDQxJzMzLjUiRQ!5e0!3m2!1svi!2s!4v1650000000000!5m2!1svi!2s"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen=""
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                ></iframe>
                             </div>
                         </div>
                     </div>
