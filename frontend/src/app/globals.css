@@ -70,7 +70,59 @@ body {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 var(--spacing-md);
+    padding: 0 1rem;
+    
+    /* Responsive padding */
+    @media (min-width: 576px) {
+        padding: 0 1.25rem;
+    }
+    
+    @media (min-width: 768px) {
+        padding: 0 var(--spacing-md);
+    }
+    
+    @media (min-width: 1024px) {
+        padding: 0 var(--spacing-lg);
+    }
+}
+
+/* Grid layouts */
+.responsive-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 1rem;
+    
+    @media (min-width: 576px) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+}
+
+.responsive-grid-tight {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    
+    @media (min-width: 576px) {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+    
+    @media (min-width: 1024px) {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 1rem;
+    }
 }
 
 .text-gradient {
@@ -104,6 +156,32 @@ body {
 .card-hover:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+/* Responsive font sizes */
+.text-responsive {
+    font-size: var(--font-size-base);
+    
+    @media (min-width: 768px) {
+        font-size: var(--font-size-lg);
+    }
+    
+    @media (min-width: 1024px) {
+        font-size: var(--font-size-xl);
+    }
+}
+
+.heading-responsive {
+    font-size: var(--font-size-xl);
+    line-height: 1.2;
+    
+    @media (min-width: 768px) {
+        font-size: var(--font-size-2xl);
+    }
+    
+    @media (min-width: 1024px) {
+        font-size: var(--font-size-3xl);
+    }
 }
 
 /* Animation Classes */
@@ -154,4 +232,33 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--primary);
+}
+
+/* Responsive helpers */
+.mobile-only {
+    @media (min-width: 768px) {
+        display: none !important;
+    }
+}
+
+.tablet-up {
+    display: none !important;
+    
+    @media (min-width: 768px) {
+        display: block !important;
+    }
+}
+
+.desktop-up {
+    display: none !important;
+    
+    @media (min-width: 1024px) {
+        display: block !important;
+    }
+}
+
+/* Fix for mobile overflow issues */
+html, body {
+    overflow-x: hidden;
+    max-width: 100%;
 }
