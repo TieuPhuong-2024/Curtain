@@ -3,62 +3,64 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { FaMapMarkerAlt, FaImages, FaVideo, FaChevronLeft, FaChevronRight, FaTimes } from 'react-icons/fa';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 export default function ProjectCard({ project }) {
   const { title, description, location, type, images, videos } = project;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showLightbox, setShowLightbox] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
-  const [showVideo, setShowVideo] = useState(false);
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
 
+  // Bổ sung lại các hàm chuyển ảnh chính
   const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) => 
+    setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) => 
+    setCurrentImageIndex((prevIndex) =>
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
   };
 
-  const openLightbox = (index) => {
+  // Gom cả ảnh và video vào một mảng slides
+  const slides = [
+    ...(images || []).map((src) => ({ type: 'image', src })),
+    ...(videos || []).map((src) => {
+      // Nếu là link YouTube, chuyển sang dạng embed
+      if (src.includes('youtube.com/watch?v=')) {
+        const videoId = src.split('v=')[1].split('&')[0];
+        return {
+          type: 'youtube',
+          videoId: videoId,
+          thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+        };
+      }
+      if (src.includes('youtu.be/')) {
+        const videoId = src.split('youtu.be/')[1].split('?')[0];
+        return {
+          type: 'youtube',
+          videoId: videoId,
+          thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+        };
+      }
+      return { type: 'video', src };
+    }),
+  ];
+
+  // Khi click xem ảnh hoặc video, xác định index trong slides
+  const handleOpenLightbox = (type, idx) => {
+    let index = 0;
+    if (type === 'image') index = idx;
+    else if (type === 'video') index = (images?.length || 0) + idx;
     setLightboxIndex(index);
-    setShowLightbox(true);
-    // Prevent background scrolling when lightbox is open
+    setLightboxOpen(true);
     document.body.style.overflow = 'hidden';
   };
-
-  const closeLightbox = () => {
-    setShowLightbox(false);
-    // Re-enable scrolling when lightbox is closed
-    document.body.style.overflow = 'auto';
-  };
-
-  const handleLightboxPrev = () => {
-    setLightboxIndex((prevIndex) => 
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
-
-  const handleLightboxNext = () => {
-    setLightboxIndex((prevIndex) => 
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
-  };
-
-  const openVideo = (index) => {
-    setCurrentVideoIndex(index);
-    setShowVideo(true);
-    // Prevent background scrolling when video is open
-    document.body.style.overflow = 'hidden';
-  };
-
-  const closeVideo = () => {
-    setShowVideo(false);
-    // Re-enable scrolling when video is closed
+  const handleCloseLightbox = () => {
+    setLightboxOpen(false);
     document.body.style.overflow = 'auto';
   };
 
@@ -125,17 +127,16 @@ export default function ProjectCard({ project }) {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {images.length > 0 && (
             <button 
-              onClick={() => openLightbox(0)}
+              onClick={() => handleOpenLightbox('image', 0)}
               className="flex items-center justify-center sm:justify-start bg-blue-100 text-blue-700 px-3 py-1.5 sm:py-2 rounded text-sm hover:bg-blue-200 transition-colors"
             >
               <FaImages className="mr-1 sm:mr-2" />
               Xem tất cả ảnh ({images.length})
             </button>
           )}
-          
           {videos && videos.length > 0 && (
             <button 
-              onClick={() => openVideo(0)}
+              onClick={() => handleOpenLightbox('video', 0)}
               className="flex items-center justify-center sm:justify-start bg-red-100 text-red-700 px-3 py-1.5 sm:py-2 rounded text-sm hover:bg-red-200 transition-colors"
             >
               <FaVideo className="mr-1 sm:mr-2" />
@@ -170,93 +171,58 @@ export default function ProjectCard({ project }) {
         </div>
       )}
       
-      {/* Lightbox for full-screen images */}
-      {showLightbox && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-          <div className="relative w-full max-w-4xl h-full max-h-screen flex items-center justify-center">
-            <button 
-              onClick={closeLightbox}
-              className="absolute top-2 sm:top-4 right-2 sm:right-4 text-white bg-black bg-opacity-50 p-1.5 sm:p-2 rounded-full hover:bg-opacity-70 z-10"
-              aria-label="Close lightbox"
-            >
-              <FaTimes size={18} className="sm:text-xl" />
-            </button>
-            
-            <button 
-              onClick={handleLightboxPrev}
-              className="absolute left-2 sm:left-4 text-white bg-black bg-opacity-50 p-2 sm:p-3 rounded-full hover:bg-opacity-70 z-10"
-              aria-label="Previous image"
-            >
-              <FaChevronLeft size={16} className="sm:text-xl" />
-            </button>
-            
-            <button 
-              onClick={handleLightboxNext}
-              className="absolute right-2 sm:right-4 text-white bg-black bg-opacity-50 p-2 sm:p-3 rounded-full hover:bg-opacity-70 z-10"
-              aria-label="Next image"
-            >
-              <FaChevronRight size={16} className="sm:text-xl" />
-            </button>
-            
-            <div className="relative w-full h-full p-2 sm:p-4 flex items-center justify-center">
-              <Image
-                src={images[lightboxIndex]}
-                alt={`Full size ${lightboxIndex + 1}`}
-                fill
-                sizes="100vw"
-                style={{ objectFit: 'contain' }}
-                quality={90}
-              />
-            </div>
-            
-            <div className="absolute bottom-2 sm:bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black bg-opacity-50 px-2 sm:px-3 py-1 rounded text-sm">
-              {lightboxIndex + 1} / {images.length}
-            </div>
-          </div>
-        </div>
-      )}
-      
-      {/* Video player */}
-      {showVideo && videos && videos.length > 0 && (
-        <div className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center">
-          <div className="relative w-full max-w-4xl max-h-screen">
-            <button 
-              onClick={closeVideo}
-              className="absolute top-2 sm:top-4 right-2 sm:right-4 text-white bg-black bg-opacity-50 p-1.5 sm:p-2 rounded-full hover:bg-opacity-70 z-10"
-              aria-label="Close video"
-            >
-              <FaTimes size={18} className="sm:text-xl" />
-            </button>
-            
-            <div className="p-2 sm:p-4">
-              <div className="relative w-full h-0 pb-[56.25%]">
+      {/* Thay thế modal custom bằng Lightbox */}
+      <Lightbox
+        open={lightboxOpen}
+        close={handleCloseLightbox}
+        slides={slides}
+        index={lightboxIndex}
+        render={{
+          slide: ({ slide }) => {
+            if (slide.type === 'youtube') {
+              return (
+                <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${slide.videoId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1`}
+                    width="80%"
+                    height="80%"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    title="YouTube video player"
+                    frameBorder="0"
+                  />
+                </div>
+              );
+            }
+            if (slide.type === 'image') {
+              return (
+                <img
+                  src={slide.src}
+                  alt=""
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    objectFit: 'contain'
+                  }}
+                />
+              );
+            }
+            if (slide.type === 'video') {
+              return (
                 <iframe
-                  className="absolute top-0 left-0 w-full h-full"
-                  src={videos[currentVideoIndex]}
-                  title={`Video ${currentVideoIndex + 1}`}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  src={slide.src}
+                  width="80%"
+                  height="80%"
+                  allow="autoplay; fullscreen"
                   allowFullScreen
-                ></iframe>
-              </div>
-            </div>
-            
-            {videos.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
-                {videos.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setCurrentVideoIndex(idx)}
-                    className={`w-3 h-3 rounded-full ${
-                      idx === currentVideoIndex ? 'bg-white' : 'bg-gray-400'
-                    }`}
-                    aria-label={`Go to video ${idx + 1}`}
-                  ></button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+                  style={{ background: 'black', border: 0 }}
+                />
+              );
+            }
+            return null;
+          }
+        }}
+      />
     </div>
   );
 }

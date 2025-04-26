@@ -173,6 +173,18 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
                         </Link>
+
+                        <Link href="/admin/contacts" className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="flex items-center">
+                                <div className="p-4 bg-yellow-100 rounded-lg mr-4">
+                                    <FaBuilding className="text-yellow-600 text-xl" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-lg text-gray-900">Quản lý Liên Hệ</h3>
+                                    <p className="text-gray-600 mt-1">Thêm, sửa, xóa liên hệ</p>
+                                </div>
+                            </div>
+                        </Link>
                     </div>
                 </>
             )}

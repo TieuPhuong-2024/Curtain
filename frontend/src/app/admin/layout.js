@@ -49,7 +49,7 @@ export default function AdminLayout({children}) {
                         </li>
                         <li>
                             <Link href="/admin/banners" className="block py-2 px-4 hover:bg-gray-700">
-                                Banner
+                                Quản lý Banner
                             </Link>
                         </li>
                         <li>
