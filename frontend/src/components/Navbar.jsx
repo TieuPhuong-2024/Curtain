@@ -81,16 +81,17 @@ export default function Navbar() {
         }`}>
             <div className="container-custom">
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center">
+                    {/* Left side with logo and navigation */}
+                    <div className="flex items-center flex-shrink-0">
                         <Link 
                             href="/" 
-                            className="text-2xl font-bold text-gradient mr-6"
+                            className="text-xl font-bold text-gradient mr-6 whitespace-nowrap flex-shrink-0"
                         >
                             Curtain Shop
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex space-x-5">
+                        <div className="hidden md:flex space-x-4 lg:space-x-5">
                             <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Trang chủ
                             </Link>
@@ -245,4 +246,4 @@ export default function Navbar() {
             </div>
         </nav>
     );
-} 
+}
