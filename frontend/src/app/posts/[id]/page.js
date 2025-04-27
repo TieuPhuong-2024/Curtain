@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { getPostById, getPosts } from '@/lib/api';
-import BlockNoteEditor from '@/components/BlockNoteEditor';
 import PostCard from '@/components/PostCard';
 
 export default function PostDetail({ params }) {
@@ -112,14 +111,6 @@ export default function PostDetail({ params }) {
             />
           </div>
         )}
-        
-        {/* Content */}
-        <div className="prose prose-lg max-w-none mb-10">
-          <BlockNoteEditor 
-            initialContent={post.content} 
-            editable={false}
-          />
-        </div>
         
         {/* Tags */}
         {post.tags && post.tags.length > 0 && (
