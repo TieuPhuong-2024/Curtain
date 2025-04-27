@@ -16,6 +16,14 @@ const postViewSchema = new Schema({
     type: String,
     required: true
   },
+  lastViewedAt: {
+    type: Date,
+    default: Date.now
+  },
+  viewCount: {
+    type: Number,
+    default: 1
+  },
   timestamp: {
     type: Date,
     default: Date.now,

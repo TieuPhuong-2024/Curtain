@@ -68,26 +68,43 @@ exports.getPostById = async (req, res) => {
     // Lấy thông tin client
     const ip = req.ip || req.connection.remoteAddress;
     const userAgent = req.headers['user-agent'];
+    const MIN_VIEW_INTERVAL = 5 * 60 * 1000; // 5 phút (trong milliseconds)
 
     try {
-      // Thử tạo bản ghi view mới
-      const view = new PostView({
-        postId: post._id,
-        ip,
-        userAgent
-      });
-      await view.save();
+      // Tìm bản ghi view hiện tại
+      let view = await PostView.findOne({ postId: post._id, ip });
+      const now = new Date();
 
-      // Nếu lưu thành công (không trùng lặp), tăng cả 2 loại view
-      post.viewCount += 1;
-      post.uniqueViewCount += 1;
-    } catch (viewError) {
-      // Nếu trùng lặp (vi phạm unique index), chỉ tăng viewCount
-      if (viewError.code === 11000) {
+      if (!view) {
+        // Nếu là lượt xem mới (chưa có trong 24h gần đây)
+        view = new PostView({
+          postId: post._id,
+          ip,
+          userAgent,
+          lastViewedAt: now,
+          viewCount: 1
+        });
+        await view.save();
+        
+        // Tăng cả hai loại view count
         post.viewCount += 1;
+        post.uniqueViewCount += 1;
       } else {
-        throw viewError;
+        // Kiểm tra thời gian giữa các lượt xem
+        const timeSinceLastView = now - view.lastViewedAt;
+        
+        if (timeSinceLastView >= MIN_VIEW_INTERVAL) {
+          // Chỉ tăng view count nếu đã đủ thời gian
+          view.viewCount += 1;
+          view.lastViewedAt = now;
+          await view.save();
+          
+          post.viewCount += 1;
+        }
       }
+    } catch (viewError) {
+      console.error('Error processing view:', viewError);
+      // Vẫn trả về bài viết ngay cả khi có lỗi xử lý view
     }
 
     await post.save();
