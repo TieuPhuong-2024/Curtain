@@ -95,7 +95,7 @@ export default function PostDetail({ params }) {
           <div className="flex items-center text-gray-500 text-sm">
             <span>Đăng ngày {formatDate(post.createdAt)}</span>
             <span className="mx-2">•</span>
-            <span>{post.viewCount} lượt xem</span>
+            <span>{post.viewCount} lượt xem ({post.uniqueViewCount} độc giả)</span>
           </div>
         </header>
         
@@ -145,4 +145,4 @@ export default function PostDetail({ params }) {
       )}
     </div>
   );
-} 
+}

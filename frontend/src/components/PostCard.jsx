@@ -57,7 +57,7 @@ const PostCard = ({ post, isAdmin = false }) => {
           <div className="flex items-center">
             <span>{formattedDate}</span>
             <span className="mx-2">•</span>
-            <span>{post.viewCount} views</span>
+            <span>{post.viewCount} lượt xem ({post.uniqueViewCount} độc giả)</span>
           </div>
           
           <div className="text-blue-600">

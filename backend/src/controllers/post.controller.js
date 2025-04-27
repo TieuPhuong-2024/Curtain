@@ -1,4 +1,4 @@
-const Post = require('../models/post.model');
+const { Post, PostView } = require('../models/post.model');
 
 // Create a new post
 exports.createPost = async (req, res) => {
@@ -24,25 +24,25 @@ exports.getAllPosts = async (req, res) => {
   try {
     const { status, tag, limit = 10, page = 1 } = req.query;
     const skip = (page - 1) * limit;
-    
+
     // Build query based on filters
     let query = {};
-    
+
     if (status) {
       query.status = status;
     }
-    
+
     if (tag) {
       query.tags = tag;
     }
-    
+
     const posts = await Post.find(query)
       .sort({ createdAt: -1 })
       .limit(parseInt(limit))
       .skip(skip);
-      
+
     const total = await Post.countDocuments(query);
-    
+
     res.status(200).json({
       posts,
       pagination: {
@@ -60,15 +60,37 @@ exports.getAllPosts = async (req, res) => {
 exports.getPostById = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    
+
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
-    
-    // Increment view count
-    post.viewCount += 1;
+
+    // Lấy thông tin client
+    const ip = req.ip || req.connection.remoteAddress;
+    const userAgent = req.headers['user-agent'];
+
+    try {
+      // Thử tạo bản ghi view mới
+      const view = new PostView({
+        postId: post._id,
+        ip,
+        userAgent
+      });
+      await view.save();
+
+      // Nếu lưu thành công (không trùng lặp), tăng cả 2 loại view
+      post.viewCount += 1;
+      post.uniqueViewCount += 1;
+    } catch (viewError) {
+      // Nếu trùng lặp (vi phạm unique index), chỉ tăng viewCount
+      if (viewError.code === 11000) {
+        post.viewCount += 1;
+      } else {
+        throw viewError;
+      }
+    }
+
     await post.save();
-    
     res.status(200).json(post);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -79,22 +101,22 @@ exports.getPostById = async (req, res) => {
 exports.updatePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    
+
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
-    
+
     // Check if user is the author
     if (post.authorId !== req.user.uid) {
       return res.status(403).json({ message: 'You are not authorized to update this post' });
     }
-    
+
     const updatedPost = await Post.findByIdAndUpdate(
       req.params.id,
       { ...req.body, updatedAt: Date.now() },
       { new: true, runValidators: true }
     );
-    
+
     res.status(200).json(updatedPost);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -105,19 +127,19 @@ exports.updatePost = async (req, res) => {
 exports.deletePost = async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
-    
+
     if (!post) {
       return res.status(404).json({ message: 'Post not found' });
     }
-    
+
     // Check if user is the author
     if (post.authorId !== req.user.uid) {
       return res.status(403).json({ message: 'You are not authorized to delete this post' });
     }
-    
+
     await Post.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: 'Post deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}; 
+};
