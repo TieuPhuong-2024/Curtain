@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { getPostById, updatePost, uploadImage } from '@/lib/api';
 import BlockNoteEditor from '@/components/BlockNoteEditor';
 import Image from 'next/image';
 
 export default function EditPost({ params }) {
-  const postId = params.id;
+  const postId = use(params).id;
   const router = useRouter();
   
   const [title, setTitle] = useState('');
