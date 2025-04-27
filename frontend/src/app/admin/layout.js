@@ -48,6 +48,11 @@ export default function AdminLayout({children}) {
                             </Link>
                         </li>
                         <li>
+                            <Link href="/admin/posts" className="block py-2 px-4 hover:bg-gray-700">
+                                Quản lý Bài viết
+                            </Link>
+                        </li>
+                        <li>
                             <Link href="/admin/banners" className="block py-2 px-4 hover:bg-gray-700">
                                 Quản lý Banner
                             </Link>
