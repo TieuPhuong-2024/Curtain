@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { getPosts, deletePost } from '@/lib/api';
 import PostCard from '@/components/PostCard';
 import { useRouter } from 'next/navigation';
@@ -111,12 +110,12 @@ export default function AdminPosts() {
                   
                   {/* Admin Actions Overlay */}
                   <div className="absolute top-0 right-0 p-2 flex gap-2">
-                    <Link 
-                      href={`/admin/posts/${post._id}`}
+                    <button 
+                      onClick={() => router.push(`/admin/posts/${post._id}`)}
                       className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm"
                     >
                       Edit
-                    </Link>
+                    </button>
                     <button
                       onClick={() => handleDelete(post._id)}
                       className="bg-red-600 text-white p-2 rounded hover:bg-red-700 text-sm"
@@ -153,4 +152,4 @@ export default function AdminPosts() {
       )}
     </div>
   );
-} 
+}

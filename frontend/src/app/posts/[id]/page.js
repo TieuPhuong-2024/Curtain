@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,7 +10,7 @@ import BlockNoteEditor from '@/components/BlockNoteEditor';
 import PostCard from '@/components/PostCard';
 
 export default function PostDetail({ params }) {
-  const postId = params.id;
+  const postId = use(params).id;
   const router = useRouter();
   
   const [post, setPost] = useState(null);

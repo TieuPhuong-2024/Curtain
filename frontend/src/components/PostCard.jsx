@@ -3,15 +3,26 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
+import { useRouter } from 'next/navigation';
 
 const PostCard = ({ post, isAdmin = false }) => {
+  const router = useRouter();
+  
   // Format date for display
   const formattedDate = post.createdAt 
     ? format(new Date(post.createdAt), 'dd/MM/yyyy')
     : '';
 
+  const handleClick = () => {
+    const path = isAdmin ? `/admin/posts/${post._id}` : `/posts/${post._id}`;
+    router.push(path);
+  };
+
   return (
-    <div className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
+    <div 
+      onClick={handleClick}
+      className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+    >
       {/* Featured image */}
       <div className="relative h-48 w-full">
         {post.featuredImage ? (
@@ -49,17 +60,8 @@ const PostCard = ({ post, isAdmin = false }) => {
             <span>{post.viewCount} views</span>
           </div>
           
-          {/* Action buttons */}
-          <div>
-            {isAdmin ? (
-              <Link href={`/admin/posts/${post._id}`} className="text-blue-600 hover:underline">
-                Edit
-              </Link>
-            ) : (
-              <Link href={`/posts/${post._id}`} className="text-blue-600 hover:underline">
-                Read more
-              </Link>
-            )}
+          <div className="text-blue-600">
+            {isAdmin ? 'Edit' : 'Read more'}
           </div>
         </div>
       </div>
@@ -67,4 +69,4 @@ const PostCard = ({ post, isAdmin = false }) => {
   );
 };
 
-export default PostCard; 
+export default PostCard;

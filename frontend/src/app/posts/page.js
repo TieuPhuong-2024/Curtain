@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { getPosts } from '@/lib/api';
 import PostCard from '@/components/PostCard';
-import Link from 'next/link';
 
 export default function Posts() {
   const [posts, setPosts] = useState([]);
@@ -102,9 +101,7 @@ export default function Posts() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {posts.map((post) => (
-                <Link key={post._id} href={`/posts/${post._id}`}>
-                  <PostCard post={post} />
-                </Link>
+                <PostCard key={post._id} post={post} />
               ))}
             </div>
           )}
@@ -133,4 +130,4 @@ export default function Posts() {
       )}
     </div>
   );
-} 
+}
