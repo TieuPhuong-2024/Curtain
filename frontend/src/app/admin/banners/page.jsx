@@ -1,8 +1,9 @@
 "use client";
 
-import {useEffect, useState} from "react";
-import {createBanner, deleteBanner, getBanners, updateBanner,} from "@/lib/api";
+import { useEffect, useState } from "react";
+import { createBanner, deleteBanner, getBanners, updateBanner, } from "@/lib/api";
 import ImageUploader from "@/components/ImageUploader";
+import { FaTrash } from "react-icons/fa";
 
 export default function AdminBannerPage() {
     const [banners, setBanners] = useState([]);
@@ -36,11 +37,22 @@ export default function AdminBannerPage() {
     }, []);
 
     const handleChange = (e) => {
-        const {name, value, type, checked} = e.target;
+        const { name, value, type, checked } = e.target;
         setForm((prev) => ({
             ...prev,
             [name]: type === "checkbox" ? checked : value,
         }));
+    };
+
+    const handleImageUpload = (uploadedImages) => {
+        setForm({
+            ...form,
+            image: uploadedImages[0]
+        });
+    };
+
+    const handleRemoveImage = () => {
+        setForm({ ...form, image: "" });
     };
 
     const handleSubmit = async (e) => {
@@ -52,7 +64,7 @@ export default function AdminBannerPage() {
             } else {
                 await createBanner(form);
             }
-            setForm({title: "", description: "", image: "", link: "", isActive: true, order: 0});
+            setForm({ title: "", description: "", image: "", link: "", isActive: true, order: 0 });
             setEditingId(null);
             fetchData();
         } catch (err) {
@@ -114,12 +126,32 @@ export default function AdminBannerPage() {
                         onChange={handleChange}
                     />
                 </div>
-                <ImageUploader 
-                    onImageSelected={(url) => {
-                        setForm(prev => ({...prev, image: url}));
-                    }}
-                    currentImage={form.image}
-                />
+                <div className="mt-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Hình ảnh <span className="text-red-500">*</span>
+                    </label>
+                    <ImageUploader onUpload={handleImageUpload} />
+
+                    {/* Display uploaded images */}
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {form.image && (
+                            <div className="relative group rounded-md overflow-hidden border">
+                                <img
+                                    src={form.image}
+                                    alt={`Banner image`}
+                                    className="w-full h-32 object-cover"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveImage()}
+                                    className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                >
+                                    <FaTrash />
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
                 <div>
                     <label className="block font-medium mb-1">Link (URL, tùy chọn)</label>
                     <input
@@ -156,7 +188,7 @@ export default function AdminBannerPage() {
                 <div className="flex space-x-2">
                     <button
                         type="submit"
-                        className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
+                        className="cursor-pointer bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
                         disabled={submitting}
                     >
                         {editingId ? "Cập nhật" : "Thêm mới"}
@@ -164,10 +196,10 @@ export default function AdminBannerPage() {
                     {editingId && (
                         <button
                             type="button"
-                            className="px-4 py-2 rounded border"
+                            className="cursor-pointer px-4 py-2 rounded border"
                             onClick={() => {
                                 setEditingId(null);
-                                setForm({title: "", description: "", image: "", link: "", isActive: true, order: 0});
+                                setForm({ title: "", description: "", image: "", link: "", isActive: true, order: 0 });
                             }}
                             disabled={submitting}
                         >
@@ -186,41 +218,41 @@ export default function AdminBannerPage() {
             ) : (
                 <table className="w-full border text-sm">
                     <thead>
-                    <tr className="bg-gray-100">
-                        <th className="border px-2 py-1">Tiêu đề</th>
-                        <th className="border px-2 py-1">Ảnh</th>
-                        <th className="border px-2 py-1">Hiển thị</th>
-                        <th className="border px-2 py-1">Thứ tự</th>
-                        <th className="border px-2 py-1">Hành động</th>
-                    </tr>
+                        <tr className="bg-gray-100">
+                            <th className="border px-2 py-1">Tiêu đề</th>
+                            <th className="border px-2 py-1">Ảnh</th>
+                            <th className="border px-2 py-1">Hiển thị</th>
+                            <th className="border px-2 py-1">Thứ tự</th>
+                            <th className="border px-2 py-1">Hành động</th>
+                        </tr>
                     </thead>
                     <tbody>
-                    {banners.map((b) => (
-                        <tr key={b._id} className="border-b">
-                            <td className="border px-2 py-1">{b.title}</td>
-                            <td className="border px-2 py-1">
-                                <img src={b.image} alt={b.title} className="w-24 h-12 object-cover rounded"/>
-                            </td>
-                            <td className="border px-2 py-1 text-center">{b.isActive ? "✔" : "✖"}</td>
-                            <td className="border px-2 py-1 text-center">{b.order}</td>
-                            <td className="border px-2 py-1 text-center">
-                                <button
-                                    className="text-blue-600 hover:underline mr-2"
-                                    onClick={() => handleEdit(b)}
-                                    disabled={submitting}
-                                >
-                                    Sửa
-                                </button>
-                                <button
-                                    className="text-red-600 hover:underline"
-                                    onClick={() => handleDelete(b._id)}
-                                    disabled={submitting}
-                                >
-                                    Xóa
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
+                        {banners.map((b) => (
+                            <tr key={b._id} className="border-b">
+                                <td className="border px-2 py-1">{b.title}</td>
+                                <td className="border px-2 py-1">
+                                    <img src={b.image} alt={b.title} className="w-24 h-12 object-cover rounded" />
+                                </td>
+                                <td className="border px-2 py-1 text-center">{b.isActive ? "✔" : "✖"}</td>
+                                <td className="border px-2 py-1 text-center">{b.order}</td>
+                                <td className="border px-2 py-1 text-center">
+                                    <button
+                                        className="cursor-pointer text-blue-600 hover:underline mr-2"
+                                        onClick={() => handleEdit(b)}
+                                        disabled={submitting}
+                                    >
+                                        Sửa
+                                    </button>
+                                    <button
+                                        className="cursor-pointer text-red-600 hover:underline"
+                                        onClick={() => handleDelete(b._id)}
+                                        disabled={submitting}
+                                    >
+                                        Xóa
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
                 </table>
             )}
