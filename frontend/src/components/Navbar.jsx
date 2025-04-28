@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import {useState, useEffect} from 'react';
-import {FaBars, FaHome, FaInfoCircle, FaPhone, FaShoppingCart, FaTimes, FaSearch, FaUser, FaHeart, FaSignInAlt, FaSignOutAlt} from 'react-icons/fa';
+import {FaBars, FaHome, FaInfoCircle, FaPhone, FaShoppingCart, FaTimes, FaSearch, FaUser, FaHeart, FaSignInAlt, FaSignOutAlt, FaBlog} from 'react-icons/fa';
 import { useAuth } from '@/lib/AuthContext';
 
 // Action Button Component
@@ -81,16 +81,17 @@ export default function Navbar() {
         }`}>
             <div className="container-custom">
                 <div className="flex justify-between items-center">
-                    <div className="flex items-center">
+                    {/* Left side with logo and navigation */}
+                    <div className="flex items-center flex-shrink-0">
                         <Link 
                             href="/" 
-                            className="text-2xl font-bold text-gradient mr-6"
+                            className="text-xl font-bold text-gradient mr-6 whitespace-nowrap flex-shrink-0"
                         >
                             Curtain Shop
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex space-x-5">
+                        <div className="hidden md:flex space-x-4 lg:space-x-5">
                             <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Trang chủ
                             </Link>
@@ -99,6 +100,9 @@ export default function Navbar() {
                             </Link>
                             <Link href="/products" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Sản phẩm
+                            </Link>
+                            <Link href="/posts" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                                Blog
                             </Link>
                             <Link href="/contact" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
                                 Liên hệ
@@ -184,6 +188,9 @@ export default function Navbar() {
                     <Link href="/products" className="block py-2 text-text-primary hover:text-primary">
                         <span className="inline-flex items-center"><FaShoppingCart className="mr-2" /> Sản phẩm</span>
                     </Link>
+                    <Link href="/posts" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaBlog className="mr-2" /> Blog</span>
+                    </Link>
                     <Link href="/contact" className="block py-2 text-text-primary hover:text-primary">
                         <span className="inline-flex items-center"><FaPhone className="mr-2" /> Liên hệ</span>
                     </Link>
@@ -199,7 +206,7 @@ export default function Navbar() {
                             </Link>
                             <button 
                                 onClick={handleLogout}
-                                className="block w-full text-left py-2 text-text-primary hover:text-primary"
+                                className="w-full text-left block py-2 text-text-primary hover:text-primary"
                             >
                                 <span className="inline-flex items-center"><FaSignOutAlt className="mr-2" /> Đăng xuất</span>
                             </button>
@@ -209,21 +216,28 @@ export default function Navbar() {
                             <span className="inline-flex items-center"><FaSignInAlt className="mr-2" /> Đăng nhập</span>
                         </Link>
                     )}
+                    
+                    <Link href="/favorites" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaHeart className="mr-2" /> Yêu thích</span>
+                    </Link>
+                    <Link href="/cart" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center"><FaShoppingCart className="mr-2" /> Giỏ hàng</span>
+                    </Link>
                 </div>
-
+                
                 {/* Mobile search */}
                 <div className="px-4 py-3 border-t">
-                    <form onSubmit={handleSearch} className="flex">
+                    <form onSubmit={handleSearch} className="relative">
                         <input
                             type="text"
                             placeholder="Tìm kiếm sản phẩm..."
-                            className="flex-grow pl-4 pr-3 py-2 border rounded-l-full text-sm focus:outline-none focus:ring focus:border-blue-300"
+                            className="w-full pl-4 pr-10 py-2 border rounded-full text-sm focus:outline-none focus:ring focus:border-blue-300"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <button
                             type="submit"
-                            className="bg-gray-100 rounded-r-full px-4 text-gray-600 hover:bg-gray-200"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                             <FaSearch />
                         </button>
@@ -232,4 +246,4 @@ export default function Navbar() {
             </div>
         </nav>
     );
-} 
+}

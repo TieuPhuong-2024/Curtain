@@ -23,6 +23,7 @@ const fileRoutes = require('./routes/file.routes');
 const projectRoutes = require('./routes/project.routes');
 const favoriteRoutes = require('./routes/favorite.routes');
 const contactRoutes = require('./routes/contact.routes');
+const postRoutes = require('./routes/post.routes');
 
 // Use routes
 app.use('/api/curtains', curtainRoutes);
@@ -34,6 +35,7 @@ app.use('/api/files', fileRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/contacts', contactRoutes);
+app.use('/api/posts', postRoutes);
 
 // Basic route
 app.get('/', (req, res) => {
