@@ -202,7 +202,7 @@ export default function AddProject() {
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveImage(index)}
-                                    className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <FaTrash />
                                 </button>

@@ -59,12 +59,12 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
       const formData = new FormData();
-      
+
       // Append all files to formData with the name 'images'
       selectedFiles.forEach(file => {
         formData.append('images', file);
       });
-      
+
       const response = await fetch(`${API_URL}/upload/multiple-from-device`, {
         method: 'POST',
         body: formData,
@@ -139,9 +139,9 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
         <div className="mb-2 flex flex-wrap gap-2">
           {previews.map((preview, index) => (
             <div key={index} className="relative inline-block">
-              <img 
-                src={preview} 
-                alt={`Preview ${index + 1}`} 
+              <img
+                src={preview}
+                alt={`Preview ${index + 1}`}
                 className="w-40 h-24 object-cover rounded border"
               />
             </div>
@@ -171,14 +171,25 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
 
       {/* Upload from device form */}
       {uploadType === 'device' && (
-        <div className="mb-2">
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="mb-2"
-            multiple
-          />
+        <div className="border-2 border-dashed border-gray-300 rounded-md p-4 text-center">
+          <label className="cursor-pointer">
+            <span className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition">
+              Chọn ảnh
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
+              multiple
+            />
+          </label>
+          <p className="mt-2 text-gray-600">Không có ảnh được chọn</p>
+          <ul className="mt-2">
+            {selectedFiles.map((file, index) => (
+              <li key={index} className="text-gray-800">{file.name}</li>
+            ))}
+          </ul>
           <div className="flex space-x-2">
             <button
               type="button"
