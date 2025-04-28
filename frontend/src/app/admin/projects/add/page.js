@@ -228,7 +228,7 @@ export default function AddProject() {
                         <button
                             type="button"
                             onClick={handleAddVideo}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center"
+                            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center"
                         >
                             <FaPlus className="mr-2" /> Thêm
                         </button>
@@ -257,7 +257,7 @@ export default function AddProject() {
 
                 <div className="mt-8 flex justify-end">
                     <Link
-                        href="/admin/curtains"
+                        href="/admin/projects"
                         className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2"
                     >
                         Hủy
@@ -265,7 +265,7 @@ export default function AddProject() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`bg-blue-600 text-white px-6 py-2 rounded-md flex items-center hover:bg-blue-700 transition ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`cursor-pointer bg-blue-600 text-white px-6 py-2 rounded-md flex items-center hover:bg-blue-700 transition ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {loading ? (
                             <>

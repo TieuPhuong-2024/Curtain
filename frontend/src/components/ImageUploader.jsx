@@ -154,14 +154,14 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
         <div className="flex space-x-2 mb-2">
           <button
             type="button"
-            className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+            className="cursor-pointer bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
             onClick={() => handleSelectUploadType('device')}
           >
             Tải lên từ thiết bị
           </button>
           <button
             type="button"
-            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+            className="cursor-pointer bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
             onClick={() => handleSelectUploadType('cloud')}
           >
             Tải lên từ cloud
@@ -182,7 +182,7 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
           <div className="flex space-x-2">
             <button
               type="button"
-              className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+              className="cursor-pointer bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
               onClick={uploadFromDevice}
               disabled={isUploading || selectedFiles.length === 0}
             >
@@ -190,7 +190,7 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
             </button>
             <button
               type="button"
-              className="px-3 py-1 rounded border"
+              className="cursor-pointer px-3 py-1 rounded border"
               onClick={handleCancel}
               disabled={isUploading}
             >
@@ -213,7 +213,7 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
           <div className="flex space-x-2">
             <button
               type="button"
-              className="bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
+              className="cursor-pointer bg-indigo-600 text-white px-3 py-1 rounded hover:bg-indigo-700"
               onClick={saveFromUrl}
               disabled={isUploading || !imageUrl}
             >
@@ -221,7 +221,7 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
             </button>
             <button
               type="button"
-              className="px-3 py-1 rounded border"
+              className="cursor-pointer px-3 py-1 rounded border"
               onClick={handleCancel}
               disabled={isUploading}
             >
