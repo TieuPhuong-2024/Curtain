@@ -9,7 +9,7 @@ import Image from 'next/image';
 export default function EditPost({ params }) {
   const postId = use(params).id;
   const router = useRouter();
-  
+
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
   const [tags, setTags] = useState('');
@@ -19,25 +19,27 @@ export default function EditPost({ params }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [content, setContent] = useState(null);
 
   // Fetch post data
   useEffect(() => {
     const fetchPost = async () => {
       try {
         const post = await getPostById(postId);
-        
+
         // Set form data
         setTitle(post.title);
         setSummary(post.summary || '');
         setStatus(post.status);
         setFeaturedImage(post.featuredImage);
         setImagePreview(post.featuredImage);
-        
+        setContent(post.content);
+
         // Convert tags array to comma-separated string
         if (post.tags && Array.isArray(post.tags)) {
           setTags(post.tags.join(', '));
         }
-        
+
         setLoading(false);
       } catch (err) {
         setError('Failed to load post');
@@ -74,7 +76,7 @@ export default function EditPost({ params }) {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!title || !content) {
       setError('Title and content are required');
       return;
@@ -101,7 +103,7 @@ export default function EditPost({ params }) {
 
       // Send to API
       await updatePost(postId, postData);
-      
+
       // Redirect to posts list
       router.push('/admin/posts');
     } catch (err) {
@@ -232,7 +234,9 @@ export default function EditPost({ params }) {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Nội dung *
           </label>
-          <BlockNoteEditor />
+          <BlockNoteEditor initialContent={null} onChange={(newContent) => {
+            setContent(newContent);
+          }} />
         </div>
 
         {/* Submit Button */}
@@ -240,9 +244,8 @@ export default function EditPost({ params }) {
           <button
             type="submit"
             disabled={saving}
-            className={`bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${
-              saving ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
           </button>
