@@ -130,7 +130,7 @@ export default function AdminBannerPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Hình ảnh <span className="text-red-500">*</span>
                     </label>
-                    <ImageUploader onUpload={handleImageUpload} />
+                    <ImageUploader onUpload={handleImageUpload} isMultiple={false} />
 
                     {/* Display uploaded images */}
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

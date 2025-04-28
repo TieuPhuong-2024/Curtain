@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const ImageUploader = ({ onUpload, initialImages = [] }) => {
+const ImageUploader = ({ onUpload, isMultiple = true }) => {
   const [uploadType, setUploadType] = useState(null);
   const [imageUrl, setImageUrl] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -181,7 +181,7 @@ const ImageUploader = ({ onUpload, initialImages = [] }) => {
               accept="image/*"
               onChange={handleFileChange}
               className="hidden"
-              multiple
+              multiple={isMultiple}
             />
           </label>
           <p className="mt-2 text-gray-600">Không có ảnh được chọn</p>
