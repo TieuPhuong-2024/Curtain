@@ -12,8 +12,6 @@ export default function EditPost({ params }) {
   
   const [title, setTitle] = useState('');
   const [summary, setSummary] = useState('');
-  const [content, setContent] = useState(null);
-  const [initialContent, setInitialContent] = useState(null);
   const [tags, setTags] = useState('');
   const [status, setStatus] = useState('draft');
   const [featuredImage, setFeaturedImage] = useState(null);
@@ -31,8 +29,6 @@ export default function EditPost({ params }) {
         // Set form data
         setTitle(post.title);
         setSummary(post.summary || '');
-        setInitialContent(post.content);
-        setContent(post.content);
         setStatus(post.status);
         setFeaturedImage(post.featuredImage);
         setImagePreview(post.featuredImage);
@@ -236,10 +232,7 @@ export default function EditPost({ params }) {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Nội dung *
           </label>
-          <BlockNoteEditor 
-            onChange={setContent} 
-            initialContent={initialContent}
-          />
+          <BlockNoteEditor />
         </div>
 
         {/* Submit Button */}
