@@ -92,7 +92,7 @@ export default function CurtainsList() {
                 <h1 className="text-2xl font-bold">Quản Lý Rèm Cửa</h1>
                 <div className="flex gap-2">
                     <button onClick={handleExportExcel}
-                            className="bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700 transition">
+                            className="cursor-pointer bg-green-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-green-700 transition">
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" strokeWidth="2"
                              viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round"
@@ -124,6 +124,7 @@ export default function CurtainsList() {
                         ))}
                     </select>
                 </div>
+                {/* Search Bar */}
                 <div className="w-full md:w-2/3 relative">
                     <input
                         type="text"
@@ -139,20 +140,6 @@ export default function CurtainsList() {
                 </div>
             </div>
 
-            {/* Search Bar */}
-            <div className="mb-6">
-                <div className="relative">
-                    <input
-                        type="text"
-                        placeholder="Tìm kiếm theo tên hoặc danh mục..."
-                        className="w-full p-3 pl-10 rounded-md border border-gray-300"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                    <FaSearch className="absolute left-3 top-3.5 text-gray-400"/>
-                </div>
-            </div>
-
             {loading ? (
                 <div className="text-center py-8">Đang tải dữ liệu...</div>
             ) : error ? (
@@ -160,7 +147,7 @@ export default function CurtainsList() {
                     <p className="text-red-500">{error}</p>
                     <button
                         onClick={fetchCurtains}
-                        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md"
+                        className="cursor-pointer mt-4 bg-blue-600 text-white px-4 py-2 rounded-md"
                     >
                         Thử lại
                     </button>
@@ -243,7 +230,7 @@ export default function CurtainsList() {
                                                 </Link>
                                                 <button
                                                     onClick={() => handleDelete(curtain._id)}
-                                                    className="text-red-600 hover:text-red-900"
+                                                    className="cursor-pointer text-red-600 hover:text-red-900"
                                                 >
                                                     <FaTrash size={18}/>
                                                 </button>

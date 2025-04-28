@@ -430,7 +430,7 @@ export default function EditCurtain({params}) {
                                     <button
                                         type="button"
                                         onClick={handleFileButtonClick}
-                                        className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center"
+                                        className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center"
                                     >
                                         <FaUpload className="mr-2" /> Tải lên
                                     </button>
@@ -456,7 +456,7 @@ export default function EditCurtain({params}) {
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveMainImage}
-                                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                                                className="cursor-pointer absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
                                                 title="Xóa ảnh"
                                             >
                                                 <FaTimes />
@@ -478,7 +478,7 @@ export default function EditCurtain({params}) {
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveMainImage}
-                                                className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
+                                                className="cursor-pointer absolute top-2 right-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center"
                                                 title="Xóa ảnh"
                                             >
                                                 <FaTimes />
@@ -514,7 +514,7 @@ export default function EditCurtain({params}) {
                             <button
                                 type="button"
                                 onClick={handleAdditionalFileButtonClick}
-                                className="bg-green-500 text-white px-4 py-2 rounded-md flex items-center text-sm"
+                                className="cursor-pointer bg-green-500 text-white px-4 py-2 rounded-md flex items-center text-sm"
                             >
                                 <FaPlus className="mr-2" /> Thêm hình ảnh
                             </button>
@@ -555,7 +555,7 @@ export default function EditCurtain({params}) {
                                                 <button
                                                     type="button"
                                                     onClick={() => handleSetMainImage(img.url)}
-                                                    className="bg-blue-500 text-white rounded-full p-2 mx-1"
+                                                    className="cursor-pointer bg-blue-500 text-white rounded-full p-2 mx-1"
                                                     title="Đặt làm ảnh chính"
                                                 >
                                                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -566,7 +566,7 @@ export default function EditCurtain({params}) {
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveImage(img._id)}
-                                                className="bg-red-500 text-white rounded-full p-2 mx-1"
+                                                className="cursor-pointer bg-red-500 text-white rounded-full p-2 mx-1"
                                                 title="Xóa ảnh này"
                                             >
                                                 <FaTimes size={16} />
@@ -606,7 +606,7 @@ export default function EditCurtain({params}) {
                         </Link>
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md"
+                            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md"
                             disabled={isSubmitting}
                         >
                             {isSubmitting ? 'Đang xử lý...' : 'Cập nhật sản phẩm'}
