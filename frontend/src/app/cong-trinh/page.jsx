@@ -70,7 +70,7 @@ export default function ThiCongLapRemPage() {
             {/* Filter options */}
             <div className="mb-8 flex flex-wrap gap-2 justify-center">
                 <button
-                    className={`${activeFilter === "all" ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
+                    className={`cursor-pointer ${activeFilter === "all" ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
                     onClick={() => handleFilterChange("all")}
                 >
                     Tất cả
@@ -79,7 +79,7 @@ export default function ThiCongLapRemPage() {
                 {projectTypes.map((type) => (
                     <button
                         key={type}
-                        className={`${activeFilter === type ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
+                        className={`cursor-pointer ${activeFilter === type ? "bg-blue-600 text-white" : "bg-white text-blue-600 border border-blue-600"} px-4 py-2 rounded-md hover:bg-blue-700 hover:text-white transition`}
                         onClick={() => handleFilterChange(type)}
                     >
                         {type}
@@ -100,7 +100,7 @@ export default function ThiCongLapRemPage() {
                     <p>{error}</p>
                     <button
                         onClick={() => window.location.reload()}
-                        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                        className="cursor-pointer mt-2 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
                     >
                         Thử lại
                     </button>

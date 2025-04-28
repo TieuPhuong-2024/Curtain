@@ -82,14 +82,14 @@ export default function ProjectCard({ project }) {
           <>
             <button 
               onClick={handlePrevImage}
-              className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-70 transition-all"
+              className="cursor-pointer absolute left-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-70 transition-all"
               aria-label="Previous image"
             >
               <FaChevronLeft className="text-sm sm:text-base" />
             </button>
             <button 
               onClick={handleNextImage}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-70 transition-all"
+              className="cursor-pointer absolute right-2 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-1 sm:p-2 rounded-full hover:bg-opacity-70 transition-all"
               aria-label="Next image"
             >
               <FaChevronRight className="text-sm sm:text-base" />
@@ -128,7 +128,7 @@ export default function ProjectCard({ project }) {
           {images.length > 0 && (
             <button 
               onClick={() => handleOpenLightbox('image', 0)}
-              className="flex items-center justify-center sm:justify-start bg-blue-100 text-blue-700 px-3 py-1.5 sm:py-2 rounded text-sm hover:bg-blue-200 transition-colors"
+              className="cursor-pointer flex items-center justify-center sm:justify-start bg-blue-100 text-blue-700 px-3 py-1.5 sm:py-2 rounded text-sm hover:bg-blue-200 transition-colors"
             >
               <FaImages className="mr-1 sm:mr-2" />
               Xem tất cả ảnh ({images.length})
@@ -137,7 +137,7 @@ export default function ProjectCard({ project }) {
           {videos && videos.length > 0 && (
             <button 
               onClick={() => handleOpenLightbox('video', 0)}
-              className="flex items-center justify-center sm:justify-start bg-red-100 text-red-700 px-3 py-1.5 sm:py-2 rounded text-sm hover:bg-red-200 transition-colors"
+              className="cursor-pointer flex items-center justify-center sm:justify-start bg-red-100 text-red-700 px-3 py-1.5 sm:py-2 rounded text-sm hover:bg-red-200 transition-colors"
             >
               <FaVideo className="mr-1 sm:mr-2" />
               Xem video ({videos.length})
@@ -186,7 +186,7 @@ export default function ProjectCard({ project }) {
                     src={`https://www.youtube.com/embed/${slide.videoId}?autoplay=1&mute=0&controls=1&rel=0&modestbranding=1`}
                     width="80%"
                     height="80%"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     title="YouTube video player"
                     frameBorder="0"
