@@ -150,7 +150,7 @@ export default function EditProject({ params }) {
                     <p>{error}</p>
                     <button 
                         onClick={() => router.push('/admin/projects')}
-                        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+                        className="cursor-pointer mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
                     >
                         Quay lại danh sách
                     </button>
@@ -250,7 +250,7 @@ export default function EditProject({ params }) {
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveImage(index)}
-                                    className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <FaTrash />
                                 </button>
@@ -276,7 +276,7 @@ export default function EditProject({ params }) {
                         <button
                             type="button"
                             onClick={handleAddVideo}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center"
+                            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition flex items-center"
                         >
                             <FaPlus className="mr-2" /> Thêm
                         </button>
@@ -294,7 +294,7 @@ export default function EditProject({ params }) {
                                 <button
                                     type="button"
                                     onClick={() => handleRemoveVideo(index)}
-                                    className="absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                    className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                                 >
                                     <FaTrash />
                                 </button>
@@ -307,7 +307,7 @@ export default function EditProject({ params }) {
                     <button
                         type="submit"
                         disabled={loading}
-                        className={`bg-blue-600 text-white px-6 py-2 rounded-md flex items-center hover:bg-blue-700 transition ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        className={`cursor-pointer bg-blue-600 text-white px-6 py-2 rounded-md flex items-center hover:bg-blue-700 transition ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
                     >
                         {loading ? (
                             <>
