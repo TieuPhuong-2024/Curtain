@@ -347,3 +347,13 @@ export const deletePost = async (id) => {
         throw error;
     }
 };
+
+export const searchCurtains = async (query) => {
+    try {
+        const response = await api.get(`/curtains/search?q=${encodeURIComponent(query)}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error searching curtains with query "${query}":`, error);
+        throw error;
+    }
+};
