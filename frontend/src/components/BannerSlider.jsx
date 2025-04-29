@@ -84,11 +84,11 @@ export default function BannerSlider({banners}) {
                         priority
                         className="scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10"></div>
                 </div>
 
                 <div className="container-custom z-10 text-white">
-                    <div className="max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/10 slide-up">
+                    <div className="max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/5 slide-up">
                         <h1 className="text-gradient text-4xl md:text-5xl font-bold mb-6">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
                         <p className="text-xl mb-8 opacity-90">
                             Khám phá bộ sưu tập rèm cửa đa dạng với chất lượng tốt nhất và giá cả hợp lý
@@ -126,12 +126,12 @@ export default function BannerSlider({banners}) {
                         priority={index === currentIndex}
                         className="w-full h-full"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-black/30"></div>
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10"></div>
                 </div>
             ))}
 
             <div className="container-custom z-10 text-white">
-                <div className={`max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/10 transition-all duration-700 ${
+                <div className={`max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/5 transition-all duration-700 ${
                     transitioning ? 'opacity-0 transform translate-y-10' : 'opacity-100 transform translate-y-0'
                 }`}>
                     <h1 className="text-gradient text-4xl md:text-5xl font-bold mb-6">{currentBanner.title}</h1>
