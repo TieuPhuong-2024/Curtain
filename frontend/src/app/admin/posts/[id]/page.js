@@ -129,7 +129,7 @@ export default function EditPost({ params }) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="text-blue-600 hover:underline"
+          className="cursor-pointer text-blue-600 hover:underline"
         >
           Quay lại
         </button>
@@ -244,7 +244,7 @@ export default function EditPost({ params }) {
           <button
             type="submit"
             disabled={saving}
-            className={`bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''
+            className={`cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''
               }`}
           >
             {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
