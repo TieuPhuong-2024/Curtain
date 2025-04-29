@@ -136,7 +136,7 @@ export default function CurtainCard({ curtain }) {
                 </div>
                 {/* Favorite button */}
                 <button
-                    className="absolute top-2 right-2 z-10 bg-white bg-opacity-90 p-1.5 rounded-full text-gray-700 hover:text-red-500 flex items-center"
+                    className="cursor-pointer absolute top-2 right-2 z-10 bg-white bg-opacity-90 p-1.5 rounded-full text-gray-700 hover:text-red-500 flex items-center"
                     onClick={toggleFavorite}
                     disabled={isLoading}
                     title={isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
@@ -159,7 +159,7 @@ export default function CurtainCard({ curtain }) {
                         <span className="text-xs sm:text-sm hidden sm:inline">Chi tiết</span>
                     </Link>
                     <button
-                        className="bg-white text-gray-700 p-2 sm:px-3 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 hover:bg-indigo-100 transition-colors duration-300"
+                        className="cursor-pointer bg-white text-gray-700 p-2 sm:px-3 sm:py-2 rounded-md flex items-center gap-1 sm:gap-2 hover:bg-indigo-100 transition-colors duration-300"
                         title="Thêm vào giỏ hàng"
                         onClick={(e) => {
                             e.preventDefault();

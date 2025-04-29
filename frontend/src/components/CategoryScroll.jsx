@@ -22,7 +22,7 @@ const CategoryScroll = ({ categories, productCounts = {} }) => {
       {/* Navigation buttons */}
       <button 
         onClick={() => scroll('left')}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-colors -ml-4"
+        className="cursor-pointer absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-colors -ml-4"
         aria-label="Scroll left"
       >
         <FaChevronLeft className="text-gray-700 text-xl" />
@@ -30,7 +30,7 @@ const CategoryScroll = ({ categories, productCounts = {} }) => {
       
       <button 
         onClick={() => scroll('right')}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-colors -mr-4"
+        className="cursor-pointer absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-3 shadow-lg hover:bg-gray-100 transition-colors -mr-4"
         aria-label="Scroll right"
       >
         <FaChevronRight className="text-gray-700 text-xl" />
