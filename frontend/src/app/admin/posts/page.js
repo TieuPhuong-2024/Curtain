@@ -58,7 +58,7 @@ export default function AdminPosts() {
         <h1 className="text-2xl font-bold">Quản lý Bài viết</h1>
         <button
           onClick={handleCreatePost}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Thêm bài viết mới
         </button>
@@ -112,13 +112,13 @@ export default function AdminPosts() {
                   <div className="absolute top-0 right-0 p-2 flex gap-2">
                     <button 
                       onClick={() => router.push(`/admin/posts/${post._id}`)}
-                      className="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm"
+                      className="cursor-pointer bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm"
                     >
                       Edit
                     </button>
                     <button
                       onClick={() => handleDelete(post._id)}
-                      className="bg-red-600 text-white p-2 rounded hover:bg-red-700 text-sm"
+                      className="cursor-pointer bg-red-600 text-white p-2 rounded hover:bg-red-700 text-sm"
                     >
                       Delete
                     </button>
@@ -136,7 +136,7 @@ export default function AdminPosts() {
                   <button
                     key={page}
                     onClick={() => setCurrentPage(page)}
-                    className={`px-4 py-2 rounded ${
+                    className={`cursor-pointer px-4 py-2 rounded ${
                       currentPage === page
                         ? 'bg-blue-600 text-white'
                         : 'bg-white text-gray-700 hover:bg-gray-100'
