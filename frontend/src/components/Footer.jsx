@@ -8,7 +8,7 @@ export default function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     {/* About Section */}
                     <div>
-                        <h3 className="text-xl font-bold mb-4">Curtain Shop</h3>
+                        <h3 className="text-xl font-bold mb-4">Tuấn Rèm</h3>
                         <p className="text-gray-300 mb-4">
                             Chúng tôi cung cấp các loại rèm cửa cao cấp với đa dạng mẫu mã,
                             chất liệu và màu sắc để phù hợp với mọi không gian sống.
@@ -38,6 +38,16 @@ export default function Footer() {
                             <li>
                                 <Link href="/products" className="text-gray-300 hover:text-white">
                                     Sản phẩm
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/cong-trinh" className="text-gray-300 hover:text-white">
+                                   Công trình
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/posts" className="text-gray-300 hover:text-white">
+                                    Blog
                                 </Link>
                             </li>
                             <li>
@@ -75,7 +85,7 @@ export default function Footer() {
 
                 <div className="border-t border-gray-700 mt-8 pt-8 text-center">
                     <p className="text-gray-300">
-                        &copy; {new Date().getFullYear()} Curtain Shop. Tất cả các quyền được bảo lưu.
+                        &copy; {new Date().getFullYear()} Tuấn Rèm. Tất cả các quyền được bảo lưu.
                     </p>
                 </div>
             </div>
