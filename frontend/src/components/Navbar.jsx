@@ -97,7 +97,7 @@ export default function Navbar() {
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex space-x-5 lg:space-x-6">
+                        <div className="hidden md:flex space-x-5 lg:space-x-6 mr-6 lg:mr-10">
                             <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Trang chủ
                             </Link>
@@ -127,7 +127,7 @@ export default function Navbar() {
                     {/* Desktop Right Side (Search & Actions) */}
                     <div className="hidden md:flex items-center space-x-6">
                         {/* Search form */}
-                        <form onSubmit={handleSearch} className="relative">
+                        <form onSubmit={handleSearch} className="relative ml-4">
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sản phẩm..."
