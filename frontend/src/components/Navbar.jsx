@@ -101,9 +101,6 @@ export default function Navbar() {
                             <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Trang chủ
                             </Link>
-                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
-                                Giới thiệu
-                            </Link>
                             <Link href="/products" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Sản phẩm
                             </Link>
@@ -112,6 +109,9 @@ export default function Navbar() {
                             </Link>
                             <Link href="/posts" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Blog
+                            </Link>
+                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
+                                Giới thiệu
                             </Link>
                             <Link href="/contact" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Liên hệ
