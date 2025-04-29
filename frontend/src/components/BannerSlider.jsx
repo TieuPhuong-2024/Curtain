@@ -151,7 +151,7 @@ export default function BannerSlider({banners}) {
                 <>
                     <button
                         onClick={goToPrevious}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
+                        className="cursor-pointer absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
                         aria-label="Previous banner"
                         disabled={transitioning}
                     >
@@ -159,7 +159,7 @@ export default function BannerSlider({banners}) {
                     </button>
                     <button
                         onClick={goToNext}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
+                        className="cursor-pointer absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
                         aria-label="Next banner"
                         disabled={transitioning}
                     >

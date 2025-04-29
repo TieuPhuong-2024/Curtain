@@ -12,7 +12,7 @@ const ActionButton = ({href, icon, label, badge, onClick}) => {
             {onClick ? (
                 <button 
                     onClick={onClick}
-                    className="flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors"
+                    className="cursor-pointer flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors"
                 >
                     <span className="text-xl">{icon}</span>
                     <span className="text-xs mt-1 whitespace-nowrap">{label}</span>
@@ -128,7 +128,7 @@ export default function Navbar() {
                             />
                             <button
                                 type="submit"
-                                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                             >
                                 <FaSearch />
                             </button>
@@ -166,7 +166,7 @@ export default function Navbar() {
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={toggleMenu}
-                            className="inline-flex items-center justify-center p-2 rounded-md text-text-primary hover:text-primary focus:outline-none transition-colors"
+                            className="cursor-pointer inline-flex items-center justify-center p-2 rounded-md text-text-primary hover:text-primary focus:outline-none transition-colors"
                             aria-expanded={isOpen}
                         >
                             <span className="sr-only">{isOpen ? 'Đóng menu' : 'Mở menu'}</span>
@@ -206,7 +206,7 @@ export default function Navbar() {
                             </Link>
                             <button 
                                 onClick={handleLogout}
-                                className="w-full text-left block py-2 text-text-primary hover:text-primary"
+                                className="cursor-pointer w-full text-left block py-2 text-text-primary hover:text-primary"
                             >
                                 <span className="inline-flex items-center"><FaSignOutAlt className="mr-2" /> Đăng xuất</span>
                             </button>
@@ -237,7 +237,7 @@ export default function Navbar() {
                         />
                         <button
                             type="submit"
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                         >
                             <FaSearch />
                         </button>
