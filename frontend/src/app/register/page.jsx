@@ -190,7 +190,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-400"
+              className="cursor-pointer group relative flex w-full justify-center rounded-md bg-indigo-600 py-2 px-3 text-sm font-semibold text-white hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:bg-indigo-400"
             >
               {loading ? 'Đang xử lý...' : 'Đăng ký'}
             </button>
@@ -212,7 +212,7 @@ export default function RegisterPage() {
               type="button"
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="flex w-full items-center justify-center gap-3 rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-70"
+              className="cursor-pointer flex w-full items-center justify-center gap-3 rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-70"
             >
               <FaGoogle className="text-red-500" />
               <span>Google</span>
@@ -222,7 +222,7 @@ export default function RegisterPage() {
               type="button"
               onClick={handleFacebookLogin}
               disabled={loading}
-              className="flex w-full items-center justify-center gap-3 rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-70"
+              className="cursor-pointer flex w-full items-center justify-center gap-3 rounded-md bg-white py-2 px-3 text-sm font-semibold text-gray-700 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-70"
             >
               <FaFacebook className="text-blue-600" />
               <span>Facebook</span>
