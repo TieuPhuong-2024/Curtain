@@ -1,21 +1,22 @@
 'use client';
 
 import Link from 'next/link';
-import {useState, useEffect} from 'react';
-import {FaBars, FaHome, FaInfoCircle, FaPhone, FaShoppingCart, FaTimes, FaSearch, FaUser, FaHeart, FaSignInAlt, FaSignOutAlt, FaBlog} from 'react-icons/fa';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { FaBars, FaHome, FaInfoCircle, FaPhone, FaShoppingCart, FaTimes, FaSearch, FaUser, FaHeart, FaSignInAlt, FaSignOutAlt, FaBlog } from 'react-icons/fa';
 import { useAuth } from '@/lib/AuthContext';
 
 // Action Button Component
-const ActionButton = ({href, icon, label, badge, onClick}) => {
+const ActionButton = ({ href, icon, label, badge, onClick }) => {
     return (
         <div className="relative">
             {onClick ? (
-                <button 
+                <button
                     onClick={onClick}
                     className="cursor-pointer flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors"
                 >
-                    <span className="text-xl">{icon}</span>
-                    <span className="text-xs mt-1 whitespace-nowrap">{label}</span>
+                    <span className="text-lg">{icon}</span>
+                    <span className="text-xs mt-1 whitespace-nowrap font-medium">{label}</span>
                     {badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                             {badge}
@@ -24,8 +25,8 @@ const ActionButton = ({href, icon, label, badge, onClick}) => {
                 </button>
             ) : (
                 <Link href={href} className="flex flex-col items-center justify-center p-2 text-text-primary hover:text-primary transition-colors">
-                    <span className="text-xl">{icon}</span>
-                    <span className="text-xs mt-1 whitespace-nowrap">{label}</span>
+                    <span className="text-lg">{icon}</span>
+                    <span className="text-xs mt-1 whitespace-nowrap font-medium">{label}</span>
                     {badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
                             {badge}
@@ -42,6 +43,7 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const { user, userRole, logout, isAdmin } = useAuth();
+    const router = useRouter();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -57,7 +59,7 @@ export default function Navbar() {
         };
 
         window.addEventListener('scroll', handleScroll);
-        
+
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
@@ -65,8 +67,13 @@ export default function Navbar() {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        // Xử lý tìm kiếm
-        console.log('Searching for:', searchQuery);
+        if (searchQuery.trim()) {
+            router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+            setSearchQuery('');
+            if (isOpen) {
+                setIsOpen(false);
+            }
+        }
     };
 
     const handleLogout = async () => {
@@ -74,41 +81,43 @@ export default function Navbar() {
     };
 
     return (
-        <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-            scrolled 
-                ? 'bg-white/95 backdrop-blur-sm shadow-md py-2' 
+        <nav className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${scrolled
+                ? 'bg-white/95 backdrop-blur-sm shadow-md py-2'
                 : 'bg-white py-4'
-        }`}>
+            }`}>
             <div className="container-custom">
                 <div className="flex justify-between items-center">
                     {/* Left side with logo and navigation */}
                     <div className="flex items-center flex-shrink-0">
-                        <Link 
-                            href="/" 
-                            className="text-xl font-bold text-gradient mr-6 whitespace-nowrap flex-shrink-0"
+                        <Link
+                            href="/"
+                            className="flex items-center mr-8 whitespace-nowrap flex-shrink-0"
                         >
-                            Curtain Shop
+                            <img src="/images/tuan-rem-logo.png" alt="Tuấn Rèm" className="h-12 w-auto" />
                         </Link>
 
                         {/* Desktop Navigation */}
-                        <div className="hidden md:flex space-x-4 lg:space-x-5">
-                            <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                        <div className="hidden md:flex space-x-5 lg:space-x-6">
+                            <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Trang chủ
                             </Link>
-                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                            <Link href="/about" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Giới thiệu
                             </Link>
-                            <Link href="/products" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                            <Link href="/products" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Sản phẩm
                             </Link>
-                            <Link href="/posts" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                            <Link href="/cong-trinh" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
+                                Công trình
+                            </Link>
+                            <Link href="/posts" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Blog
                             </Link>
-                            <Link href="/contact" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                            <Link href="/contact" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                 Liên hệ
                             </Link>
                             {isAdmin && (
-                                <Link href="/admin" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap">
+                                <Link href="/admin" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-sm font-medium">
                                     Quản trị
                                 </Link>
                             )}
@@ -116,47 +125,47 @@ export default function Navbar() {
                     </div>
 
                     {/* Desktop Right Side (Search & Actions) */}
-                    <div className="hidden md:flex items-center space-x-4">
+                    <div className="hidden md:flex items-center space-x-6">
                         {/* Search form */}
                         <form onSubmit={handleSearch} className="relative">
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sản phẩm..."
-                                className="w-64 pl-4 pr-10 py-2 border rounded-full text-sm focus:outline-none focus:ring focus:border-blue-300"
+                                className="w-56 pl-4 pr-10 py-2 border rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <button
                                 type="submit"
-                                className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
                             >
                                 <FaSearch />
                             </button>
                         </form>
 
                         {/* Action buttons */}
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                             <ActionButton href="/favorites" icon={<FaHeart />} label="Yêu thích" badge={0} />
                             <ActionButton href="/cart" icon={<FaShoppingCart />} label="Giỏ hàng" badge={0} />
-                            
+
                             {user ? (
                                 <>
-                                    <ActionButton 
-                                        href="/account" 
-                                        icon={<FaUser />} 
-                                        label={userRole === 'admin' ? 'Admin' : 'Tài khoản'} 
+                                    <ActionButton
+                                        href="/account"
+                                        icon={<FaUser />}
+                                        label={userRole === 'admin' ? 'Admin' : 'Tài khoản'}
                                     />
-                                    <ActionButton 
+                                    <ActionButton
                                         onClick={handleLogout}
-                                        icon={<FaSignOutAlt />} 
-                                        label="Đăng xuất" 
+                                        icon={<FaSignOutAlt />}
+                                        label="Đăng xuất"
                                     />
                                 </>
                             ) : (
-                                <ActionButton 
-                                    href="/login" 
-                                    icon={<FaSignInAlt />} 
-                                    label="Đăng nhập" 
+                                <ActionButton
+                                    href="/login"
+                                    icon={<FaSignInAlt />}
+                                    label="Đăng nhập"
                                 />
                             )}
                         </div>
@@ -180,64 +189,67 @@ export default function Navbar() {
             <div className={`${isOpen ? 'block' : 'hidden'} md:hidden bg-white shadow-lg`}>
                 <div className="px-4 py-2 space-y-1">
                     <Link href="/" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaHome className="mr-2" /> Trang chủ</span>
+                        <span className="inline-flex items-center font-medium"><FaHome className="mr-2" /> Trang chủ</span>
                     </Link>
                     <Link href="/about" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaInfoCircle className="mr-2" /> Giới thiệu</span>
+                        <span className="inline-flex items-center font-medium"><FaInfoCircle className="mr-2" /> Giới thiệu</span>
                     </Link>
                     <Link href="/products" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaShoppingCart className="mr-2" /> Sản phẩm</span>
+                        <span className="inline-flex items-center font-medium"><FaShoppingCart className="mr-2" /> Sản phẩm</span>
+                    </Link>
+                    <Link href="/cong-trinh" className="block py-2 text-text-primary hover:text-primary">
+                        <span className="inline-flex items-center font-medium"><FaInfoCircle className="mr-2" /> Công trình</span>
                     </Link>
                     <Link href="/posts" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaBlog className="mr-2" /> Blog</span>
+                        <span className="inline-flex items-center font-medium"><FaBlog className="mr-2" /> Blog</span>
                     </Link>
                     <Link href="/contact" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaPhone className="mr-2" /> Liên hệ</span>
+                        <span className="inline-flex items-center font-medium"><FaPhone className="mr-2" /> Liên hệ</span>
                     </Link>
                     {isAdmin && (
                         <Link href="/admin" className="block py-2 text-text-primary hover:text-primary">
-                            <span className="inline-flex items-center"><FaUser className="mr-2" /> Quản trị</span>
+                            <span className="inline-flex items-center font-medium"><FaUser className="mr-2" /> Quản trị</span>
                         </Link>
                     )}
                     {user ? (
                         <>
                             <Link href="/account" className="block py-2 text-text-primary hover:text-primary">
-                                <span className="inline-flex items-center"><FaUser className="mr-2" /> Tài khoản</span>
+                                <span className="inline-flex items-center font-medium"><FaUser className="mr-2" /> Tài khoản</span>
                             </Link>
-                            <button 
+                            <button
                                 onClick={handleLogout}
                                 className="cursor-pointer w-full text-left block py-2 text-text-primary hover:text-primary"
                             >
-                                <span className="inline-flex items-center"><FaSignOutAlt className="mr-2" /> Đăng xuất</span>
+                                <span className="inline-flex items-center font-medium"><FaSignOutAlt className="mr-2" /> Đăng xuất</span>
                             </button>
                         </>
                     ) : (
                         <Link href="/login" className="block py-2 text-text-primary hover:text-primary">
-                            <span className="inline-flex items-center"><FaSignInAlt className="mr-2" /> Đăng nhập</span>
+                            <span className="inline-flex items-center font-medium"><FaSignInAlt className="mr-2" /> Đăng nhập</span>
                         </Link>
                     )}
-                    
+
                     <Link href="/favorites" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaHeart className="mr-2" /> Yêu thích</span>
+                        <span className="inline-flex items-center font-medium"><FaHeart className="mr-2" /> Yêu thích</span>
                     </Link>
                     <Link href="/cart" className="block py-2 text-text-primary hover:text-primary">
-                        <span className="inline-flex items-center"><FaShoppingCart className="mr-2" /> Giỏ hàng</span>
+                        <span className="inline-flex items-center font-medium"><FaShoppingCart className="mr-2" /> Giỏ hàng</span>
                     </Link>
                 </div>
-                
+
                 {/* Mobile search */}
                 <div className="px-4 py-3 border-t">
                     <form onSubmit={handleSearch} className="relative">
                         <input
                             type="text"
                             placeholder="Tìm kiếm sản phẩm..."
-                            className="w-full pl-4 pr-10 py-2 border rounded-full text-sm focus:outline-none focus:ring focus:border-blue-300"
+                            className="w-full pl-4 pr-10 py-2 border rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                         <button
                             type="submit"
-                            className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
                         >
                             <FaSearch />
                         </button>
