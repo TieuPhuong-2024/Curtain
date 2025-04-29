@@ -126,7 +126,7 @@ export default function Home() {
             {/* Categories Section */}
             <section className="py-16 bg-[#f3e6d8]">
                 <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Danh Mục Sản Phẩm</h2>
+                    <h2 className="text-3xl font-bold text-center mb-12">Danh Mục Rèm Cửa</h2>
                     {loadingCategories ? (
                         <div className="text-center py-12">Đang tải danh mục...</div>
                     ) : categoryError ? (
