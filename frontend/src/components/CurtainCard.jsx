@@ -15,26 +15,36 @@ export default function CurtainCard({ curtain }) {
     const [favoriteCount, setFavoriteCount] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [isTouchDevice, setIsTouchDevice] = useState(false);
+    const [isActive, setIsActive] = useState(false);
 
     // Sử dụng mainImage hoặc fallback vào image cho tương thích ngược
     const displayImage = mainImage || image || '/images/curtain-placeholder.jpg';
     // Xử lý trường hợp category có thể là object hoặc string
     const categoryName = typeof category === 'object' ? category?.name : category;
 
+    // Check if device is touch-enabled for better mobile experience
+    const checkTouch = () => {
+        const touchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        setIsTouchDevice(touchDevice);
+        // Reset isActive when device type changes to avoid buttons staying visible
+        if (!touchDevice) {
+            setIsActive(false);
+        }
+    };
+    
     useEffect(() => {
         fetchFavoriteStatus();
         fetchFavoriteCount();
         
-        // Check if device is touch-enabled for better mobile experience
-        const checkTouch = () => {
-            setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
-        };
-        
         checkTouch();
         window.addEventListener('touchstart', () => setIsTouchDevice(true), { once: true });
         
+        // Listen for resize events which might indicate device/orientation changes
+        window.addEventListener('resize', checkTouch);
+        
         return () => {
             window.removeEventListener('touchstart', () => setIsTouchDevice(true));
+            window.removeEventListener('resize', checkTouch);
         };
     }, [_id]);
 
@@ -107,14 +117,21 @@ export default function CurtainCard({ curtain }) {
         }
     };
 
-    // Touch devices (mobile) show action buttons always, while desktop/laptop shows on hover
-    const showActions = isTouchDevice || isHovered;
+    // Touch devices need click/tap to show actions, desktop uses hover
+    const showActions = isTouchDevice ? isActive : isHovered;
+    
+    const handleCardClick = () => {
+        if (isTouchDevice) {
+            setIsActive(!isActive);
+        }
+    };
 
     return (
         <div
             className="bg-white rounded-lg overflow-hidden shadow-md card-hover"
             onMouseEnter={() => !isTouchDevice && setIsHovered(true)}
             onMouseLeave={() => !isTouchDevice && setIsHovered(false)}
+            onClick={handleCardClick}
         >
             <div className="relative h-48 sm:h-56 md:h-64 w-full group">
                 <Image
@@ -137,18 +154,22 @@ export default function CurtainCard({ curtain }) {
                 {/* Favorite button */}
                 <button
                     className="cursor-pointer absolute top-2 right-2 z-10 bg-white bg-opacity-90 p-1.5 rounded-full text-gray-700 hover:text-red-500 flex items-center"
-                    onClick={toggleFavorite}
+                    onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click when favorite is clicked
+                        toggleFavorite(e);
+                    }}
                     disabled={isLoading}
                     title={isFavorite ? "Xóa khỏi yêu thích" : "Thêm vào yêu thích"}
                 >
                     <FaHeart size={16} className={`${isFavorite ? "text-red-500" : ""} ${isLoading ? "opacity-50" : ""}`} />
                     <span className="ml-1 text-xs">{favoriteCount}</span>
                 </button>
-                {/* Overlay with actions - always visible on mobile, hover on desktop */}
+                {/* Overlay with actions - shown on hover (desktop) or tap (mobile) */}
                 <div
-                    className={`absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center gap-3 transition-opacity duration-300 ${
-                        showActions ? 'opacity-100' : 'opacity-0'
+                    className={`absolute inset-0 bg-transparent bg-opacity-20 flex items-center justify-center gap-3 transition-opacity duration-300 ${
+                        showActions ? 'opacity-100' : 'opacity-0 pointer-events-none'
                     }`}
+                    onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside overlay
                 >
                     <Link
                         href={`/products/${_id}`}
