@@ -21,6 +21,20 @@ export default function CurtainCard({ curtain }) {
     const displayImage = mainImage || image || '/images/curtain-placeholder.jpg';
     // Xử lý trường hợp category có thể là object hoặc string
     const categoryName = typeof category === 'object' ? category?.name : category;
+    // Map Vietnamese color names to CSS colors
+    const colorMap = {
+        'trắng': 'white',
+        'đen': 'black',
+        'xám': 'gray',
+        'be': 'beige',
+        'nâu': 'brown',
+        'xanh dương': 'blue',
+        'xanh lá': 'green',
+        'đỏ': 'red',
+        'vàng': 'yellow',
+        'hồng': 'pink'
+    };
+    const displayColor = color ? colorMap[color] || color.toLowerCase() : 'gray';
 
     // Check if device is touch-enabled for better mobile experience
     const checkTouch = () => {
@@ -203,11 +217,16 @@ export default function CurtainCard({ curtain }) {
                             currency: 'VND'
                         }).format(price)}
                     </p>
-                    <div
-                        className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-gray-300"
-                        style={{ backgroundColor: color?.toLowerCase() }}
-                        title={color}
-                    />
+                    <div className="flex items-center gap-1 sm:gap-2">
+                        <div
+                            className="w-3 h-3 sm:w-4 sm:h-4 rounded-full border border-gray-300"
+                            style={{ backgroundColor: displayColor }}
+                            title={color}
+                        />
+                        <span className="text-xs text-gray-600 truncate max-w-[50px] sm:max-w-[100px]">
+                            {color || 'N/A'}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
