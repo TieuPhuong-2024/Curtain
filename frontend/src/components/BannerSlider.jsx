@@ -74,7 +74,7 @@ export default function BannerSlider({banners}) {
     // If no banners, show a fallback
     if (!banners || banners.length === 0) {
         return (
-            <div className="relative h-[80vh] flex items-center overflow-hidden">
+            <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] flex items-center overflow-hidden max-h-[800px]">
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/images/hero-curtain.jpg"
@@ -88,9 +88,9 @@ export default function BannerSlider({banners}) {
                 </div>
 
                 <div className="container-custom z-10 text-white">
-                    <div className="max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/5 slide-up">
-                        <h1 className="text-gradient text-4xl md:text-5xl font-bold mb-6">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
-                        <p className="text-xl mb-8 opacity-90">
+                    <div className="max-w-2xl p-4 sm:p-6 md:p-8 rounded-lg backdrop-blur-sm bg-black/5 slide-up">
+                        <h1 className="text-gradient text-3xl sm:text-4xl md:text-5xl font-bold mb-4 md:mb-6">Rèm Cửa Cao Cấp Cho Không Gian Của Bạn</h1>
+                        <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 opacity-90">
                             Khám phá bộ sưu tập rèm cửa đa dạng với chất lượng tốt nhất và giá cả hợp lý
                         </p>
                         <Link href="/products" className="btn-primary inline-flex items-center">
@@ -105,7 +105,7 @@ export default function BannerSlider({banners}) {
     const currentBanner = banners[currentIndex];
 
     return (
-        <div className="relative h-[80vh] flex items-center overflow-hidden">
+        <div className="relative h-[50vh] sm:h-[60vh] md:h-[70vh] lg:h-[80vh] flex items-center overflow-hidden max-h-[800px]">
             {/* Banner images with transition effect */}
             {banners.map((banner, index) => (
                 <div 
@@ -131,15 +131,15 @@ export default function BannerSlider({banners}) {
             ))}
 
             <div className="container-custom z-10 text-white">
-                <div className={`max-w-2xl p-8 rounded-lg backdrop-blur-sm bg-black/5 transition-all duration-700 ${
+                <div className={`max-w-xl lg:max-w-2xl p-4 sm:p-6 lg:p-8 rounded-lg backdrop-blur-sm bg-black/5 transition-all duration-700 ${
                     transitioning ? 'opacity-0 transform translate-y-10' : 'opacity-100 transform translate-y-0'
                 }`}>
-                    <h1 className="text-gradient text-4xl md:text-5xl font-bold mb-6">{currentBanner.title}</h1>
+                    <h1 className="text-gradient text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold mb-3 sm:mb-4 lg:mb-6">{currentBanner.title}</h1>
                     {currentBanner.description && (
-                        <p className="text-xl mb-8 opacity-90">{currentBanner.description}</p>
+                        <p className="text-sm sm:text-base lg:text-lg xl:text-xl mb-4 sm:mb-6 lg:mb-8 opacity-90">{currentBanner.description}</p>
                     )}
                     {currentBanner.link && (
-                        <Link href={currentBanner.link} className="btn-primary inline-flex items-center">
+                        <Link href={currentBanner.link} className="btn-primary inline-flex items-center text-sm sm:text-base">
                             Xem thêm <FaArrowRight className="ml-2"/>
                         </Link>
                     )}
