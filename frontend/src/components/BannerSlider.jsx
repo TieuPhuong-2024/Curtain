@@ -133,14 +133,14 @@ export default function BannerSlider({banners}) {
             <div className="container-custom z-10 text-white">
                 <div className={`max-w-xs sm:max-w-sm md:max-w-xl lg:max-w-2xl p-3 sm:p-4 md:p-6 lg:p-8 rounded-lg backdrop-blur-sm bg-black/5 transition-all duration-700 ${
                     transitioning ? 'opacity-0 transform translate-y-10' : 'opacity-100 transform translate-y-0'
-                }`}>
+                } ml-12 xs:ml-14 sm:ml-16 md:ml-16 lg:ml-20 xl:ml-0`}>
                     <h1 className="text-gradient text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold mb-2 sm:mb-3 md:mb-4 lg:mb-6">{currentBanner.title}</h1>
                     {currentBanner.description && (
                         <p className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl mb-3 sm:mb-4 md:mb-6 lg:mb-8 opacity-90">{currentBanner.description}</p>
                     )}
                     {currentBanner.link && (
                         <Link href={currentBanner.link} className="btn-primary inline-flex items-center text-xs sm:text-sm md:text-base">
-                            Xem thêm <FaArrowRight className="ml-2 text-xs sm:text-sm" />
+                            Xem thêm <FaArrowRight className="ml-2 text-xs sm:text-sm md:text-base" />
                         </Link>
                     )}
                 </div>
@@ -151,7 +151,7 @@ export default function BannerSlider({banners}) {
                 <>
                     <button
                         onClick={goToPrevious}
-                        className="hidden sm:flex cursor-pointer absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-2 sm:p-3 md:p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
+                        className="hidden sm:flex cursor-pointer absolute left-2 xs:left-3 sm:left-4 md:left-5 lg:left-8 xl:left-6 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-primary text-white p-2 sm:p-3 md:p-4 rounded-full z-20 transition-all hover:scale-110 backdrop-blur-sm"
                         aria-label="Previous banner"
                         disabled={transitioning}
                     >
