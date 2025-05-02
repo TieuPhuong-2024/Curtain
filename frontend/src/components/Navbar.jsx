@@ -107,9 +107,15 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <Link
                             href="/"
-                            className="flex items-center mr-1 xs:mr-2 sm:mr-4 md:mr-5 lg:mr-6 xl:mr-8 whitespace-nowrap flex-shrink-0"
+                            className="flex items-center mr-1 xs:mr-2 sm:mr-4 md:mr-5 lg:mr-6 xl:mr-8 whitespace-nowrap flex-shrink-0 group"
                         >
-                            <img src="/images/tuan-rem-logo.png" alt="Tuấn Rèm" className="h-6 xs:h-7 sm:h-8 md:h-10 lg:h-12 w-auto" />
+                            <div className={`${scrolled ? 'bg-white shadow-md' : 'bg-white/90 shadow-sm'} rounded-lg p-1 xs:p-1.5 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105`}>
+                                <img 
+                                    src="/images/logo.png" 
+                                    alt="Tuấn Rèm" 
+                                    className="h-7 xs:h-8 sm:h-9 md:h-11 lg:h-14 w-auto object-contain drop-shadow-sm" 
+                                />
+                            </div>
                         </Link>
 
                         {/* Desktop Navigation - Hidden on smaller screens and when not wide enough */}
