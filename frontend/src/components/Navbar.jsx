@@ -9,11 +9,11 @@ import { useAuth } from '@/lib/AuthContext';
 // Action Button Component
 const ActionButton = ({ href, icon, label, badge, onClick }) => {
     return (
-        <div className="relative mx-0.5 sm:mx-1 md:mx-1.5 lg:mx-2">
+        <div className="relative mx-0.5 sm:mx-1 md:mx-1 lg:mx-1.5 xl:mx-2">
             {onClick ? (
                 <button
                     onClick={onClick}
-                    className="cursor-pointer flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-8 sm:w-10 lg:w-12 xl:w-14"
+                    className="cursor-pointer flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-7 xs:w-8 sm:w-10 lg:w-12 xl:w-14"
                 >
                     <span className="text-sm lg:text-base xl:text-lg">{icon}</span>
                     <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs mt-0.5 xl:mt-1 whitespace-nowrap font-medium">{label}</span>
@@ -24,7 +24,7 @@ const ActionButton = ({ href, icon, label, badge, onClick }) => {
                     )}
                 </button>
             ) : (
-                <Link href={href} className="flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-8 sm:w-10 lg:w-12 xl:w-14">
+                <Link href={href} className="flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-7 xs:w-8 sm:w-10 lg:w-12 xl:w-14">
                     <span className="text-sm lg:text-base xl:text-lg">{icon}</span>
                     <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs mt-0.5 xl:mt-1 whitespace-nowrap font-medium">{label}</span>
                     {badge > 0 && (
@@ -69,7 +69,7 @@ export default function Navbar() {
     // Effect to track screen width
     useEffect(() => {
         const handleResize = () => {
-            setIsWideScreen(window.innerWidth >= 1180);
+            setIsWideScreen(window.innerWidth >= 1220);
         };
         
         // Initial check
@@ -113,7 +113,7 @@ export default function Navbar() {
                         </Link>
 
                         {/* Desktop Navigation - Hidden on smaller screens and when not wide enough */}
-                        <div className={`hidden ${isWideScreen ? 'lg:flex' : 'xl:flex'} space-x-2 md:space-x-3 lg:space-x-4 xl:space-x-5 2xl:space-x-8`}>
+                        <div className={`hidden ${isWideScreen ? 'lg:flex' : 'xl:flex'} space-x-1.5 sm:space-x-2 md:space-x-3 lg:space-x-3.5 xl:space-x-5 2xl:space-x-8`}>
                             <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-xs lg:text-sm xl:text-base font-medium">
                                 Trang chủ
                             </Link>
@@ -147,7 +147,7 @@ export default function Navbar() {
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sản phẩm..."
-                                className="w-32 sm:w-36 md:w-44 lg:w-48 xl:w-56 pl-2 lg:pl-3 xl:pl-4 pr-7 lg:pr-8 xl:pr-10 py-1 lg:py-1.5 xl:py-2 border rounded-full text-xs lg:text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                className="w-24 xs:w-28 sm:w-32 md:w-36 lg:w-40 xl:w-56 pl-2 lg:pl-3 xl:pl-4 pr-7 lg:pr-8 xl:pr-10 py-1 lg:py-1.5 xl:py-2 border rounded-full text-xs lg:text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
