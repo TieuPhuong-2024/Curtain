@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import CategoryCard from './CategoryCard';
@@ -35,11 +34,10 @@ const CategorySlider = ({ categories, productCounts = {} }) => {
 
   return (
     <>
-      <h2 className="text-3xl font-bold text-center mb-6">Danh Mục Rèm Cửa</h2>
       <p className="text-center text-gray-500 max-w-3xl mx-auto mb-8 text-base">
         Rèm cửa không chỉ là một phụ kiện trang trí đơn thuần, mà còn là yếu tố quan trọng tạo nên không gian lý tưởng cho gia đình bạn.
       </p>
-      
+
       <div className="relative px-0 md:px-8">
         {/* Left navigation arrow */}
         {showLeftArrow && (
@@ -51,16 +49,16 @@ const CategorySlider = ({ categories, productCounts = {} }) => {
             <FaArrowLeft size={20} />
           </button>
         )}
-        
+
         {/* Categories slider container */}
-        <div 
+        <div
           ref={sliderRef}
           className="flex overflow-x-auto gap-4 py-4 px-4 md:px-2 hide-scrollbar"
           onScroll={handleScroll}
         >
           {categories.map(category => (
-            <div 
-              key={category._id} 
+            <div
+              key={category._id}
               className="flex-shrink-0 w-[250px] md:w-[280px]"
             >
               <CategoryCard
@@ -70,7 +68,7 @@ const CategorySlider = ({ categories, productCounts = {} }) => {
             </div>
           ))}
         </div>
-        
+
         {/* Right navigation arrow */}
         {showRightArrow && (
           <button
@@ -82,16 +80,16 @@ const CategorySlider = ({ categories, productCounts = {} }) => {
           </button>
         )}
       </div>
-      
+
       <div className="text-center mt-8">
-        <Link 
-          href="/products" 
+        <Link
+          href="/products"
           className="inline-flex items-center text-primary hover:text-primary-dark font-medium transition-colors"
         >
           Xem tất cả danh mục <FaArrowRight className="ml-2" size={14} />
         </Link>
       </div>
-      
+
       {/* CSS for hiding scrollbar */}
       <style jsx>{`
         .hide-scrollbar::-webkit-scrollbar {
