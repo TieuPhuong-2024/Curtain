@@ -330,3 +330,17 @@ html, body {
         padding: 0 1.25rem;
     }
 }
+
+/* Special adjustments for screens around 1199px */
+@media (min-width: 1181px) and (max-width: 1220px) {
+    .container-custom {
+        padding: 0 1.5rem;
+    }
+}
+
+/* Special adjustments for screens around 1320px */
+@media (min-width: 1221px) and (max-width: 1350px) {
+    .container-custom {
+        padding: 0 1.75rem;
+    }
+}
