@@ -215,51 +215,54 @@ export default function Navbar() {
             {/* Mobile Menu */}
             <div className={`${isOpen ? 'block' : 'hidden'} ${isWideScreen ? 'lg:hidden' : 'xl:hidden'} bg-white shadow-lg max-h-[calc(100vh-70px)] overflow-y-auto`}>
                 <div className="px-4 py-2 space-y-1">
-                    <Link href="/" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaHome className="mr-2" /> Trang chủ</span>
                     </Link>
-                    <Link href="/about" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/about" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaInfoCircle className="mr-2" /> Giới thiệu</span>
                     </Link>
-                    <Link href="/products" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/products" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaShoppingCart className="mr-2" /> Sản phẩm</span>
                     </Link>
-                    <Link href="/cong-trinh" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/cong-trinh" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaInfoCircle className="mr-2" /> Công trình</span>
                     </Link>
-                    <Link href="/posts" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/posts" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaBlog className="mr-2" /> Blog</span>
                     </Link>
-                    <Link href="/contact" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/contact" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaPhone className="mr-2" /> Liên hệ</span>
                     </Link>
                     {isAdmin && (
-                        <Link href="/admin" className="block py-2 text-text-primary hover:text-primary">
+                        <Link href="/admin" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                             <span className="inline-flex items-center font-medium"><FaUser className="mr-2" /> Quản trị</span>
                         </Link>
                     )}
                     {user ? (
                         <>
-                            <Link href="/account" className="block py-2 text-text-primary hover:text-primary">
+                            <Link href="/account" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                                 <span className="inline-flex items-center font-medium"><FaUser className="mr-2" /> Tài khoản</span>
                             </Link>
                             <button
-                                onClick={handleLogout}
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    handleLogout();
+                                }}
                                 className="cursor-pointer w-full text-left block py-2 text-text-primary hover:text-primary"
                             >
                                 <span className="inline-flex items-center font-medium"><FaSignOutAlt className="mr-2" /> Đăng xuất</span>
                             </button>
                         </>
                     ) : (
-                        <Link href="/login" className="block py-2 text-text-primary hover:text-primary">
+                        <Link href="/login" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                             <span className="inline-flex items-center font-medium"><FaSignInAlt className="mr-2" /> Đăng nhập</span>
                         </Link>
                     )}
 
-                    <Link href="/favorites" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/favorites" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaHeart className="mr-2" /> Yêu thích</span>
                     </Link>
-                    <Link href="/cart" className="block py-2 text-text-primary hover:text-primary">
+                    <Link href="/cart" className="block py-2 text-text-primary hover:text-primary" onClick={() => setIsOpen(false)}>
                         <span className="inline-flex items-center font-medium"><FaShoppingCart className="mr-2" /> Giỏ hàng</span>
                     </Link>
                 </div>
@@ -277,6 +280,7 @@ export default function Navbar() {
                         <button
                             type="submit"
                             className="cursor-pointer absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"
+                            onClick={() => setIsOpen(false)}
                         >
                             <FaSearch />
                         </button>
