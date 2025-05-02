@@ -9,14 +9,14 @@ import { useAuth } from '@/lib/AuthContext';
 // Action Button Component
 const ActionButton = ({ href, icon, label, badge, onClick }) => {
     return (
-        <div className="relative mx-1 md:mx-1.5 lg:mx-2">
+        <div className="relative mx-0.5 sm:mx-1 md:mx-1.5 lg:mx-2">
             {onClick ? (
                 <button
                     onClick={onClick}
-                    className="cursor-pointer flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-10 lg:w-12 xl:w-14"
+                    className="cursor-pointer flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-8 sm:w-10 lg:w-12 xl:w-14"
                 >
                     <span className="text-sm lg:text-base xl:text-lg">{icon}</span>
-                    <span className="text-[9px] lg:text-[10px] xl:text-xs mt-0.5 xl:mt-1 whitespace-nowrap font-medium">{label}</span>
+                    <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs mt-0.5 xl:mt-1 whitespace-nowrap font-medium">{label}</span>
                     {badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full">
                             {badge}
@@ -24,9 +24,9 @@ const ActionButton = ({ href, icon, label, badge, onClick }) => {
                     )}
                 </button>
             ) : (
-                <Link href={href} className="flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-10 lg:w-12 xl:w-14">
+                <Link href={href} className="flex flex-col items-center justify-center p-1 lg:p-1.5 xl:p-2 text-text-primary hover:text-primary transition-colors w-8 sm:w-10 lg:w-12 xl:w-14">
                     <span className="text-sm lg:text-base xl:text-lg">{icon}</span>
-                    <span className="text-[9px] lg:text-[10px] xl:text-xs mt-0.5 xl:mt-1 whitespace-nowrap font-medium">{label}</span>
+                    <span className="text-[8px] sm:text-[9px] lg:text-[10px] xl:text-xs mt-0.5 xl:mt-1 whitespace-nowrap font-medium">{label}</span>
                     {badge > 0 && (
                         <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-4 h-4 md:w-5 md:h-5 flex items-center justify-center rounded-full">
                             {badge}
@@ -69,7 +69,7 @@ export default function Navbar() {
     // Effect to track screen width
     useEffect(() => {
         const handleResize = () => {
-            setIsWideScreen(window.innerWidth >= 1100);
+            setIsWideScreen(window.innerWidth >= 1180);
         };
         
         // Initial check
@@ -107,13 +107,13 @@ export default function Navbar() {
                     <div className="flex items-center">
                         <Link
                             href="/"
-                            className="flex items-center mr-4 sm:mr-6 lg:mr-4 xl:mr-6 whitespace-nowrap flex-shrink-0"
+                            className="flex items-center mr-1 xs:mr-2 sm:mr-4 md:mr-5 lg:mr-6 xl:mr-8 whitespace-nowrap flex-shrink-0"
                         >
-                            <img src="/images/tuan-rem-logo.png" alt="Tuấn Rèm" className="h-8 sm:h-10 lg:h-12 w-auto" />
+                            <img src="/images/tuan-rem-logo.png" alt="Tuấn Rèm" className="h-6 xs:h-7 sm:h-8 md:h-10 lg:h-12 w-auto" />
                         </Link>
 
                         {/* Desktop Navigation - Hidden on smaller screens and when not wide enough */}
-                        <div className={`hidden ${isWideScreen ? 'lg:flex' : 'xl:flex'} space-x-3 lg:space-x-4 xl:space-x-5 2xl:space-x-6`}>
+                        <div className={`hidden ${isWideScreen ? 'lg:flex' : 'xl:flex'} space-x-2 md:space-x-3 lg:space-x-4 xl:space-x-5 2xl:space-x-8`}>
                             <Link href="/" className="text-text-primary hover:text-primary transition-colors whitespace-nowrap text-xs lg:text-sm xl:text-base font-medium">
                                 Trang chủ
                             </Link>
@@ -143,11 +143,11 @@ export default function Navbar() {
                     {/* Desktop Right Side (Search & Actions) */}
                     <div className={`hidden ${isWideScreen ? 'lg:flex' : 'xl:flex'} items-center`}>
                         {/* Search form */}
-                        <form onSubmit={handleSearch} className="relative ml-2 xl:ml-4">
+                        <form onSubmit={handleSearch} className="relative ml-1 sm:ml-2 xl:ml-4">
                             <input
                                 type="text"
                                 placeholder="Tìm kiếm sản phẩm..."
-                                className="w-36 lg:w-40 xl:w-56 pl-2 lg:pl-3 xl:pl-4 pr-7 lg:pr-8 xl:pr-10 py-1 lg:py-1.5 xl:py-2 border rounded-full text-xs lg:text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
+                                className="w-32 sm:w-36 md:w-44 lg:w-48 xl:w-56 pl-2 lg:pl-3 xl:pl-4 pr-7 lg:pr-8 xl:pr-10 py-1 lg:py-1.5 xl:py-2 border rounded-full text-xs lg:text-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -160,7 +160,7 @@ export default function Navbar() {
                         </form>
 
                         {/* Action buttons */}
-                        <div className="flex items-center ml-3 xl:ml-6">
+                        <div className="flex items-center ml-1 sm:ml-2 lg:ml-2 xl:ml-6">
                             <ActionButton href="/favorites" icon={<FaHeart />} label="Yêu thích" badge={0} />
                             <ActionButton href="/cart" icon={<FaShoppingCart />} label="Giỏ hàng" badge={0} />
 
@@ -188,25 +188,25 @@ export default function Navbar() {
                     </div>
 
                     {/* Mobile icons */}
-                    <div className={`${isWideScreen ? 'lg:hidden' : 'xl:hidden'} flex items-center`}>
-                        <Link href="/favorites" className="mx-1 p-2 text-text-primary hover:text-primary">
-                            <FaHeart className="text-lg" />
+                    <div className={`${isWideScreen ? 'lg:hidden' : 'xl:hidden'} flex items-center space-x-0.5 xs:space-x-1 sm:space-x-2`}>
+                        <Link href="/favorites" className="p-1 xs:p-1.5 sm:p-2 text-text-primary hover:text-primary">
+                            <FaHeart className="text-sm xs:text-base sm:text-lg" />
                         </Link>
-                        <Link href="/cart" className="mx-1 p-2 text-text-primary hover:text-primary">
-                            <FaShoppingCart className="text-lg" />
+                        <Link href="/cart" className="p-1 xs:p-1.5 sm:p-2 text-text-primary hover:text-primary">
+                            <FaShoppingCart className="text-sm xs:text-base sm:text-lg" />
                         </Link>
                         {user && (
-                            <Link href="/account" className="mx-1 p-2 text-text-primary hover:text-primary">
-                                <FaUser className="text-lg" />
+                            <Link href="/account" className="p-1 xs:p-1.5 sm:p-2 text-text-primary hover:text-primary">
+                                <FaUser className="text-sm xs:text-base sm:text-lg" />
                             </Link>
                         )}
                         <button
                             onClick={toggleMenu}
-                            className="cursor-pointer mx-1 p-2 text-text-primary hover:text-primary focus:outline-none"
+                            className="cursor-pointer p-1 xs:p-1.5 sm:p-2 text-text-primary hover:text-primary focus:outline-none"
                             aria-expanded={isOpen}
                         >
                             <span className="sr-only">{isOpen ? 'Đóng menu' : 'Mở menu'}</span>
-                            {isOpen ? <FaTimes className="text-lg" /> : <FaBars className="text-lg" />}
+                            {isOpen ? <FaTimes className="text-sm xs:text-base sm:text-lg" /> : <FaBars className="text-sm xs:text-base sm:text-lg" />}
                         </button>
                     </div>
                 </div>
