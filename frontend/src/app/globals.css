@@ -70,9 +70,13 @@ body {
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 0.75rem;
+    padding: 0 0.5rem;
     
     /* Responsive padding */
+    @media (min-width: 375px) {
+        padding: 0 0.75rem;
+    }
+    
     @media (min-width: 576px) {
         padding: 0 1rem;
     }
@@ -97,9 +101,10 @@ body {
         padding: 0 2.5rem;
     }
 
-    @media (max-width: 575px) {
+    @media (max-width: 374px) {
         max-width: 100%;
         overflow-x: hidden;
+        padding: 0 0.375rem;
     }
 }
 
@@ -297,5 +302,31 @@ html, body {
 @media (min-width: 1800px) {
     .container-custom {
         max-width: 1600px;
+    }
+}
+
+/* Button styles for very small screens */
+@media (max-width: 374px) {
+    .btn-primary {
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1150px) {
+    .container-custom {
+        padding: 0 1rem;
+    }
+    
+    /* Additional size tuning for this specific range */
+    .btn-primary {
+        padding: 0.375rem 0.75rem;
+    }
+}
+
+/* Special adjustments for screens around 1153px */
+@media (min-width: 1151px) and (max-width: 1180px) {
+    .container-custom {
+        padding: 0 1.25rem;
     }
 }
