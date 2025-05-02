@@ -81,7 +81,13 @@ export default function ProductsPage() {
         // Xử lý trường hợp category có thể là object
         const curtainCategoryId = typeof curtain.category === 'object' ? curtain.category?._id : curtain.category;
         const matchesCategory = selectedCategory === '' || curtainCategoryId === selectedCategory;
-        const matchesColor = selectedColors.length === 0 || selectedColors.includes(curtain.color);
+        
+        // Xử lý trường hợp color có thể null hoặc case sensitivity
+        const curtainColor = curtain.color || '';
+        const matchesColor = selectedColors.length === 0 || 
+            selectedColors.some(color => 
+                curtainColor.toLowerCase() === color.toLowerCase());
+                
         const matchesPrice = curtain.price >= priceRange.min && curtain.price <= priceRange.max;
 
         return matchesCategory && matchesColor && matchesPrice;
