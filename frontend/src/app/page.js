@@ -9,7 +9,7 @@ import {useEffect, useState} from 'react';
 import {getBanners, getCategories, getCurtains} from '@/lib/api';
 import CurtainCard from '@/components/CurtainCard';
 import BannerSlider from '@/components/BannerSlider';
-import CategoryScroll from '@/components/CategoryScroll';
+import CategorySlider from '@/components/CategorySlider';
 
 export default function Home() {
     const [featuredCurtains, setFeaturedCurtains] = useState([]);
@@ -134,7 +134,7 @@ export default function Home() {
                     ) : categories.length === 0 ? (
                         <div className="text-center py-12">Chưa có danh mục nào.</div>
                     ) : (
-                        <CategoryScroll categories={categories} productCounts={productCounts} />
+                        <CategorySlider categories={categories} productCounts={productCounts} />
                     )}
                 </div>
             </section>
