@@ -1,25 +1,25 @@
 'use client';
 
-import {use, useEffect, useState, useRef} from 'react';
-import {useRouter} from 'next/navigation';
+import { use, useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {FaArrowLeft, FaUpload, FaPlus, FaTimes} from 'react-icons/fa';
-import {getCurtainById, updateCurtain, uploadImage, getCategories, getImagesByCurtainId, addImageToCurtain, deleteImage} from '@/lib/api';
+import { FaArrowLeft, FaUpload, FaPlus, FaTimes } from 'react-icons/fa';
+import { getCurtainById, updateCurtain, uploadImage, getCategories, getImagesByCurtainId, addImageToCurtain, deleteImage } from '@/lib/api';
 
-export default function EditCurtain({params}) {
+export default function EditCurtain({ params }) {
     const router = useRouter();
-    const {id} = use(params);
+    const { id } = use(params);
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
-    
+
     // Thêm state cho nhiều hình ảnh
     const [imageList, setImageList] = useState([]);
     const additionalFileInputRef = useRef(null);
-    
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -59,7 +59,7 @@ export default function EditCurtain({params}) {
 
             // Fetch curtain data
             const curtainData = await getCurtainById(id);
-            
+
             // Fetch images separately if not included in response
             let images = curtainData.images || [];
             if (!curtainData.images || !Array.isArray(curtainData.images) || curtainData.images.length === 0) {
@@ -69,9 +69,9 @@ export default function EditCurtain({params}) {
                     console.error('Error fetching images:', imgErr);
                 }
             }
-            
+
             setImageList(images);
-            
+
             // Map the curtain data to the form
             setFormData({
                 name: curtainData.name || '',
@@ -95,7 +95,7 @@ export default function EditCurtain({params}) {
     };
 
     const handleChange = (e) => {
-        const {name, value, type, checked} = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
             [name]: type === 'checkbox' ? checked : value
@@ -129,42 +129,42 @@ export default function EditCurtain({params}) {
     const handleFileButtonClick = () => {
         fileInputRef.current.click();
     };
-    
+
     // Xử lý thêm hình ảnh phụ
     const handleAdditionalFileButtonClick = () => {
         additionalFileInputRef.current.click();
     };
-    
+
     const handleAdditionalFileChange = async (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
-        
+
         setIsSubmitting(true);
-        
+
         try {
             // Upload each file and add to curtain
             for (const file of files) {
                 // Upload the file first
                 const uploadResult = await uploadImage(file);
-                
+
                 // Add the image to the curtain
                 const imageData = {
                     url: uploadResult.url,
                     isMain: false
                 };
-                
+
                 const savedImage = await addImageToCurtain(id, imageData);
-                
+
                 // Add to image list with local preview
                 setImageList(prev => [
-                    ...prev, 
+                    ...prev,
                     {
                         ...savedImage,
                         preview: URL.createObjectURL(file)
                     }
                 ]);
             }
-            
+
             alert('Đã thêm hình ảnh thành công!');
         } catch (error) {
             console.error('Error uploading additional images:', error);
@@ -174,16 +174,16 @@ export default function EditCurtain({params}) {
             e.target.value = null; // Reset file input
         }
     };
-    
+
     const handleRemoveImage = async (imageId) => {
         if (!imageId) return;
-        
+
         if (!confirm('Bạn có chắc chắn muốn xóa hình ảnh này?')) {
             return;
         }
-        
+
         setIsSubmitting(true);
-        
+
         try {
             await deleteImage(imageId);
             // Refresh image list
@@ -196,7 +196,7 @@ export default function EditCurtain({params}) {
             setIsSubmitting(false);
         }
     };
-    
+
     const handleSetMainImage = async (imageUrl) => {
         setFormData({
             ...formData,
@@ -282,9 +282,6 @@ export default function EditCurtain({params}) {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mb-4 flex items-center">
-                <Link href="/admin/curtains" className="text-blue-500 flex items-center mr-4">
-                    <FaArrowLeft className="mr-1"/> Quay lại
-                </Link>
                 <h1 className="text-2xl font-bold">Chỉnh sửa sản phẩm</h1>
             </div>
 
@@ -504,7 +501,7 @@ export default function EditCurtain({params}) {
                             </label>
                         </div>
                     </div>
-                    
+
                     {/* Hình ảnh phụ */}
                     <div className="mt-6">
                         <div className="flex justify-between items-center">
@@ -527,19 +524,18 @@ export default function EditCurtain({params}) {
                                 className="hidden"
                             />
                         </div>
-                        
+
                         {/* Hiển thị tất cả hình ảnh */}
                         {imageList.length > 0 ? (
                             <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {imageList.map((img) => (
                                     <div key={img._id} className="relative group">
-                                        <div 
-                                            className={`relative h-32 border rounded-md overflow-hidden ${
-                                                formData.mainImage === img.url ? 'border-2 border-blue-500' : 'border-gray-300'
-                                            }`}
+                                        <div
+                                            className={`relative h-32 border rounded-md overflow-hidden ${formData.mainImage === img.url ? 'border-2 border-blue-500' : 'border-gray-300'
+                                                }`}
                                         >
-                                            <img 
-                                                src={img.preview || img.url} 
+                                            <img
+                                                src={img.preview || img.url}
                                                 alt={img.isMain ? "Main Image" : "Additional Image"}
                                                 className="w-full h-full object-cover"
                                             />
@@ -549,7 +545,7 @@ export default function EditCurtain({params}) {
                                                 </div>
                                             )}
                                         </div>
-                                        
+
                                         <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
                                             {formData.mainImage !== img.url && (
                                                 <button
