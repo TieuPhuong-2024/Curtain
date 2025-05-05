@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye } from 'react-icons/fa';
 import axios from 'axios';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 export default function AdminProjects() {
     const [projects, setProjects] = useState([]);

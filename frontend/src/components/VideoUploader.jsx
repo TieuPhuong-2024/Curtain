@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { FaUpload } from 'react-icons/fa';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 
 export default function VideoUploader({ onUpload }) {
     const [uploading, setUploading] = useState(false);
