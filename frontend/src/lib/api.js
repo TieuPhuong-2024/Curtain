@@ -283,6 +283,16 @@ export const updateContactStatus = async (id, status) => {
     }
 };
 
+export const deleteContact = async (id) => {
+    try {
+        const response = await api.delete(`/contacts/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting contact:', error);
+        throw error;
+    }
+};
+
 export const createContact = async (contactData) => {
     try {
         const response = await api.post('/contacts', contactData);
