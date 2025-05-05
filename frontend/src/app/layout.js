@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from '@/lib/AuthContext';
+import "./styles/cozy-theme.css";
 
 const quicksand = Quicksand({
     subsets: ["latin"],
@@ -21,7 +22,7 @@ export const metadata = {
 export default function RootLayout({children}) {
     return (
         <html lang="vi" className={quicksand.variable}>
-        <body className={`${quicksand.className} flex flex-col min-h-screen`}>
+        <body className={`${quicksand.className} flex flex-col min-h-screen cozy-bg`}>
             <AuthProvider>
                 <Navbar/>
                 <main className="flex-grow pt-24">

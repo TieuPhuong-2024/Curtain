@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye, FaCheckCircle, FaTimesCircle, FaExclamationCircle } from 'react-icons/fa';
+import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye } from 'react-icons/fa';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
 
@@ -153,14 +153,14 @@ export default function AdminProjects() {
                                                         <div className="flex items-center space-x-2">
                                                             <button
                                                                 onClick={() => handleDelete(project._id)}
-                                                                className="text-red-600 hover:text-red-900"
+                                                                className="cursor-pointer text-red-600 hover:text-red-900"
                                                                 title="Xác nhận xóa"
                                                             >
                                                                 Xác nhận
                                                             </button>
                                                             <button
                                                                 onClick={() => setConfirmDelete(null)}
-                                                                className="text-gray-600 hover:text-gray-900"
+                                                                className="cursor-pointer text-gray-600 hover:text-gray-900"
                                                                 title="Hủy"
                                                             >
                                                                 Hủy
@@ -169,7 +169,7 @@ export default function AdminProjects() {
                                                     ) : (
                                                         <button
                                                             onClick={() => setConfirmDelete(project._id)}
-                                                            className="text-red-600 hover:text-red-900"
+                                                            className="cursor-pointer text-red-600 hover:text-red-900"
                                                             title="Xóa"
                                                         >
                                                             <FaTrash />
