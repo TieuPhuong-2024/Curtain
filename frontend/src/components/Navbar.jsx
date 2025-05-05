@@ -111,7 +111,7 @@ export default function Navbar() {
                         >
                             <div className={`${scrolled ? 'bg-white shadow-md' : 'bg-white/90 shadow-sm'} rounded-lg p-1 xs:p-1.5 transition-all duration-300 group-hover:shadow-lg group-hover:scale-105`}>
                                 <img 
-                                    src="/images/logo.png" 
+                                    src="/images/logo-2.png" 
                                     alt="Tuấn Rèm" 
                                     className="h-7 xs:h-8 sm:h-9 md:h-11 lg:h-14 w-auto object-contain drop-shadow-sm" 
                                 />
