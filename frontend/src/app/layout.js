@@ -4,6 +4,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from '@/lib/AuthContext';
 import "./styles/cozy-theme.css";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const quicksand = Quicksand({
     subsets: ["latin"],
@@ -29,6 +31,7 @@ export default function RootLayout({children}) {
                     {children}
                 </main>
                 <Footer/>
+                <ToastContainer position="top-center" autoClose={3000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
             </AuthProvider>
         </body>
         </html>
