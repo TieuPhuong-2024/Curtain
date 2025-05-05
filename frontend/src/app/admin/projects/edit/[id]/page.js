@@ -15,7 +15,7 @@ export default function EditProject({ params }) {
     const [loading, setLoading] = useState(false);
     const [loadingData, setLoadingData] = useState(true);
     const [error, setError] = useState(null);
-    
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -24,9 +24,9 @@ export default function EditProject({ params }) {
         images: [],
         videos: []
     });
-    
+
     const [videoUrl, setVideoUrl] = useState('');
-    
+
     useEffect(() => {
         const fetchProject = async () => {
             try {
@@ -40,10 +40,10 @@ export default function EditProject({ params }) {
                 setLoadingData(false);
             }
         };
-        
+
         fetchProject();
     }, [id]);
-    
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
@@ -52,64 +52,64 @@ export default function EditProject({ params }) {
     const handleVideoUrlChange = (e) => {
         setVideoUrl(e.target.value);
     };
-    
+
     const handleAddVideo = () => {
         if (!videoUrl) return;
         if (!videoUrl.startsWith('http://') && !videoUrl.startsWith('https://')) {
             toast.error('URL video không hợp lệ!');
             return;
         }
-        
+
         setFormData({
             ...formData,
             videos: [...formData.videos, videoUrl]
         });
         setVideoUrl('');
     };
-    
+
     const handleRemoveVideo = (index) => {
         const newVideos = [...formData.videos];
         newVideos.splice(index, 1);
         setFormData({ ...formData, videos: newVideos });
     };
-    
+
     const handleImageUpload = (uploadedImages) => {
         setFormData({
             ...formData,
             images: [...formData.images, ...uploadedImages]
         });
     };
-    
+
     const handleVideoUpload = (uploadedVideos) => {
         setFormData({
             ...formData,
             videos: [...formData.videos, ...uploadedVideos]
         });
     };
-    
+
     const handleRemoveImage = (index) => {
         const newImages = [...formData.images];
         newImages.splice(index, 1);
         setFormData({ ...formData, images: newImages });
     };
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Validate required fields
         const requiredFields = ['title', 'description', 'location', 'type'];
         const missingFields = requiredFields.filter(field => !formData[field]);
-        
+
         if (missingFields.length > 0) {
             toast.error(`Vui lòng điền đầy đủ thông tin: ${missingFields.join(', ')}`);
             return;
         }
-        
+
         if (formData.images.length === 0) {
             toast.error('Vui lòng thêm ít nhất một hình ảnh!');
             return;
         }
-        
+
         try {
             setLoading(true);
             const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, formData, {
@@ -117,21 +117,21 @@ export default function EditProject({ params }) {
                     'Content-Type': 'application/json'
                 }
             });
-            
+
             if (response.data) {
                 toast.success('Cập nhật công trình thành công!');
                 router.push('/admin/projects');
             }
         } catch (error) {
             console.error('Error updating project:', error);
-            const errorMessage = error.response?.data?.message || 
-                               (error.response?.status === 413 ? 'Dữ liệu quá lớn!' : 'Lỗi khi cập nhật công trình!');
+            const errorMessage = error.response?.data?.message ||
+                (error.response?.status === 413 ? 'Dữ liệu quá lớn!' : 'Lỗi khi cập nhật công trình!');
             toast.error(errorMessage);
         } finally {
             setLoading(false);
         }
     };
-    
+
     if (loadingData) {
         return (
             <div className="p-6 flex items-center justify-center h-screen">
@@ -142,13 +142,13 @@ export default function EditProject({ params }) {
             </div>
         );
     }
-    
+
     if (error) {
         return (
             <div className="p-6 flex items-center justify-center h-screen">
                 <div className="text-center text-red-600">
                     <p>{error}</p>
-                    <button 
+                    <button
                         onClick={() => router.push('/admin/projects')}
                         className="cursor-pointer mt-4 bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
                     >
@@ -158,17 +158,14 @@ export default function EditProject({ params }) {
             </div>
         );
     }
-    
+
     return (
         <div className="p-6">
             <Toaster position="top-center" />
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Chỉnh Sửa Công Trình</h1>
-                <Link href="/admin/projects" className="text-blue-600 hover:text-blue-800 flex items-center">
-                    <FaArrowLeft className="mr-2" /> Quay lại
-                </Link>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -185,7 +182,7 @@ export default function EditProject({ params }) {
                             placeholder="Nhập tên công trình"
                         />
                     </div>
-                    
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             Địa điểm <span className="text-red-500">*</span>
@@ -201,7 +198,7 @@ export default function EditProject({ params }) {
                         />
                     </div>
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Loại công trình <span className="text-red-500">*</span>
@@ -216,7 +213,7 @@ export default function EditProject({ params }) {
                         placeholder="Ví dụ: Biệt thự, Chung cư, Văn phòng, Khách sạn..."
                     />
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Mô tả <span className="text-red-500">*</span>
@@ -231,13 +228,13 @@ export default function EditProject({ params }) {
                         rows={4}
                     />
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Hình ảnh <span className="text-red-500">*</span>
                     </label>
                     <ImageUploader onUpload={handleImageUpload} />
-                    
+
                     {/* Display uploaded images */}
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {formData.images.map((img, index) => (
@@ -258,7 +255,7 @@ export default function EditProject({ params }) {
                         ))}
                     </div>
                 </div>
-                
+
                 <div className="mt-6">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                         Video
@@ -281,7 +278,7 @@ export default function EditProject({ params }) {
                             <FaPlus className="mr-2" /> Thêm
                         </button>
                     </div>
-                    
+
                     {/* Display added videos */}
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {formData.videos.map((video, index) => (
@@ -302,7 +299,7 @@ export default function EditProject({ params }) {
                         ))}
                     </div>
                 </div>
-                
+
                 <div className="mt-8 flex justify-end">
                     <button
                         type="submit"

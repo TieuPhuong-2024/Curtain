@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createPost, uploadImage } from '@/lib/api';
+import { createPost } from '@/lib/api';
 import BlockNoteEditor from '@/components/BlockNoteEditor';
+import ImageUploader from '@/components/ImageUploader';
 import Image from 'next/image';
 
 export default function NewPost() {
@@ -14,36 +15,20 @@ export default function NewPost() {
   const [tags, setTags] = useState('');
   const [status, setStatus] = useState('draft');
   const [featuredImage, setFeaturedImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Handle featured image upload
-  const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Preview the image
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload the image to server
-    try {
-      const response = await uploadImage(file);
-      setFeaturedImage(response.url);
-    } catch (err) {
-      setError('Failed to upload image');
-      console.error(err);
+  const handleImageUpload = (urls) => {
+    if (urls && urls.length > 0) {
+      setFeaturedImage(urls[0]);
     }
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!title || !content) {
       setError('Title and content are required');
       return;
@@ -70,7 +55,7 @@ export default function NewPost() {
 
       // Send to API
       await createPost(postData);
-      
+
       // Redirect to posts list
       router.push('/admin/posts');
     } catch (err) {
@@ -85,13 +70,6 @@ export default function NewPost() {
     <div className="bg-white rounded-lg shadow-md p-6">
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-bold">Thêm Bài Viết Mới</h1>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="cursor-pointer text-blue-600 hover:underline"
-        >
-          Quay lại
-        </button>
       </div>
 
       {error && (
@@ -135,26 +113,25 @@ export default function NewPost() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Hình ảnh nổi bật
           </label>
-          <div className="flex items-center space-x-4">
-            <div className="flex-1">
-              <input
-                type="file"
-                onChange={handleImageUpload}
-                accept="image/*"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+          <ImageUploader onUpload={handleImageUpload} isMultiple={false} />
+
+          {/* Display uploaded image */}
+          {featuredImage && (
+            <div className="mt-4 relative group rounded-md overflow-hidden border w-40 h-24">
+              <img
+                src={featuredImage}
+                alt="Featured image"
+                className="w-full h-full object-cover"
               />
+              <button
+                type="button"
+                onClick={() => setFeaturedImage(null)}
+                className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                Xóa
+              </button>
             </div>
-            {imagePreview && (
-              <div className="relative h-20 w-20 border rounded">
-                <Image
-                  src={imagePreview}
-                  alt="Preview"
-                  fill
-                  className="object-cover rounded"
-                />
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Tags */}
@@ -193,22 +170,37 @@ export default function NewPost() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Nội dung *
           </label>
-          <BlockNoteEditor 
-            onChange={setContent} 
+          <BlockNoteEditor
+            onChange={setContent}
             initialContent={null}
           />
         </div>
 
         {/* Submit Button */}
-        <div className="flex justify-end">
+        <div className="mt-6 flex items-center justify-end gap-2">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="cursor-pointer bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Hủy
+          </button>
           <button
             type="submit"
             disabled={loading}
-            className={`cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 ${
-              loading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
           >
-            {loading ? 'Đang xử lý...' : 'Tạo bài viết'}
+            {loading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Đang xử lý...
+              </>
+            ) : (
+              'Tạo bài viết'
+            )}
           </button>
         </div>
       </form>

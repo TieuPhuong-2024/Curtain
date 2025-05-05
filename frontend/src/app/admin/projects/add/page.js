@@ -116,9 +116,6 @@ export default function AddProject() {
             <Toaster position="top-center" />
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Thêm Công Trình Mới</h1>
-                <Link href="/admin/projects" className="text-blue-600 hover:text-blue-800 flex items-center">
-                    <FaArrowLeft className="mr-2" /> Quay lại
-                </Link>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">

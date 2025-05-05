@@ -1,10 +1,10 @@
 'use client';
 
-import {useEffect, useState, useRef} from 'react';
-import {useRouter} from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import {FaArrowLeft, FaUpload, FaPlus, FaTimes} from 'react-icons/fa';
-import {createCurtain, getCategories, uploadImage} from '@/lib/api';
+import { FaArrowLeft, FaUpload, FaPlus, FaTimes } from 'react-icons/fa';
+import { createCurtain, getCategories, uploadImage } from '@/lib/api';
 
 export default function AddCurtain() {
     const router = useRouter();
@@ -13,11 +13,11 @@ export default function AddCurtain() {
     const [selectedFile, setSelectedFile] = useState(null);
     const [imagePreview, setImagePreview] = useState(null);
     const fileInputRef = useRef(null);
-    
+
     // Thêm state cho nhiều hình ảnh
     const [additionalImages, setAdditionalImages] = useState([]);
     const additionalFileInputRef = useRef(null);
-    
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -46,7 +46,7 @@ export default function AddCurtain() {
     }, []);
 
     const handleChange = (e) => {
-        const {name, value, type, checked} = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData({
             ...formData,
             [name]: type === 'checkbox' ? checked : value
@@ -70,18 +70,18 @@ export default function AddCurtain() {
     const handleFileButtonClick = () => {
         fileInputRef.current.click();
     };
-    
+
     // Xử lý thêm hình ảnh phụ
     const handleAdditionalFileButtonClick = () => {
         additionalFileInputRef.current.click();
     };
-    
+
     const handleAdditionalFileChange = async (e) => {
         const files = Array.from(e.target.files);
         if (files.length === 0) return;
-        
+
         setIsSubmitting(true);
-        
+
         try {
             // Upload each file and add to additional images
             for (const file of files) {
@@ -100,7 +100,7 @@ export default function AddCurtain() {
             e.target.value = null; // Reset file input
         }
     };
-    
+
     const handleRemoveAdditionalImage = (index) => {
         setAdditionalImages(prev => prev.filter((_, i) => i !== index));
     };
@@ -108,7 +108,7 @@ export default function AddCurtain() {
     const handleRemoveMainImage = () => {
         setSelectedFile(null);
         setImagePreview(null);
-        setFormData(prev => ({...prev, mainImage: ''}));
+        setFormData(prev => ({ ...prev, mainImage: '' }));
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
@@ -185,9 +185,6 @@ export default function AddCurtain() {
     return (
         <div className="container mx-auto px-4 py-8">
             <div className="mb-4 flex items-center">
-                <Link href="/admin/curtains" className="text-blue-500 flex items-center mr-4">
-                    <FaArrowLeft className="mr-1"/> Quay lại
-                </Link>
                 <h1 className="text-2xl font-bold">Thêm sản phẩm mới</h1>
             </div>
 
@@ -369,7 +366,7 @@ export default function AddCurtain() {
                                 )}
                             </div>
                         </div>
-                        
+
                         {/* Tình trạng */}
                         <div className="flex items-center mt-4">
                             <input
@@ -385,7 +382,7 @@ export default function AddCurtain() {
                             </label>
                         </div>
                     </div>
-                    
+
                     {/* Hình ảnh phụ */}
                     <div className="mt-6">
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -408,15 +405,15 @@ export default function AddCurtain() {
                                 className="hidden"
                             />
                         </div>
-                        
+
                         {/* Hiển thị hình ảnh phụ đã chọn */}
                         {additionalImages.length > 0 && (
                             <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {additionalImages.map((img, index) => (
                                     <div key={index} className="relative group">
                                         <div className="relative h-32 border rounded-md overflow-hidden">
-                                            <img 
-                                                src={img.preview || img.url} 
+                                            <img
+                                                src={img.preview || img.url}
                                                 alt={`Additional ${index}`}
                                                 className="w-full h-full object-cover"
                                             />
