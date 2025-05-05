@@ -63,7 +63,7 @@ export default function ThiCongLapRemPage() {
                 <p className="text-lg text-gray-700 max-w-3xl mx-auto">
                     Chúng tôi tự hào giới thiệu những công trình rèm cửa đã thi công thực tế.
                     Dưới đây là bộ sưu tập các dự án tiêu biểu mà chúng tôi đã hoàn thành,
-                    giúp quý khách hàng có cái nhìn trực quan về chất lượng và phong cách làm việc của Curtain Shop.
+                    giúp quý khách hàng có cái nhìn trực quan về chất lượng và phong cách làm việc của Tuấn Rèm.
                 </p>
             </div>
 
@@ -173,7 +173,7 @@ export default function ThiCongLapRemPage() {
                     </div>
 
                     <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-                        <p className="italic text-gray-700 mb-4">"Tôi đã tìm hiểu nhiều nơi và quyết định chọn Curtain Shop. Kết quả hoàn toàn xứng đáng, rèm đẹp và chất lượng vượt mong đợi."</p>
+                        <p className="italic text-gray-700 mb-4">"Tôi đã tìm hiểu nhiều nơi và quyết định chọn Tuấn Rèm. Kết quả hoàn toàn xứng đáng, rèm đẹp và chất lượng vượt mong đợi."</p>
                         <div className="font-semibold text-blue-700">- Chị Hương, Quận 10</div>
                     </div>
                 </div>

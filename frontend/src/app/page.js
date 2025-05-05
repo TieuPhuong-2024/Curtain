@@ -146,7 +146,7 @@ export default function Home() {
                         <div>
                             <h2 className="text-3xl font-bold mb-6">Tại Sao Chọn Chúng Tôi?</h2>
                             <p className="text-gray-600 mb-8">
-                                Với hơn 10 năm kinh nghiệm, chúng tôi tự hào cung cấp các sản phẩm rèm cửa
+                                Với hơn 20 năm kinh nghiệm, chúng tôi tự hào cung cấp các sản phẩm rèm cửa
                                 chất lượng cao, được thiết kế để nâng tầm không gian sống của bạn.
                             </p>
 
