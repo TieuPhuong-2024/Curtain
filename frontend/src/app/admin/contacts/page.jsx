@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { getAllContacts, updateContactStatus, deleteContact } from '@/lib/api';
-import { toast } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { FaEnvelope, FaPhone, FaSpinner, FaTrash } from 'react-icons/fa';
 

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FaSave, FaArrowLeft, FaPlus, FaTrash } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
-import { toast, Toaster } from 'react-hot-toast';
+import { toast } from 'react-toastify';
 import ImageUploader from '@/components/ImageUploader';
 import VideoUploader from '@/components/VideoUploader';
 
@@ -113,7 +113,6 @@ export default function AddProject() {
 
     return (
         <div className="p-6">
-            <Toaster position="top-center" />
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Thêm Công Trình Mới</h1>
             </div>
