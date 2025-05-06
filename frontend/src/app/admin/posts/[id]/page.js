@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { getPostById, updatePost } from '@/lib/api';
 import CKEditorComponent from '@/components/CKEditorComponent';
 import ImageUploader from '@/components/ImageUploader';
-import Image from 'next/image';
 
 export default function EditPost({ params }) {
   const postId = use(params).id;
