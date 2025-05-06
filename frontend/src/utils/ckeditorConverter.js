@@ -8,31 +8,29 @@ export const renderCKEditorContent = (htmlContent) => {
   if (!htmlContent) return '';
   
   try {
-    // Enhanced sanitization method without external dependencies
+    // Enhanced sanitization method without external dependencies,
     // This is a more comprehensive version of the original sanitization
-    const sanitized = htmlContent
-      // Remove script tags and their content
-      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-      // Remove inline event handlers
-      .replace(/on\w+\s*=\s*(["']).*?\1/gi, '')
-      // Remove javascript: protocol links
-      .replace(/javascript:\s*[^\s"']*?/gi, 'javascript:void(0)')
-      // Remove data: urls from attributes except for images with safe mime types
-      .replace(/data:[^\s"']*?/gi, (match) => {
-        // Allow only safe image data URLs
-        if (match.match(/data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,[a-zA-Z0-9+/]+=*/i)) {
-          return match;
-        }
-        return 'data:void(0)';
-      })
-      // Prevent uncommon exploits with iframe sources
-      .replace(/(<iframe[^>]*src\s*=\s*["'])(.*?)(["'][^>]*>)/gi, (match, p1, p2, p3) => {
-        const allowedSources = ['https://www.youtube.com', 'https://player.vimeo.com', 'https://www.dailymotion.com'];
-        const isAllowed = allowedSources.some(src => p2.startsWith(src));
-        return isAllowed ? match : `${p1}about:blank${p3}`;
-      });
-    
-    return sanitized;
+    return htmlContent
+        // Remove script tags and their content
+        .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+        // Remove inline event handlers
+        .replace(/on\w+\s*=\s*(["']).*?\1/gi, '')
+        // Remove javascript: protocol links
+        .replace(/javascript:\s*[^\s"']*?/gi, 'javascript:void(0)')
+        // Remove data: urls from attributes except for images with safe mime types
+        .replace(/data:[^\s"']*?/gi, (match) => {
+          // Allow only safe image data URLs
+          if (match.match(/data:image\/(png|jpeg|jpg|gif|webp|svg\+xml);base64,[a-zA-Z0-9+/]+=*/i)) {
+            return match;
+          }
+          return 'data:void(0)';
+        })
+        // Prevent uncommon exploits with iframe sources
+        .replace(/(<iframe[^>]*src\s*=\s*["'])(.*?)(["'][^>]*>)/gi, (match, p1, p2, p3) => {
+          const allowedSources = ['https://www.youtube.com', 'https://player.vimeo.com', 'https://www.dailymotion.com'];
+          const isAllowed = allowedSources.some(src => p2.startsWith(src));
+          return isAllowed ? match : `${p1}about:blank${p3}`;
+        });
   } catch (error) {
     console.error('Error sanitizing CKEditor content:', error);
     return '';
