@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { format } from 'date-fns';
 import { getPostById, getPosts } from '@/lib/api';
 import PostCard from '@/components/PostCard';
-import { convertBlockNoteToHtml } from '@/utils/blockNoteConverter';
+import { renderCKEditorContent } from '@/utils/ckeditorConverter';
 
 export default function PostDetail({ params }) {
   const postId = use(params).id;
@@ -115,7 +115,7 @@ export default function PostDetail({ params }) {
 
         {/* Post content */}
         <div className="prose prose-lg max-w-none mb-12">
-          <div dangerouslySetInnerHTML={{ __html: convertBlockNoteToHtml(post.content) }} />
+          <div dangerouslySetInnerHTML={{ __html: renderCKEditorContent(post.content) }} />
         </div>
         
         {/* Tags */}

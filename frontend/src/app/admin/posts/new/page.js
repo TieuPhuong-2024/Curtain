@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createPost } from '@/lib/api';
-import BlockNoteEditor from '@/components/BlockNoteEditor';
 import ImageUploader from '@/components/ImageUploader';
+import CKEditorComponent from '@/components/CKEditorComponent';
 import Image from 'next/image';
 
 export default function NewPost() {
@@ -170,9 +170,9 @@ export default function NewPost() {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Nội dung *
           </label>
-          <BlockNoteEditor
+          <CKEditorComponent
             onChange={setContent}
-            initialContent={null}
+            initialContent=""
           />
         </div>
 
