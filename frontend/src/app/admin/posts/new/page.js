@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { createPost } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
 import CKEditorComponent from '@/components/CKEditorComponent';
-import Image from 'next/image';
 
 export default function NewPost() {
   const router = useRouter();

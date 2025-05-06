@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { uploadImage } from '@/lib/api';
 import { getContentStats, renderCKEditorContent } from '@/utils/ckeditorConverter';
 
-// Flag to track if editor has been initialized globally
+// Flag to track if the editor has been initialized globally
 let isEditorInitialized = false;
 
 const CKEditorComponent = ({ 
@@ -234,7 +234,7 @@ const CKEditorComponent = ({
                 }
               });
 
-              // Set editor as read-only if not editable
+              // Set the editor as read-only if not editable
               if (!editable) {
                 newEditor.isReadOnly = true;
               }
@@ -267,7 +267,7 @@ const CKEditorComponent = ({
       setupEditor();
     }, 50);
 
-    // Cleanup on unmount
+    // Cleanup on unmounting
     return () => {
       // Xóa timer nếu component unmount
       if (initTimer) {
@@ -346,7 +346,7 @@ const CKEditorComponent = ({
         </div>
       )}
       
-      {/* Add custom styles for dark theme and spinner */}
+      {/* Add custom styles for a dark theme and spinner */}
       <style jsx>{`
         .ckeditor-wrapper.dark-theme {
           --ck-color-base-background: #1e1e1e;
