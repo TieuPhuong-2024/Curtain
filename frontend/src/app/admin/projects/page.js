@@ -45,26 +45,28 @@ export default function AdminProjects() {
 
     const filteredProjects = projects.filter(project => 
         project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (project.shortDescription && project.shortDescription.toLowerCase().includes(searchTerm.toLowerCase())) ||
         project.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
         project.type.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     const renderProjectImage = (project) => {
-        if (project.images && project.images.length > 0) {
+        if (project.thumbnail) {
             return (
                 <div className="relative w-20 h-20 overflow-hidden rounded">
                     <Image 
-                        src={project.images[0]} 
+                        src={project.thumbnail}
                         alt={project.title} 
                         fill
                         style={{ objectFit: 'cover' }}
+                        sizes="80px"
                     />
                 </div>
             );
         }
         return (
             <div className="w-20 h-20 bg-gray-200 flex items-center justify-center rounded">
-                <span className="text-gray-400">No image</span>
+                <span className="text-xs text-gray-400">No image</span>
             </div>
         );
     };
