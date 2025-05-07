@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import ProjectCard from "@/components/ProjectCard";
 import axios from "axios";
 import Link from "next/link";
 import Image from "next/image";
-import { FaSearch, FaHardHat, FaBuilding, FaHome, FaStar, FaArrowRight } from "react-icons/fa";
+import { FaSearch, FaHardHat, FaBuilding, FaStar, FaArrowRight } from "react-icons/fa";
 
 export default function ThiCongLapRemPage() {
     const [projects, setProjects] = useState([]);
@@ -19,32 +18,30 @@ export default function ThiCongLapRemPage() {
     const projectsPerPage = 6;
 
     useEffect(() => {
-        const fetchProjects = async () => {
+        const fetchProjectsData = async () => {
             try {
                 setLoading(true);
+                setError(null);
                 const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
-                
-                // Set all projects
-                setProjects(response.data);
-                
-                // Set featured projects (assuming there's a featured flag or just use the first 3)
-                setFeaturedProjects(response.data.filter(p => p.featured).length > 0 
-                    ? response.data.filter(p => p.featured) 
-                    : response.data.slice(0, 3));
 
-                // Extract unique project types for filters
-                const types = [...new Set(response.data.map(project => project.type))];
+                const allProjects = response.data;
+                setProjects(allProjects);
+
+                const trulyFeaturedProjects = allProjects.filter(p => p.featured === true);
+                setFeaturedProjects(trulyFeaturedProjects);
+
+                const types = [...new Set(allProjects.map(project => project.type))];
                 setProjectTypes(types);
 
-                setLoading(false);
             } catch (err) {
                 setError("Không thể tải dữ liệu công trình. Vui lòng thử lại sau.");
-                setLoading(false);
                 console.error("Error fetching projects:", err);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchProjects();
+        fetchProjectsData();
     }, []);
 
     const handleFilterChange = async (filter) => {
@@ -73,7 +70,7 @@ export default function ThiCongLapRemPage() {
         setSearchTerm(e.target.value);
     };
 
-    const filteredProjects = projects.filter(project => 
+    const filteredProjects = projects.filter(project =>
         project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (project.shortDescription && project.shortDescription.toLowerCase().includes(searchTerm.toLowerCase())) ||
         project.location.toLowerCase().includes(searchTerm.toLowerCase())
@@ -92,8 +89,8 @@ export default function ThiCongLapRemPage() {
             {/* Hero Section */}
             <section className="relative h-[40vh] min-h-[300px] bg-gradient-to-r from-blue-900 to-blue-700 flex items-center">
                 <div className="absolute inset-0 overflow-hidden opacity-20">
-                    <Image 
-                        src="/images/logo.png" 
+                    <Image
+                        src="/images/logo.png"
                         alt="Logo pattern"
                         fill
                         style={{ objectFit: 'cover' }}
@@ -103,7 +100,7 @@ export default function ThiCongLapRemPage() {
                 <div className="container mx-auto px-4 z-10 text-white">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4">Công Trình Đã Thi Công</h1>
                     <p className="text-lg md:text-xl max-w-3xl opacity-90">
-                        Bộ sưu tập các dự án tiêu biểu mà chúng tôi đã hoàn thành, 
+                        Bộ sưu tập các dự án tiêu biểu mà chúng tôi đã hoàn thành,
                         giúp quý khách hàng có cái nhìn trực quan về chất lượng và phong cách làm việc.
                     </p>
                 </div>
@@ -118,14 +115,14 @@ export default function ThiCongLapRemPage() {
                             Xem tất cả <FaArrowRight className="ml-2" />
                         </Link>
                     </div>
-                    
+
                     {loading && (
                         <div className="text-center py-10">
                             <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"></div>
                             <p className="mt-2 text-gray-600">Đang tải dự án nổi bật...</p>
                         </div>
                     )}
-                    
+
                     {!loading && featuredProjects.length > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                             {featuredProjects.map((project, index) => (
@@ -168,6 +165,12 @@ export default function ThiCongLapRemPage() {
                             ))}
                         </div>
                     )}
+                    {!loading && !error && featuredProjects.length === 0 && (
+                        <div className="text-center py-10 text-gray-600 col-span-full">
+                            <FaStar className="mx-auto text-3xl text-gray-400 mb-3" />
+                            <p>Hiện chưa có dự án nào được đánh dấu là nổi bật.</p>
+                        </div>
+                    )}
                 </div>
             </section>
 
@@ -199,7 +202,7 @@ export default function ThiCongLapRemPage() {
             <section id="all-projects" className="py-16">
                 <div className="container mx-auto px-4">
                     <h2 className="text-3xl font-bold text-blue-900 mb-10 text-center">Tất Cả Công Trình</h2>
-                    
+
                     {/* Search and filter controls */}
                     <div className="mb-10">
                         <div className="flex flex-col md:flex-row gap-4 justify-between mb-6">
@@ -214,11 +217,11 @@ export default function ThiCongLapRemPage() {
                                 />
                                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                             </div>
-                            
+
                             {/* Project type dropdown (mobile) */}
                             <div className="md:hidden">
-                                <select 
-                                    value={activeFilter} 
+                                <select
+                                    value={activeFilter}
                                     onChange={(e) => handleFilterChange(e.target.value)}
                                     className="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:ring-2 focus:ring-blue-600 focus:border-blue-600"
                                 >
@@ -229,7 +232,7 @@ export default function ThiCongLapRemPage() {
                                 </select>
                             </div>
                         </div>
-                        
+
                         {/* Filter buttons (desktop) */}
                         <div className="hidden md:flex flex-wrap gap-2 justify-center">
                             <button
@@ -327,10 +330,10 @@ export default function ThiCongLapRemPage() {
                                     </div>
                                 )}
                             </div>
-                            
+
                             {filteredProjects.length > 0 && hasMoreProjects && (
                                 <div className="text-center mt-8">
-                                    <button 
+                                    <button
                                         onClick={handleLoadMore}
                                         className="cursor-pointer bg-blue-100 text-blue-700 px-6 py-3 rounded-md hover:bg-blue-200 transition font-medium"
                                     >
