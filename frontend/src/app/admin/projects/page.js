@@ -145,7 +145,7 @@ export default function AdminProjects() {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
-                                                    <Link href={`/cong-trinh?id=${project._id}`} target="_blank" className="text-indigo-600 hover:text-indigo-900" title="Xem">
+                                                    <Link href={`/cong-trinh/${project._id}`} target="_blank" className="text-indigo-600 hover:text-indigo-900" title="Xem">
                                                         <FaEye />
                                                     </Link>
                                                     <Link href={`/admin/projects/edit/${project._id}`} className="text-blue-600 hover:text-blue-900" title="Sửa">
