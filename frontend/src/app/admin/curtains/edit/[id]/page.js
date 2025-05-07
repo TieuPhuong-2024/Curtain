@@ -770,74 +770,80 @@ export default function EditCurtain({ params }) {
 
             {/* Add/Edit Color Modal */}
             {showColorModal && (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
-                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
-                        <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
-                            {isEditingColor ? 'Chỉnh sửa màu sắc' : 'Thêm màu sắc mới'}
-                        </h3>
-                        <div>
-                            <label htmlFor="newColorNameEdit" className="block text-sm font-medium text-gray-700">Tên màu</label>
-                            <input 
-                                type="text" 
-                                name="newColorNameEdit" 
-                                id="newColorNameEdit" 
-                                value={newColorName} 
-                                onChange={(e) => setNewColorName(e.target.value)} 
-                                className="mt-1 mb-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="newColorHexCodeEdit" className="block text-sm font-medium text-gray-700">Mã Hex</label>
-                            <div className="flex mt-1 mb-4">
+                <>
+                    {/* Backdrop with blur effect */}
+                    <div className="fixed inset-0 backdrop-blur-sm bg-gray-600/40 z-40"></div>
+                    
+                    {/* Modal */}
+                    <div className="fixed inset-0 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
+                        <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative">
+                            <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">
+                                {isEditingColor ? 'Chỉnh sửa màu sắc' : 'Thêm màu sắc mới'}
+                            </h3>
+                            <div>
+                                <label htmlFor="newColorNameEdit" className="block text-sm font-medium text-gray-700">Tên màu</label>
                                 <input 
                                     type="text" 
-                                    name="newColorHexCodeEdit" 
-                                    id="newColorHexCodeEdit" 
-                                    value={newColorHexCode} 
-                                    onChange={(e) => setNewColorHexCode(e.target.value)} 
-                                    placeholder="#RRGGBB" 
-                                    className="block w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                />
-                                <input 
-                                    type="color" 
-                                    value={newColorHexCode || '#808080'} 
-                                    onChange={(e) => setNewColorHexCode(e.target.value)} 
-                                    className="h-10 w-10 border border-gray-300 rounded-r-md"
+                                    name="newColorNameEdit" 
+                                    id="newColorNameEdit" 
+                                    value={newColorName} 
+                                    onChange={(e) => setNewColorName(e.target.value)} 
+                                    className="mt-1 mb-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    required
                                 />
                             </div>
-                            {newColorHexCode && (
-                                <div className="flex items-center mb-4">
-                                    <div className="w-6 h-6 mr-2 border border-gray-300" style={{backgroundColor: newColorHexCode}}></div>
-                                    <span className="text-sm text-gray-600">Xem trước màu sắc</span>
+                            <div>
+                                <label htmlFor="newColorHexCodeEdit" className="block text-sm font-medium text-gray-700">Mã Hex</label>
+                                <div className="flex mt-1 mb-4">
+                                    <input 
+                                        type="text" 
+                                        name="newColorHexCodeEdit" 
+                                        id="newColorHexCodeEdit" 
+                                        value={newColorHexCode} 
+                                        onChange={(e) => setNewColorHexCode(e.target.value)} 
+                                        placeholder="#RRGGBB" 
+                                        className="block w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                    />
+                                    <input 
+                                        type="color" 
+                                        value={newColorHexCode || '#808080'} 
+                                        onChange={(e) => setNewColorHexCode(e.target.value)} 
+                                        className="h-10 w-10 border border-gray-300 rounded-r-md"
+                                    />
+                                </div>
+                                {newColorHexCode && (
+                                    <div className="flex items-center mb-4">
+                                        <div className="w-6 h-6 mr-2 border border-gray-300" style={{backgroundColor: newColorHexCode}}></div>
+                                        <span className="text-sm text-gray-600">Xem trước màu sắc</span>
+                                    </div>
+                                )}
+                            </div>
+                            {addColorError && (
+                                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-3 text-sm">
+                                    {addColorError}
                                 </div>
                             )}
-                        </div>
-                        {addColorError && (
-                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-3 text-sm">
-                                {addColorError}
+                            <div className="flex justify-end gap-3">
+                                <button 
+                                    type="button" 
+                                    onClick={handleCloseColorModal} 
+                                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    disabled={isAddingColor}
+                                >
+                                    Hủy
+                                </button>
+                                <button 
+                                    type="button" 
+                                    onClick={handleSaveColor} 
+                                    className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    disabled={isAddingColor}
+                                >
+                                    {isAddingColor ? 'Đang lưu...' : isEditingColor ? 'Cập nhật' : 'Lưu màu'}
+                                </button>
                             </div>
-                        )}
-                        <div className="flex justify-end gap-3">
-                            <button 
-                                type="button" 
-                                onClick={handleCloseColorModal} 
-                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                disabled={isAddingColor}
-                            >
-                                Hủy
-                            </button>
-                            <button 
-                                type="button" 
-                                onClick={handleSaveColor} 
-                                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                disabled={isAddingColor}
-                            >
-                                {isAddingColor ? 'Đang lưu...' : isEditingColor ? 'Cập nhật' : 'Lưu màu'}
-                            </button>
                         </div>
                     </div>
-                </div>
+                </>
             )}
         </div>
     );
