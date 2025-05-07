@@ -1,58 +1,82 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { getPostById, updatePost } from '@/lib/api';
-import CKEditorComponent from '@/components/CKEditorComponent';
 import ImageUploader from '@/components/ImageUploader';
+import { toast } from 'react-toastify';
 
-export default function EditPost({ params }) {
-  const postId = use(params).id;
+// CKEditor imports for direct use
+let CKEditor;
+let ClassicEditor;
+
+export default function EditPost() {
   const router = useRouter();
+  const params = useParams();
+  const postId = params?.id;
 
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [tags, setTags] = useState('');
-  const [status, setStatus] = useState('draft');
-  const [featuredImage, setFeaturedImage] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    summary: '',
+    content: '',
+    tags: '',
+    status: 'draft',
+    featuredImage: null,
+  });
+
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState(null);
-  const [content, setContent] = useState(null);
+  const [editorLoaded, setEditorLoaded] = useState(false);
+
+  // Dynamically load CKEditor
+  useEffect(() => {
+    CKEditor = require('@ckeditor/ckeditor5-react').CKEditor;
+    ClassicEditor = require('@ckeditor/ckeditor5-build-classic');
+    setEditorLoaded(true);
+  }, []);
 
   // Fetch post data
   useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const post = await getPostById(postId);
-
-        // Set form data
-        setTitle(post.title);
-        setSummary(post.summary || '');
-        setStatus(post.status);
-        setFeaturedImage(post.featuredImage);
-        setContent(post.content);
-
-        // Convert tags array to comma-separated string
-        if (post.tags && Array.isArray(post.tags)) {
-          setTags(post.tags.join(', '));
+    if (postId) {
+      const fetchPost = async () => {
+        setLoading(true);
+        try {
+          const post = await getPostById(postId);
+          setFormData({
+            title: post.title || '',
+            summary: post.summary || '',
+            content: post.content || '',
+            tags: post.tags && Array.isArray(post.tags) ? post.tags.join(', ') : '',
+            status: post.status || 'draft',
+            featuredImage: post.featuredImage || null,
+          });
+        } catch (err) {
+          toast.error('Không thể tải dữ liệu bài viết: ' + (err.response?.data?.message || err.message));
+          console.error(err);
+        } finally {
+          setLoading(false);
         }
-
-        setLoading(false);
-      } catch (err) {
-        setError('Failed to load post');
-        console.error(err);
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
+      };
+      fetchPost();
+    }
   }, [postId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleEditorChange = (event, editor) => {
+    const data = editor.getData();
+    setFormData(prev => ({ ...prev, content: data }));
+  };
 
   // Handle featured image upload
   const handleImageUpload = (urls) => {
     if (urls && urls.length > 0) {
-      setFeaturedImage(urls[0]);
+      setFormData(prev => ({ ...prev, featuredImage: urls[0] }));
+    } else {
+      setFormData(prev => ({ ...prev, featuredImage: null }));
     }
   };
 
@@ -60,37 +84,32 @@ export default function EditPost({ params }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!title || !content) {
-      setError('Title and content are required');
+    if (!formData.title || !formData.content) {
+      toast.error('Tiêu đề và nội dung là bắt buộc');
       return;
     }
 
     setSaving(true);
-    setError(null);
 
     try {
-      // Process tags from comma-separated string to array
-      const tagsArray = tags
-        ? tags.split(',').map(tag => tag.trim()).filter(tag => tag)
+      const tagsArray = formData.tags
+        ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag)
         : [];
 
-      // Create post data
       const postData = {
-        title,
-        content,
-        summary: summary || null,
+        title: formData.title,
+        content: formData.content,
+        summary: formData.summary || null,
         tags: tagsArray,
-        status,
-        featuredImage: featuredImage || null
+        status: formData.status,
+        featuredImage: formData.featuredImage || null
       };
 
-      // Send to API
       await updatePost(postId, postData);
-
-      // Redirect to posts list
+      toast.success("Cập nhật bài viết thành công!");
       router.push('/admin/posts');
     } catch (err) {
-      setError('Failed to update post');
+      toast.error('Không thể cập nhật bài viết: ' + (err.response?.data?.message || err.message));
       console.error(err);
     } finally {
       setSaving(false);
@@ -111,12 +130,6 @@ export default function EditPost({ params }) {
         <h1 className="text-2xl font-bold">Chỉnh sửa bài viết</h1>
       </div>
 
-      {error && (
-        <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
-          {error}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit}>
         {/* Title */}
         <div className="mb-4">
@@ -125,9 +138,10 @@ export default function EditPost({ params }) {
           </label>
           <input
             id="title"
+            name="title"
             type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            value={formData.title}
+            onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             required
           />
@@ -140,8 +154,9 @@ export default function EditPost({ params }) {
           </label>
           <textarea
             id="summary"
-            value={summary}
-            onChange={(e) => setSummary(e.target.value)}
+            name="summary"
+            value={formData.summary}
+            onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             rows="3"
           />
@@ -152,19 +167,18 @@ export default function EditPost({ params }) {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Hình ảnh nổi bật
           </label>
-          <ImageUploader onUpload={handleImageUpload} isMultiple={false} />
+          <ImageUploader onUpload={handleImageUpload} maxFiles={1} />
 
-          {/* Display uploaded image */}
-          {featuredImage && (
+          {formData.featuredImage && (
             <div className="mt-4 relative group rounded-md overflow-hidden border w-40 h-24">
               <img
-                src={featuredImage}
+                src={formData.featuredImage}
                 alt="Featured image"
                 className="w-full h-full object-cover"
               />
               <button
                 type="button"
-                onClick={() => setFeaturedImage(null)}
+                onClick={() => setFormData(prev => ({ ...prev, featuredImage: null }))}
                 className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 Xóa
@@ -180,9 +194,10 @@ export default function EditPost({ params }) {
           </label>
           <input
             id="tags"
+            name="tags"
             type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
+            value={formData.tags}
+            onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
             placeholder="tag1, tag2, tag3"
           />
@@ -195,8 +210,9 @@ export default function EditPost({ params }) {
           </label>
           <select
             id="status"
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
           >
             <option value="draft">Bản nháp</option>
@@ -209,10 +225,18 @@ export default function EditPost({ params }) {
           <label className="block text-gray-700 text-sm font-bold mb-2">
             Nội dung *
           </label>
-          <CKEditorComponent
-            onChange={setContent}
-            initialContent={content}
-          />
+          {editorLoaded && CKEditor && ClassicEditor ? (
+            <CKEditor
+              editor={ClassicEditor}
+              data={formData.content}
+              onChange={handleEditorChange}
+              config={{
+                placeholder: "Nhập nội dung bài viết tại đây...",
+              }}
+            />
+          ) : (
+            <p>Đang tải trình soạn thảo / Đang tải nội dung...</p>
+          )}
         </div>
 
         {/* Submit Button */}
@@ -226,7 +250,7 @@ export default function EditPost({ params }) {
           </button>
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || loading}
             className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
           >
             {saving ? (

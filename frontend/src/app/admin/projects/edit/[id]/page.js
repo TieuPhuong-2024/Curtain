@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
 import Link from 'next/link';
@@ -52,11 +52,11 @@ export default function EditProject() {
                     const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`);
                     const projectData = response.data;
                     console.log('Fetched project data:', projectData); // Add logging for debugging
-                    
+
                     // Kiểm tra nếu projectData có chứa thumbnail và featured
-                    const thumbnailUrl = projectData.thumbnail || 
-                                        (projectData.images && projectData.images.length > 0 ? projectData.images[0] : null);
-                    
+                    const thumbnailUrl = projectData.thumbnail ||
+                        (projectData.images && projectData.images.length > 0 ? projectData.images[0] : null);
+
                     setFormData({
                         title: projectData.title || '',
                         location: projectData.location || '',
@@ -169,9 +169,6 @@ export default function EditProject() {
         <div className="p-6">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Chỉnh Sửa Công Trình</h1>
-                <Link href="/admin/projects" className="text-blue-600 hover:text-blue-700 flex items-center">
-                    <FaArrowLeft className="mr-2" /> Quay lại danh sách
-                </Link>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
@@ -317,7 +314,7 @@ export default function EditProject() {
                     <button
                         type="submit"
                         disabled={loading || loadingData}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
+                        className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
                     >
                         <FaSave className="mr-2" /> {loading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
                     </button>

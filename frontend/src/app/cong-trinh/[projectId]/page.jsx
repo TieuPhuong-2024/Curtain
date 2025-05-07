@@ -97,7 +97,7 @@ export default function ProjectDetailPage() {
             <div className="container mx-auto px-4">
                 <button
                     onClick={() => router.back()}
-                    className="mb-8 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium"
+                    className="cursor-pointer mb-8 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium"
                 >
                     <FaArrowLeft className="mr-2" /> Quay lại danh sách công trình
                 </button>
