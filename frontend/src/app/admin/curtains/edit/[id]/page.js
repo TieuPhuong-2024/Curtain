@@ -4,7 +4,7 @@ import { use, useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FaArrowLeft, FaUpload, FaPlus, FaTimes } from 'react-icons/fa';
-import { getCurtainById, updateCurtain, uploadImage, getCategories, getImagesByCurtainId, addImageToCurtain, deleteImage } from '@/lib/api';
+import { getCurtainById, updateCurtain, uploadImage, getCategories, getImagesByCurtainId, addImageToCurtain, deleteImage, getColors, createColor } from '@/lib/api';
 
 export default function EditCurtain({ params }) {
     const router = useRouter();
@@ -34,23 +34,44 @@ export default function EditCurtain({ params }) {
     });
 
     const [categories, setCategories] = useState([]);
+    const [colors, setColors] = useState([]);
+
+    // State for Add Color Modal
+    const [showAddColorModal, setShowAddColorModal] = useState(false);
+    const [newColorName, setNewColorName] = useState('');
+    const [newColorHexCode, setNewColorHexCode] = useState('');
+    const [addColorError, setAddColorError] = useState(null);
+    const [isAddingColor, setIsAddingColor] = useState(false);
 
     useEffect(() => {
-        const fetchCategories = async () => {
+        const fetchInitialData = async () => {
             try {
-                const data = await getCategories();
-                setCategories(data);
+                const catData = await getCategories();
+                setCategories(catData || []);
             } catch (error) {
                 console.error('Error fetching categories:', error);
                 setCategories([]);
             }
+            await fetchAllColors();
         };
-        fetchCategories();
+        fetchInitialData();
     }, []);
 
     useEffect(() => {
-        fetchCurtainData();
+        if (id) { // Ensure id is available before fetching
+            fetchCurtainData();
+        }
     }, [id]);
+
+    const fetchAllColors = async () => {
+        try {
+            const colorsData = await getColors();
+            setColors(colorsData || []);
+        } catch (colorError) {
+            console.error('Error fetching colors:', colorError);
+            setColors([]);
+        }
+    };
 
     const fetchCurtainData = async () => {
         try {
@@ -79,7 +100,7 @@ export default function EditCurtain({ params }) {
                 price: curtainData.price || '',
                 category: curtainData.category?._id || curtainData.category || '',
                 material: curtainData.material || '',
-                color: curtainData.color || '',
+                color: curtainData.color?._id || curtainData.color || '', // Ensure we use the ID
                 width: curtainData.size?.width || '',
                 height: curtainData.size?.height || '',
                 mainImage: curtainData.mainImage || curtainData.image || '',
@@ -207,6 +228,7 @@ export default function EditCurtain({ params }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError(null);
+        setAddColorError(null); // Clear color error on main submit
 
         // Validate form
         if (
@@ -268,6 +290,39 @@ export default function EditCurtain({ params }) {
             console.error('Error updating curtain:', error);
             setIsSubmitting(false);
             setError('Có lỗi xảy ra khi cập nhật sản phẩm. Vui lòng thử lại sau.');
+        }
+    };
+
+    const handleOpenAddColorModal = () => {
+        setNewColorName('');
+        setNewColorHexCode('');
+        setAddColorError(null);
+        setShowAddColorModal(true);
+    };
+
+    const handleCloseAddColorModal = () => {
+        setShowAddColorModal(false);
+        setAddColorError(null);
+    };
+
+    const handleSaveNewColor = async () => {
+        if (!newColorName.trim()) {
+            setAddColorError('Tên màu sắc không được để trống.');
+            return;
+        }
+        setIsAddingColor(true);
+        setAddColorError(null);
+        try {
+            const newColorData = { name: newColorName, hexCode: newColorHexCode || undefined };
+            const savedColor = await createColor(newColorData);
+            await fetchAllColors(); // Refresh color list
+            setFormData(prev => ({ ...prev, color: savedColor._id })); // Auto-select new color
+            handleCloseAddColorModal();
+        } catch (error) {
+            console.error('Error creating new color:', error);
+            setAddColorError(error.response?.data?.message || 'Lỗi khi tạo màu mới.');
+        } finally {
+            setIsAddingColor(false);
         }
     };
 
@@ -366,14 +421,31 @@ export default function EditCurtain({ params }) {
                             <label className="block text-sm font-medium text-gray-700 mb-1">
                                 Màu sắc <span className="text-red-500">*</span>
                             </label>
-                            <input
-                                type="text"
-                                name="color"
-                                className="w-full p-2 border border-gray-300 rounded-md"
-                                value={formData.color}
-                                onChange={handleChange}
-                                required
-                            />
+                            <div className="flex items-center gap-2 mt-1">
+                                <select 
+                                    name="color" 
+                                    id="color" 
+                                    value={formData.color} 
+                                    onChange={handleChange} 
+                                    required 
+                                    className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                >
+                                    <option value="">Chọn màu sắc</option>
+                                    {colors.map(color => (
+                                        <option key={color._id} value={color._id}>
+                                            {color.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <button 
+                                    type="button"
+                                    onClick={handleOpenAddColorModal}
+                                    className="p-2 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
+                                    title="Thêm màu mới"
+                                >
+                                    <FaPlus />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Kích thước - Chiều rộng */}
@@ -610,6 +682,61 @@ export default function EditCurtain({ params }) {
                     </div>
                 </form>
             </div>
+
+            {/* Add Color Modal */}
+            {showAddColorModal && (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
+                    <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+                        <h3 className="text-lg font-medium leading-6 text-gray-900 mb-4">Thêm màu sắc mới</h3>
+                        <div>
+                            <label htmlFor="newColorNameEdit" className="block text-sm font-medium text-gray-700">Tên màu</label>
+                            <input 
+                                type="text" 
+                                name="newColorNameEdit" 
+                                id="newColorNameEdit" 
+                                value={newColorName} 
+                                onChange={(e) => setNewColorName(e.target.value)} 
+                                className="mt-1 mb-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="newColorHexCodeEdit" className="block text-sm font-medium text-gray-700">Mã Hex (tùy chọn)</label>
+                            <input 
+                                type="text" 
+                                name="newColorHexCodeEdit" 
+                                id="newColorHexCodeEdit" 
+                                value={newColorHexCode} 
+                                onChange={(e) => setNewColorHexCode(e.target.value)} 
+                                className="mt-1 mb-4 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                            />
+                        </div>
+                        {addColorError && (
+                            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-3 text-sm">
+                                {addColorError}
+                            </div>
+                        )}
+                        <div className="flex justify-end gap-3">
+                            <button 
+                                type="button" 
+                                onClick={handleCloseAddColorModal} 
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                disabled={isAddingColor}
+                            >
+                                Hủy
+                            </button>
+                            <button 
+                                type="button" 
+                                onClick={handleSaveNewColor} 
+                                className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                disabled={isAddingColor}
+                            >
+                                {isAddingColor ? 'Đang lưu...' : 'Lưu màu'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
-} 
+}

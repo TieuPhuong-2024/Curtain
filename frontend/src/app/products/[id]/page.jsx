@@ -4,7 +4,7 @@ import '../../styles/cozy-theme.css';
 import {use, useEffect, useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {getCurtainById, getImagesByCurtainId} from '@/lib/api';
+import {getCurtainById, getImagesByCurtainId, getColors} from '@/lib/api';
 import {FaArrowLeft, FaPalette, FaRuler, FaShoppingCart, FaTag} from 'react-icons/fa';
 
 export default function ProductDetailPage({params}) {
@@ -16,20 +16,28 @@ export default function ProductDetailPage({params}) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
+    const [colors, setColors] = useState([]); // State for colors
+    const [selectedColor, setSelectedColor] = useState(null);
 
     useEffect(() => {
-        const fetchCurtain = async () => {
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const data = await getCurtainById(id);
-                setCurtain(data);
+                // Fetch product and colors in parallel
+                const [productData, colorsData] = await Promise.all([
+                    getCurtainById(id),
+                    getColors()
+                ]);
+                
+                setCurtain(productData);
+                setColors(colorsData || []); // Store colors from database
                 
                 // Set the main image as selected by default
-                setSelectedImage(data.mainImage);
+                setSelectedImage(productData.mainImage);
                 
                 // Fetch additional images if available
-                if (data.images && data.images.length > 0) {
-                    setImages(data.images);
+                if (productData.images && productData.images.length > 0) {
+                    setImages(productData.images);
                 } else {
                     // If images not included in the response, fetch separately
                     try {
@@ -47,7 +55,7 @@ export default function ProductDetailPage({params}) {
             }
         };
 
-        fetchCurtain();
+        fetchData();
     }, [id]);
 
     const handleAddToCart = () => {
@@ -176,13 +184,32 @@ export default function ProductDetailPage({params}) {
                                 <div className="space-y-3">
                                     <div className="flex items-center">
                                         <FaPalette className="text-[#a67c52] mr-2"/>
-                                        <span className="text-[#5b4636]">Màu sắc: </span>
+                                        <div className="font-semibold">Màu sắc:</div>
                                         <div className="flex items-center ml-2">
-                                            <div
-                                                className="w-5 h-5 rounded-full mr-2 border border-[#e7cba9]"
-                                                style={{backgroundColor: color.toLowerCase()}}
-                                            ></div>
-                                            <span>{color}</span>
+                                            {colors && colors.length > 0 ? (
+                                                colors.map((colorOption, index) => (
+                                                    <button
+                                                        key={index}
+                                                        onClick={() => setSelectedColor(colorOption)}
+                                                        className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ease-in-out
+                                                            ${selectedColor && selectedColor.name === colorOption.name ? 'ring-2 ring-offset-1 ring-indigo-500 border-indigo-500' : 'border-gray-300 hover:border-gray-500'}
+                                                        `}
+                                                        style={{backgroundColor: colorOption?.hexCode || 'transparent'}}
+                                                        title={colorOption.name}
+                                                    >
+                                                        {/* Optional: Add a checkmark or other indicator for selected state */}
+                                                        {selectedColor && selectedColor.name === colorOption.name && (
+                                                            <span className="sr-only">Selected</span>
+                                                        )}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <div 
+                                                    className="w-8 h-8 rounded-full border-2 border-gray-300"
+                                                    style={{backgroundColor: color?.hexCode || 'transparent'}}
+                                                    title={color?.name}
+                                                ></div>
+                                            )}
                                         </div>
                                     </div>
                                     <div className="flex items-center">
