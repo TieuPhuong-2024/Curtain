@@ -162,11 +162,50 @@ export const deleteCategory = async (id) => {
 // Upload image from device
 export const uploadImage = async (imageFile) => {
     try {
+        console.log('uploadImage function called with:', imageFile.name);
         const formData = new FormData();
         formData.append('image', imageFile);
 
+        // Log thêm headers và thông tin API call để debug
+        console.log('Sending to:', `${API_URL}/upload/from-device`);
+        
         const response = await uploadApi.post('/upload/from-device', formData);
-        return response.data;
+        console.log('Raw upload response:', response);
+        
+        // Chuẩn hóa kết quả trả về cho CKEditor
+        let result;
+        
+        if (response && response.data) {
+            // Đảm bảo kết quả trả về có url
+            if (response.data.url) {
+                // Trường hợp url trả về trực tiếp
+                result = {
+                    url: response.data.url,
+                    // Thêm các thuộc tính khác cho đầy đủ CKEditor
+                    default: response.data.url
+                };
+            } else if (typeof response.data === 'string') {
+                // URL trả về dưới dạng chuỗi
+                result = {
+                    url: response.data,
+                    default: response.data
+                };
+            } else {
+                // Trường hợp khác, cố gắng lấy URL
+                result = {
+                    url: typeof response.data === 'object' 
+                        ? JSON.stringify(response.data) 
+                        : String(response.data),
+                    default: API_URL + '/upload/image-error'
+                };
+            }
+        } else {
+            // Trường hợp không có data, trả về lỗi
+            throw new Error('No data in upload response');
+        }
+        
+        console.log('Normalized upload result:', result);
+        return result;
     } catch (error) {
         console.error('Error uploading image:', error);
         throw error;
