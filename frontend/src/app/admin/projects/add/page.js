@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaSave, FaArrowLeft } from 'react-icons/fa';
+import { FaSave } from 'react-icons/fa';
 import Link from 'next/link';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -15,7 +15,6 @@ let ClassicEditor; // For dynamic import
 export default function AddProject() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const editorRef = useRef(null); // Ref for CKEditor instance
     const [editorLoaded, setEditorLoaded] = useState(false);
 
     const [formData, setFormData] = useState({
@@ -123,9 +122,6 @@ export default function AddProject() {
         <div className="p-6">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold text-gray-800">Thêm Công Trình Mới</h1>
-                <Link href="/admin/projects" className="text-blue-600 hover:text-blue-700 flex items-center">
-                    <FaArrowLeft className="mr-2" /> Quay lại danh sách
-                </Link>
             </div>
 
             <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-6">
