@@ -180,6 +180,26 @@ export const createColor = async (colorData) => {
     }
 };
 
+export const getColorById = async (id) => {
+    try {
+        const response = await api.get(`/colors/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error(`Error fetching color with id ${id}:`, error);
+        throw error;
+    }
+};
+
+export const updateColor = async (id, colorData) => {
+    try {
+        const response = await api.put(`/colors/${id}`, colorData);
+        return response.data;
+    } catch (error) {
+        console.error(`Error updating color with id ${id}:`, error);
+        throw error;
+    }
+};
+
 // Upload image from device
 export const uploadImage = async (imageFile) => {
     try {

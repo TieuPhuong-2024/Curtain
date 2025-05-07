@@ -8,6 +8,12 @@ router.get('/', colorController.getAllColors);
 // POST a new color (optional, if you want to manage colors via API)
 router.post('/', colorController.createColor);
 
-// Add other routes for GET by ID, PUT, DELETE as needed
+// GET a color by ID
+router.get('/:id', colorController.getColorById);
+
+// PUT (update) a color
+router.put('/:id', colorController.updateColor);
+
+// Add other routes for DELETE as needed
 
 module.exports = router;
