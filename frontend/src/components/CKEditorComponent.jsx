@@ -1,40 +1,101 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { uploadImage } from '@/lib/api';
 import { getContentStats, renderCKEditorContent } from '@/utils/ckeditorConverter';
 
-// Flag to track if the editor has been initialized globally
-let isEditorInitialized = false;
+// Custom upload adapter for handling image uploads
+class MyUploadAdapter {
+  constructor(loader) {
+    this.loader = loader;
+  }
 
-const CKEditorComponent = ({ 
-  initialContent, 
-  onChange, 
+  upload() {
+    return this.loader.file
+      .then(file => {
+        return uploadImage(file);
+      })
+      .then(response => {
+        // Handle image URL from response
+        let imageUrl = null;
+        
+        if (response && typeof response === 'object' && response.url) {
+          imageUrl = response.url;
+        } else if (response && typeof response === 'object' && response.default) {
+          imageUrl = response.default;
+        } else if (response && typeof response === 'string') {
+          imageUrl = response;
+        } else if (response && typeof response === 'object') {
+          const possibleFields = ['link', 'path', 'src', 'data', 'location', 'file'];
+          for (const field of possibleFields) {
+            if (response[field]) {
+              imageUrl = response[field];
+              break;
+            }
+          }
+        }
+        
+        // Convert relative URLs to absolute if needed
+        if (imageUrl && typeof imageUrl === 'string' && !imageUrl.startsWith('http')) {
+          if (imageUrl.startsWith('/')) {
+            imageUrl = `${window.location.origin}${imageUrl}`;
+          } else {
+            imageUrl = `${window.location.origin}/${imageUrl}`;
+          }
+        }
+        
+        if (!imageUrl) {
+          return Promise.reject('Upload failed. URL not found in response.');
+        }
+        
+        return {
+          default: imageUrl
+        };
+      })
+      .catch(error => {
+        console.error('Image upload error:', error);
+        return Promise.reject(error);
+      });
+  }
+
+  abort() {
+    // Handle abort operation if needed
+  }
+}
+
+// Custom upload adapter plugin
+function MyCustomUploadAdapterPlugin(editor) {
+  editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+    return new MyUploadAdapter(loader);
+  };
+}
+
+const CKEditorComponent = ({
+  initialContent = '',
+  onChange,
   editable = true,
   height = '400px',
   autosave = false,
-  autosaveInterval = 30000, // 30 seconds
+  autosaveInterval = 30000,
   showStatistics = true,
   allowPreview = true,
   className = '',
   label
 }) => {
   const editorRef = useRef();
-  const containerRef = useRef();
   const [isLoading, setIsLoading] = useState(true);
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [statistics, setStatistics] = useState({ words: 0, chars: 0, charsNoSpace: 0 });
   const [editorData, setEditorData] = useState(initialContent || '');
-  const [theme, setTheme] = useState('light'); // 'light' or 'dark'
+  const [theme, setTheme] = useState('light');
 
   // Detect theme preference
   useEffect(() => {
-    // Check for system preference for dark mode
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
       setTheme('dark');
     }
 
-    // Listen for theme changes
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e) => setTheme(e.matches ? 'dark' : 'light');
     mediaQuery.addEventListener('change', handleChange);
@@ -48,8 +109,6 @@ const CKEditorComponent = ({
     
     if (autosave && editable && editorData) {
       autosaveTimer = setInterval(() => {
-        // You can implement a proper autosave function here
-        console.log('Autosaving...', new Date().toLocaleTimeString());
         localStorage.setItem('ckeditor_autosave', editorData);
       }, autosaveInterval);
     }
@@ -67,315 +126,268 @@ const CKEditorComponent = ({
     }
   }, [editorData, showStatistics]);
 
-  useEffect(() => {
-    let editor = null;
-    let initTimer = null;
-    
-    // Ngăn hiển thị hai toolbar bằng cách sử dụng một biến global
-    const setupEditor = async () => {
-      // Nếu đã có editor được khởi tạo, bỏ qua
-      if (isEditorInitialized) {
-        console.log('CKEditor already initialized, skipping initialization');
-        setIsLoading(false);
-        return;
-      }
-      
-      // Kiểm tra container
-      if (!containerRef.current) {
-        setIsLoading(false);
-        return;
-      }
-      
-      // Kiểm tra thêm một lần nữa xem đã có CKEditor nào trong DOM chưa
-      if (document.querySelector('.ck-editor')) {
-        console.log('CKEditor element already found in DOM');
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        setIsLoading(true);
-        isEditorInitialized = true; // Set flag trước khi khởi tạo
-        
-        // Import CKEditor
-        const { default: ClassicEditor } = await import('@ckeditor/ckeditor5-build-classic');
-        
-        const editorConfig = {
-          placeholder: 'Start writing...',
-          toolbar: {
-            items: [
-              'undo', 'redo', '|',
-              'heading', '|',
-              'bold', 'italic', 'underline', 'strikethrough', '|',
-              'fontSize', 'fontColor', 'fontBackgroundColor', '|',
-              'link', 'bulletedList', 'numberedList', 'todoList', '|',
-              'alignment', 'outdent', 'indent', '|',
-              'uploadImage', 'insertTable', 'blockQuote', 'codeBlock', '|',
-              'horizontalLine', 'pageBreak', 'specialCharacters'
-            ],
-            shouldNotGroupWhenFull: true
-          },
-          heading: {
-            options: [
-              { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
-              { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
-              { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
-              { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
-              { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
-              { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
-              { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
-            ]
-          },
-          image: {
-            toolbar: [
-              'imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|',
-              'toggleImageCaption', 'imageTextAlternative', '|',
-              'linkImage', 'resizeImage'
-            ],
-            resizeOptions: [
-              {
-                name: 'resizeImage:original',
-                label: 'Original',
-                value: null
-              },
-              {
-                name: 'resizeImage:50',
-                label: '50%',
-                value: '50'
-              },
-              {
-                name: 'resizeImage:75',
-                label: '75%',
-                value: '75'
-              }
-            ],
-            styles: {
-              options: [
-                'inline', 'block', 'side'
-              ]
-            }
-          },
-          table: {
-            contentToolbar: [
-              'tableColumn', 'tableRow', 'mergeTableCells',
-              'tableProperties', 'tableCellProperties'
-            ],
-            tableProperties: {
-              borderColors: [/* colors */],
-              backgroundColors: [/* colors */]
-            },
-            tableCellProperties: {
-              borderColors: [/* colors */],
-              backgroundColors: [/* colors */]
-            }
-          },
-          link: {
-            decorators: {
-              openInNewTab: {
-                mode: 'manual',
-                label: 'Open in a new tab',
-                defaultValue: true
-              },
-              toggleDownloadable: {
-                mode: 'manual',
-                label: 'Downloadable',
-                attributes: {
-                  download: 'file'
-                }
-              }
-            }
-          },
-          // Configure image upload
-          simpleUpload: {
-            uploadUrl: '/api/images',
-            // Handle image upload
-            uploadAdapter: (loader) => {
-              return {
-                upload: async () => {
-                  const file = await loader.file;
-                  try {
-                    const response = await uploadImage(file);
-                    return { default: response.url };
-                  } catch (error) {
-                    console.error('Error uploading image:', error);
-                    return Promise.reject(error);
-                  }
-                }
-              };
-            }
-          },
-          mediaEmbed: {
-            previewsInData: true
-          },
-          // Ensure the content styles match the defined height
-          height: height
-        };
-
-        // Chỉ khởi tạo khi chưa có editor và container sẵn sàng
-        if (!editorRef.current && containerRef.current) {
-          // Initialize the editor
-          ClassicEditor
-            .create(containerRef.current, editorConfig)
-            .then(newEditor => {
-              editor = newEditor;
-              editorRef.current = newEditor;
-
-              // Set initial content if provided
-              if (initialContent) {
-                newEditor.setData(initialContent);
-              }
-
-              // Handle content changes
-              newEditor.model.document.on('change:data', () => {
-                const data = newEditor.getData();
-                setEditorData(data);
-                if (onChange) {
-                  onChange(data);
-                }
-              });
-
-              // Set the editor as read-only if not editable
-              if (!editable) {
-                newEditor.isReadOnly = true;
-              }
-
-              // Try to load autosaved content if no initial content provided
-              if (!initialContent && autosave) {
-                const savedContent = localStorage.getItem('ckeditor_autosave');
-                if (savedContent) {
-                  newEditor.setData(savedContent);
-                }
-              }
-
-              setIsLoading(false);
-            })
-            .catch(error => {
-              console.error('Error initializing CKEditor:', error);
-              isEditorInitialized = false; // Reset flag on error
-              setIsLoading(false);
-            });
-        }
-      } catch (error) {
-        console.error('Failed to load CKEditor:', error);
-        isEditorInitialized = false; // Reset flag on error
-        setIsLoading(false);
-      }
-    };
-
-    // Trì hoãn khởi tạo để tránh khởi tạo kép trong React Strict Mode
-    initTimer = setTimeout(() => {
-      setupEditor();
-    }, 50);
-
-    // Cleanup on unmounting
-    return () => {
-      // Xóa timer nếu component unmount
-      if (initTimer) {
-        clearTimeout(initTimer);
-      }
-      
-      // Destroy editor và reset flag
-      if (editorRef.current) {
-        editorRef.current.destroy()
-          .then(() => {
-            editorRef.current = null;
-            isEditorInitialized = false; // Reset flag khi destroy
-          })
-          .catch(error => {
-            console.error('Error destroying CKEditor:', error);
-          });
-      }
-    };
-  }, [initialContent, onChange, editable, height, autosave]);
-
-  // Handle preview mode toggle
+  // Toggle preview mode
   const togglePreviewMode = () => {
     setIsPreviewMode(!isPreviewMode);
   };
 
   return (
-    <div className={`ckeditor-wrapper ${className} ${theme === 'dark' ? 'dark-theme' : ''}`}>
-      {label && <div className="text-sm font-medium mb-2">{label}</div>}
+    <div className={`ckeditor-wrapper ${className} ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
+      {/* Optional label */}
+      {label && <div className="editor-label">{label}</div>}
       
-      {/* Editor controls */}
-      {editable && (
-        <div className="flex justify-between items-center mb-2 text-sm">
-          <div className="editor-statistics space-x-4">
-            {showStatistics && (
-              <>
-                <span className="stat-item">Words: {statistics.words}</span>
-                <span className="stat-item">Characters: {statistics.chars}</span>
-              </>
-            )}
-          </div>
-          <div className="editor-actions space-x-2">
-            {allowPreview && (
-              <button 
-                onClick={togglePreviewMode}
-                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-              >
-                {isPreviewMode ? 'Edit' : 'Preview'}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-      
-      {/* Main editor container */}
-      <div 
-        className={`border rounded-lg overflow-hidden transition-all duration-200 ${isLoading ? 'opacity-50' : 'opacity-100'}`}
-        style={{ minHeight: editable ? height : 'auto' }}
-      >
-        {isPreviewMode ? (
-          // Preview mode
-          <div 
-            className="preview-container p-4 prose max-w-none"
-            dangerouslySetInnerHTML={{ __html: renderCKEditorContent(editorData) }}
-          />
-        ) : (
-          // Edit mode
-          <div ref={containerRef} className="w-full h-full" />
+      {/* Editor toolbar */}
+      <div className="editor-toolbar">
+        {allowPreview && (
+          <button 
+            type="button" 
+            onClick={togglePreviewMode} 
+            className="preview-toggle-btn"
+          >
+            {isPreviewMode ? 'Edit' : 'Preview'}
+          </button>
         )}
       </div>
-
-      {/* Loading indicator and status */}
-      {isLoading && (
-        <div className="flex justify-center items-center mt-2">
-          <div className="loading-spinner mr-2"></div>
-          <span className="text-sm text-gray-600">Loading editor...</span>
+      
+      {/* Main editor area */}
+      {!isPreviewMode ? (
+        <div className="editor-container" style={{ height }}>
+          {isLoading && <div className="editor-loading">Loading editor...</div>}
+          
+          <div className="ckeditor5-container" style={{ opacity: isLoading ? 0 : 1 }}>
+            {/* Using dynamic import for client-side only loading */}
+            {typeof window !== 'undefined' && (
+              <CKEditor
+                editor={require('@ckeditor/ckeditor5-build-classic')}
+                data={editorData}
+                disabled={!editable}
+                onReady={editor => {
+                  editorRef.current = editor;
+                  setIsLoading(false);
+                  
+                  // Restore autosaved content if needed
+                  if (autosave && !initialContent) {
+                    const savedContent = localStorage.getItem('ckeditor_autosave');
+                    if (savedContent) {
+                      editor.setData(savedContent);
+                    }
+                  }
+                }}
+                onChange={(event, editor) => {
+                  const data = editor.getData();
+                  setEditorData(data);
+                  if (onChange) {
+                    onChange(data);
+                  }
+                }}
+                config={{
+                  extraPlugins: [MyCustomUploadAdapterPlugin],
+                  toolbar: {
+                    items: [
+                      'undo', 'redo',
+                      '|',
+                      'heading',
+                      '|',
+                      'bold', 'italic', 'underline', 'strikethrough',
+                      '|',
+                      'fontSize', 'fontColor', 'fontBackgroundColor',
+                      '|',
+                      'link', 'bulletedList', 'numberedList',
+                      '|',
+                      'alignment', 'indent', 'outdent',
+                      '|',
+                      'imageUpload',
+                      '|',
+                      'insertTable', 'blockQuote', 'codeBlock',
+                      '|',
+                      'horizontalLine'
+                    ],
+                    shouldNotGroupWhenFull: true
+                  },
+                  image: {
+                    toolbar: [
+                      'imageStyle:inline', 'imageStyle:block', 'imageStyle:side',
+                      '|',
+                      'toggleImageCaption', 'imageTextAlternative',
+                      '|',
+                      'linkImage'
+                    ]
+                  },
+                  table: {
+                    contentToolbar: [
+                      'tableColumn', 'tableRow', 'mergeTableCells'
+                    ]
+                  },
+                  heading: {
+                    options: [
+                      { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                      { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                      { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                      { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' },
+                      { model: 'heading4', view: 'h4', title: 'Heading 4', class: 'ck-heading_heading4' },
+                      { model: 'heading5', view: 'h5', title: 'Heading 5', class: 'ck-heading_heading5' },
+                      { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' }
+                    ]
+                  },
+                  placeholder: 'Start writing...',
+                  language: 'en',
+                }}
+              />
+            )}
+          </div>
+        </div>
+      ) : (
+        <div 
+          className="preview-container"
+          style={{ height, overflow: 'auto' }}
+          dangerouslySetInnerHTML={{ __html: renderCKEditorContent(editorData) }}
+        />
+      )}
+      
+      {/* Statistics footer */}
+      {showStatistics && (
+        <div className="editor-statistics">
+          <span>{statistics.words} words</span>
+          <span>{statistics.chars} characters</span>
+          <span>{statistics.charsNoSpace} characters (no spaces)</span>
         </div>
       )}
       
-      {/* Add custom styles for a dark theme and spinner */}
       <style jsx>{`
+        .ckeditor-wrapper {
+          display: flex;
+          flex-direction: column;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          overflow: hidden;
+        }
+        
         .ckeditor-wrapper.dark-theme {
-          --ck-color-base-background: #1e1e1e;
-          --ck-color-base-foreground: #2f2f2f;
-          --ck-color-text: #c9c9c9;
-          --ck-color-focus-border: #0f90fa;
-          --ck-color-button-default-background: #2f2f2f;
-          --ck-color-button-default-hover-background: #3e3e3e;
-          color: #c9c9c9;
+          border-color: #444;
+          color: #f5f5f5;
+          background: #1e1e1e;
+        }
+        
+        .editor-label {
+          padding: 8px 12px;
+          font-weight: 600;
+          background: #f5f5f5;
+          border-bottom: 1px solid #ddd;
+        }
+        
+        .dark-theme .editor-label {
+          background: #2d2d2d;
+          border-color: #444;
+        }
+        
+        .editor-toolbar {
+          display: flex;
+          justify-content: flex-end;
+          padding: 8px;
+          background: #f5f5f5;
+          border-bottom: 1px solid #ddd;
+        }
+        
+        .dark-theme .editor-toolbar {
+          background: #2d2d2d;
+          border-color: #444;
+        }
+        
+        .preview-toggle-btn {
+          padding: 6px 12px;
+          background: #4b7bec;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          cursor: pointer;
+        }
+        
+        .preview-toggle-btn:hover {
+          background: #3867d6;
+        }
+        
+        .editor-container {
+          position: relative;
+          flex: 1;
+          min-height: 200px;
+        }
+        
+        .editor-loading {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255, 255, 255, 0.8);
+          z-index: 1;
+        }
+        
+        .dark-theme .editor-loading {
+          background: rgba(30, 30, 30, 0.8);
+        }
+        
+        .ckeditor5-container {
+          height: 100%;
+          transition: opacity 0.3s;
         }
         
         .preview-container {
-          min-height: ${height};
-          background-color: ${theme === 'dark' ? '#1e1e1e' : '#ffffff'};
-          color: ${theme === 'dark' ? '#c9c9c9' : 'inherit'};
+          padding: 16px;
+          background: white;
         }
         
-        .loading-spinner {
-          border: 2px solid rgba(0, 0, 0, 0.1);
-          border-left-color: #3498db;
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          animation: spin 1s linear infinite;
+        .dark-theme .preview-container {
+          background: #1e1e1e;
+          color: #f5f5f5;
         }
         
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
+        .editor-statistics {
+          display: flex;
+          gap: 16px;
+          padding: 8px 12px;
+          font-size: 0.85rem;
+          color: #666;
+          background: #f9f9f9;
+          border-top: 1px solid #ddd;
+        }
+        
+        .dark-theme .editor-statistics {
+          background: #2d2d2d;
+          color: #aaa;
+          border-color: #444;
+        }
+        
+        /* CKEditor Dark Theme Customization */
+        .dark-theme :global(.ck.ck-editor__main) {
+          background: #1e1e1e;
+          color: #f5f5f5;
+        }
+        
+        .dark-theme :global(.ck.ck-editor__editable) {
+          background: #1e1e1e;
+          color: #f5f5f5;
+          border-color: #444 !important;
+        }
+        
+        .dark-theme :global(.ck.ck-toolbar) {
+          background: #2d2d2d;
+          border-color: #444 !important;
+        }
+        
+        .dark-theme :global(.ck.ck-button),
+        .dark-theme :global(.ck.ck-dropdown__button) {
+          color: #f5f5f5;
+        }
+        
+        .dark-theme :global(.ck.ck-list) {
+          background: #2d2d2d;
+        }
+        
+        .dark-theme :global(.ck.ck-list__item) {
+          color: #f5f5f5;
         }
       `}</style>
     </div>
