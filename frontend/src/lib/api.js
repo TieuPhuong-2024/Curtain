@@ -159,6 +159,27 @@ export const deleteCategory = async (id) => {
     }
 };
 
+// Color APIs
+export const getColors = async () => {
+    try {
+        const response = await api.get('/colors');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching colors:', error);
+        throw error;
+    }
+};
+
+export const createColor = async (colorData) => {
+    try {
+        const response = await api.post('/colors', colorData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating color:', error);
+        throw error;
+    }
+};
+
 // Upload image from device
 export const uploadImage = async (imageFile) => {
     try {

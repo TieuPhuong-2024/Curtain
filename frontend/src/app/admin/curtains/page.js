@@ -75,7 +75,7 @@ export default function CurtainsList() {
             'Danh mục': typeof curtain.category === 'object' ? curtain.category?.name : curtain.category,
             'Giá': curtain.price,
             'Chất liệu': curtain.material,
-            'Màu sắc': curtain.color,
+            'Màu sắc': curtain.color?.name || '', 
             'Kích thước': curtain.size ? `${curtain.size.width} x ${curtain.size.height}` : '',
             'Còn hàng': curtain.inStock ? 'Có' : 'Không',
         }));
@@ -195,7 +195,7 @@ export default function CurtainsList() {
                                                 <div className="ml-4">
                                                     <div
                                                         className="text-sm font-medium text-gray-900">{curtain.name}</div>
-                                                    <div className="text-sm text-gray-500">{curtain.color}</div>
+                                                    <div className="text-sm text-gray-500">{curtain.color?.name || 'N/A'}</div> 
                                                 </div>
                                             </div>
                                         </td>
