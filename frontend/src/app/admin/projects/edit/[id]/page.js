@@ -7,6 +7,44 @@ import Link from 'next/link';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import ImageUploader from '@/components/ImageUploader';
+import Image from 'next/image';
+import { uploadImage, uploadVideo } from '@/lib/api';
+
+// Custom upload adapter for CKEditor
+class MyUploadAdapter {
+    constructor(loader) {
+        this.loader = loader;
+    }
+
+    upload() {
+        return this.loader.file
+            .then(file => {
+                // Check file type to determine upload method
+                if (file.type.startsWith('video/')) {
+                    return uploadVideo(file);
+                } else {
+                    return uploadImage(file);
+                }
+            })
+            .then(response => {
+                if (response && response.url) {
+                    return { default: response.url };
+                }
+                return Promise.reject('Upload failed');
+            });
+    }
+
+    abort() {
+        // Abort upload implementation
+    }
+}
+
+// Custom upload adapter plugin
+function MyCustomUploadAdapterPlugin(editor) {
+    editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+        return new MyUploadAdapter(loader);
+    };
+}
 
 // CKEditor imports
 let CKEditorComponent; // Renamed for clarity
@@ -271,6 +309,28 @@ export default function EditProject() {
                             onChange={handleEditorChange}
                             config={{
                                 placeholder: "Nhập nội dung chi tiết của công trình tại đây...",
+                                extraPlugins: [MyCustomUploadAdapterPlugin],
+                                toolbar: {
+                                    items: [
+                                        'heading', '|',
+                                        'bold', 'italic', 'link', '|',
+                                        'bulletedList', 'numberedList', '|',
+                                        'insertTable', '|',
+                                        'imageUpload', 'mediaEmbed', '|',
+                                        'undo', 'redo'
+                                    ]
+                                },
+                                image: {
+                                    toolbar: [
+                                        'imageStyle:full',
+                                        'imageStyle:side',
+                                        '|',
+                                        'imageTextAlternative'
+                                    ]
+                                },
+                                mediaEmbed: {
+                                    previewsInData: true
+                                }
                             }}
                         />
                     ) : (
