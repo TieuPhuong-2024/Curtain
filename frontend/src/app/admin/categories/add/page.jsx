@@ -1,8 +1,9 @@
 "use client";
-import {useState} from "react";
-import {useRouter} from "next/navigation";
-import {createCategory, uploadImage} from "@/lib/api";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { createCategory, uploadImage } from "@/lib/api";
 import Image from "next/image";
+import { FaTimes } from "react-icons/fa";
 
 export default function AddCategoryPage() {
     const [name, setName] = useState("");
@@ -24,7 +25,7 @@ export default function AddCategoryPage() {
             setImage(reader.result);
         };
         reader.readAsDataURL(file);
-        
+
         setImageFile(file);
     };
 
@@ -41,7 +42,7 @@ export default function AddCategoryPage() {
 
     const handleImageUpload = async () => {
         if (!imageFile) return;
-        
+
         try {
             setUploadingImage(true);
             const uploadedImage = await uploadImage(imageFile);
@@ -59,10 +60,10 @@ export default function AddCategoryPage() {
         e.preventDefault();
         setLoading(true);
         setError("");
-        
+
         try {
             let imageUrl = image; // Use existing image URL if no new file is selected
-            
+
             // Upload image if there's a new file selected
             if (imageFile) {
                 imageUrl = await handleImageUpload();
@@ -71,8 +72,8 @@ export default function AddCategoryPage() {
                     return;
                 }
             }
-            
-            await createCategory({name, description, image: imageUrl});
+
+            await createCategory({ name, description, image: imageUrl });
             router.push("/admin/categories");
         } catch (err) {
             setError(err.message);
@@ -98,7 +99,7 @@ export default function AddCategoryPage() {
                         autoFocus
                     />
                 </div>
-                
+
                 <div>
                     <label htmlFor="category-description" className="block mb-2 text-sm font-medium text-gray-700">Mô tả:</label>
                     <textarea
@@ -109,11 +110,11 @@ export default function AddCategoryPage() {
                         placeholder="Nhập mô tả danh mục (không bắt buộc)"
                     />
                 </div>
-                
+
                 <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">Hình ảnh đại diện:</label>
-                    
-                    <div 
+
+                    <div
                         className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50 hover:border-indigo-500 transition-all duration-300 ease-in-out cursor-pointer mb-3 relative overflow-hidden"
                         onClick={(e) => {
                             // Prevent click on children from triggering file dialog
@@ -144,24 +145,22 @@ export default function AddCategoryPage() {
                             className="absolute top-0 left-0 opacity-0 w-full h-full cursor-pointer z-[-1]"
                         />
                     </div>
-                    
+
                     {image && (
                         <div className="mt-4 relative h-48 w-full group">
-                            <Image 
+                            <Image
                                 src={image}
                                 alt="Category preview"
                                 fill
                                 className="object-cover rounded-lg shadow-md"
                             />
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={handleRemoveImage}
-                                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                className="cursor-pointer absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center"
                                 aria-label="Remove image"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <FaTimes />
                             </button>
                         </div>
                     )}
@@ -176,9 +175,9 @@ export default function AddCategoryPage() {
                         Đang tải ảnh lên...
                     </div>
                 )}
-                
+
                 {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                
+
                 <div className="flex items-center justify-end space-x-4 pt-2">
                     <button
                         type="button"
