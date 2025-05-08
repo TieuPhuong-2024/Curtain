@@ -102,7 +102,7 @@ export default function CurtainsList() {
                     </button>
                     <Link
                         href="/admin/curtains/add"
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition"
+                        className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition"
                     >
                         <FaPlus className="mr-2"/> Thêm Mới
                     </Link>

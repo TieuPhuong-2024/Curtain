@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaUpload, FaPlus, FaTimes, FaEdit } from 'react-icons/fa';
+import { FaUpload, FaPlus, FaTimes, FaEdit, FaSave } from 'react-icons/fa';
 import { createCurtain, getCategories, uploadImage, getColors, createColor, getColorById, updateColor } from '@/lib/api';
 
 export default function AddCurtain() {
@@ -74,7 +74,7 @@ export default function AddCurtain() {
         if (name === 'color') {
             return;
         }
-        
+
         setFormData({
             ...formData,
             [name]: type === 'checkbox' ? checked : value
@@ -88,7 +88,7 @@ export default function AddCurtain() {
             ...formData,
             [name]: value
         });
-        
+
         if (value) {
             try {
                 const colorData = await getColorById(value);
@@ -244,7 +244,7 @@ export default function AddCurtain() {
         setAddColorError(null);
         setIsEditingColor(true);
         setCurrentColorId(colorId);
-        
+
         try {
             const colorData = await getColorById(colorId);
             setNewColorName(colorData.name || '');
@@ -268,13 +268,13 @@ export default function AddCurtain() {
             setAddColorError('Tên màu sắc không được để trống.');
             return;
         }
-        
+
         setIsAddingColor(true);
         setAddColorError(null);
-        
+
         try {
             const colorData = { name: newColorName, hexCode: newColorHexCode || '#808080' };
-            
+
             if (isEditingColor && currentColorId) {
                 // Update existing color
                 await updateColor(currentColorId, colorData);
@@ -283,10 +283,10 @@ export default function AddCurtain() {
                 const savedColor = await createColor(colorData);
                 setFormData(prev => ({ ...prev, color: savedColor._id })); // Auto-select new color
             }
-            
+
             await fetchAllColors(); // Refresh color list
             handleCloseColorModal();
-            
+
             // If we're editing the currently selected color, refresh the selected color data
             if (formData.color === currentColorId) {
                 const updatedColor = await getColorById(currentColorId);
@@ -388,12 +388,12 @@ export default function AddCurtain() {
                                 Màu sắc <span className="text-red-500">*</span>
                             </label>
                             <div className="flex items-center gap-2 mt-1">
-                                <select 
-                                    name="color" 
-                                    id="color" 
-                                    value={formData.color} 
-                                    onChange={handleColorChange} 
-                                    required 
+                                <select
+                                    name="color"
+                                    id="color"
+                                    value={formData.color}
+                                    onChange={handleColorChange}
+                                    required
                                     className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                 >
                                     <option value="">Chọn màu sắc</option>
@@ -403,7 +403,7 @@ export default function AddCurtain() {
                                         </option>
                                     ))}
                                 </select>
-                                <button 
+                                <button
                                     type="button"
                                     onClick={handleOpenAddColorModal}
                                     className="p-2 border border-gray-300 rounded-md shadow-sm hover:bg-gray-50"
@@ -412,19 +412,19 @@ export default function AddCurtain() {
                                     <FaPlus />
                                 </button>
                             </div>
-                            
+
                             {/* Display selected color details */}
                             {selectedColor && (
                                 <div className="mt-2 flex items-center space-x-3">
-                                    <div 
-                                        className="w-6 h-6 border border-gray-300" 
-                                        style={{backgroundColor: selectedColor.hexCode || '#808080'}}
+                                    <div
+                                        className="w-6 h-6 border border-gray-300"
+                                        style={{ backgroundColor: selectedColor.hexCode || '#808080' }}
                                     ></div>
                                     <div className="text-sm text-gray-600">
                                         {selectedColor.name} - {selectedColor.hexCode || 'Không có mã màu'}
                                     </div>
-                                    <button 
-                                        type="button" 
+                                    <button
+                                        type="button"
                                         onClick={() => handleOpenEditColorModal(selectedColor._id)}
                                         className="text-blue-500 hover:text-blue-700"
                                         title="Chỉnh sửa màu"
@@ -606,16 +606,16 @@ export default function AddCurtain() {
                     <div className="mt-6 flex justify-end">
                         <Link
                             href="/admin/curtains"
-                            className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2"
+                            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2"
                         >
                             Hủy
                         </Link>
                         <button
                             type="submit"
-                            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md"
+                            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
                             disabled={isSubmitting}
                         >
-                            {isSubmitting ? 'Đang xử lý...' : 'Thêm sản phẩm'}
+                            <FaSave className="mr-2" /> {isSubmitting ? 'Đang xử lý...' : 'Lưu'}
                         </button>
                     </div>
                 </form>
@@ -626,7 +626,7 @@ export default function AddCurtain() {
                 <>
                     {/* Backdrop with blur effect */}
                     <div className="fixed inset-0 backdrop-blur-sm bg-gray-600/40 z-40"></div>
-                    
+
                     {/* Modal */}
                     <div className="fixed inset-0 overflow-y-auto h-full w-full z-50 flex justify-center items-center">
                         <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md relative">
@@ -635,12 +635,12 @@ export default function AddCurtain() {
                             </h3>
                             <div>
                                 <label htmlFor="newColorName" className="block text-sm font-medium text-gray-700">Tên màu</label>
-                                <input 
-                                    type="text" 
-                                    name="newColorName" 
-                                    id="newColorName" 
-                                    value={newColorName} 
-                                    onChange={(e) => setNewColorName(e.target.value)} 
+                                <input
+                                    type="text"
+                                    name="newColorName"
+                                    id="newColorName"
+                                    value={newColorName}
+                                    onChange={(e) => setNewColorName(e.target.value)}
                                     className="mt-1 mb-2 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                     required
                                 />
@@ -648,25 +648,25 @@ export default function AddCurtain() {
                             <div>
                                 <label htmlFor="newColorHexCode" className="block text-sm font-medium text-gray-700">Mã Hex</label>
                                 <div className="flex mt-1 mb-4">
-                                    <input 
-                                        type="text" 
-                                        name="newColorHexCode" 
-                                        id="newColorHexCode" 
-                                        value={newColorHexCode} 
-                                        onChange={(e) => setNewColorHexCode(e.target.value)} 
-                                        placeholder="#RRGGBB" 
+                                    <input
+                                        type="text"
+                                        name="newColorHexCode"
+                                        id="newColorHexCode"
+                                        value={newColorHexCode}
+                                        onChange={(e) => setNewColorHexCode(e.target.value)}
+                                        placeholder="#RRGGBB"
                                         className="block w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                                     />
-                                    <input 
-                                        type="color" 
-                                        value={newColorHexCode || '#808080'} 
-                                        onChange={(e) => setNewColorHexCode(e.target.value)} 
+                                    <input
+                                        type="color"
+                                        value={newColorHexCode || '#808080'}
+                                        onChange={(e) => setNewColorHexCode(e.target.value)}
                                         className="h-10 w-10 border border-gray-300 rounded-r-md"
                                     />
                                 </div>
                                 {newColorHexCode && (
                                     <div className="flex items-center mb-4">
-                                        <div className="w-6 h-6 mr-2 border border-gray-300" style={{backgroundColor: newColorHexCode}}></div>
+                                        <div className="w-6 h-6 mr-2 border border-gray-300" style={{ backgroundColor: newColorHexCode }}></div>
                                         <span className="text-sm text-gray-600">Xem trước màu sắc</span>
                                     </div>
                                 )}
@@ -677,17 +677,17 @@ export default function AddCurtain() {
                                 </div>
                             )}
                             <div className="flex justify-end gap-3">
-                                <button 
-                                    type="button" 
-                                    onClick={handleCloseColorModal} 
+                                <button
+                                    type="button"
+                                    onClick={handleCloseColorModal}
                                     className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     disabled={isAddingColor}
                                 >
                                     Hủy
                                 </button>
-                                <button 
-                                    type="button" 
-                                    onClick={handleSaveColor} 
+                                <button
+                                    type="button"
+                                    onClick={handleSaveColor}
                                     className="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     disabled={isAddingColor}
                                 >

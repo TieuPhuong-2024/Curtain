@@ -133,7 +133,7 @@ export default function AddProject() {
         try {
             setLoading(true);
             const result = await createProject(payload);
-            
+
             if (result) {
                 toast.success('Thêm công trình thành công!');
                 router.push('/admin/projects');
@@ -316,15 +316,15 @@ export default function AddProject() {
                 </div>
 
                 <div className="mt-8 flex justify-end space-x-3">
-                    <Link href="/admin/projects" className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    <Link href="/admin/projects" className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2 hover:bg-gray-400">
                         Hủy
                     </Link>
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
+                        className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
                     >
-                        <FaSave className="mr-2" /> {loading ? 'Đang lưu...' : 'Lưu Công Trình'}
+                        <FaSave className="mr-2" /> {loading ? 'Đang lưu...' : 'Lưu'}
                     </button>
                 </div>
             </form>

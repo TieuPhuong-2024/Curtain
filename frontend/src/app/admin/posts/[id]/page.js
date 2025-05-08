@@ -6,6 +6,7 @@ import { getPostById, updatePost } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
 import { toast } from 'react-toastify';
 import { uploadImage, uploadVideo } from '@/lib/api';
+import { FaSave } from 'react-icons/fa';
 
 // Custom upload adapter for CKEditor
 class MyUploadAdapter {
@@ -299,20 +300,20 @@ export default function EditPost() {
         </div>
 
         {/* Submit Button */}
-        <div className="flex items-center justify-end gap-2">
+        <div className="mt-6 flex justify-end">
           <button
             type="button"
             onClick={() => router.back()}
-            className="cursor-pointer bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="cursor-pointer bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2"
           >
             Hủy
           </button>
           <button
             type="submit"
             disabled={saving || loading}
-            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
+            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
           >
-            {saving ? (
+            <FaSave className='mr-2' /> {saving ? (
               <>
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -321,7 +322,7 @@ export default function EditPost() {
                 Đang xử lý...
               </>
             ) : (
-              'Cập nhật bài viết'
+              'Cập nhật'
             )}
           </button>
         </div>
