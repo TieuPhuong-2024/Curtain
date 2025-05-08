@@ -1,14 +1,15 @@
 'use client';
 
 import '../../styles/cozy-theme.css';
-import {use, useEffect, useState} from 'react';
+import { use, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import {getCurtainById, getImagesByCurtainId, getColors} from '@/lib/api';
-import {FaArrowLeft, FaPalette, FaRuler, FaShoppingCart, FaTag} from 'react-icons/fa';
+import { getCurtainById, getImagesByCurtainId } from '@/lib/api';
+import { FaArrowLeft, FaPalette, FaRuler, FaShoppingCart, FaTag } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
-export default function ProductDetailPage({params}) {
-    const {id} = use(params);
+export default function ProductDetailPage({ params }) {
+    const { id } = use(params);
 
     const [curtain, setCurtain] = useState(null);
     const [images, setImages] = useState([]);
@@ -16,25 +17,22 @@ export default function ProductDetailPage({params}) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const [colors, setColors] = useState([]); // State for colors
     const [selectedColor, setSelectedColor] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                // Fetch product and colors in parallel
-                const [productData, colorsData] = await Promise.all([
-                    getCurtainById(id),
-                    getColors()
-                ]);
-                
+
+                // Fetch product data only
+                const productData = await getCurtainById(id);
+
                 setCurtain(productData);
-                setColors(colorsData || []); // Store colors from database
-                
+                setSelectedColor(productData.color); // Set selected color directly from productData
+
                 // Set the main image as selected by default
                 setSelectedImage(productData.mainImage);
-                
+
                 // Fetch additional images if available
                 if (productData.images && productData.images.length > 0) {
                     setImages(productData.images);
@@ -49,7 +47,7 @@ export default function ProductDetailPage({params}) {
                 }
             } catch (err) {
                 setError('Không thể tải thông tin sản phẩm. Vui lòng thử lại sau.');
-                console.error(err);
+                console.error('Error fetching product data:', err); // Log error
             } finally {
                 setLoading(false);
             }
@@ -59,7 +57,7 @@ export default function ProductDetailPage({params}) {
     }, [id]);
 
     const handleAddToCart = () => {
-        alert(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
+        toast.success(`Đã thêm ${quantity} sản phẩm vào giỏ hàng`);
         // Implement cart functionality
     };
 
@@ -88,7 +86,7 @@ export default function ProductDetailPage({params}) {
                         </div>
                         <div className="mt-4">
                             <Link href="/products" className="cozy-link font-medium flex items-center">
-                                <FaArrowLeft className="mr-2"/> Quay lại danh sách sản phẩm
+                                <FaArrowLeft className="mr-2" /> Quay lại danh sách sản phẩm
                             </Link>
                         </div>
                     </div>
@@ -97,7 +95,7 @@ export default function ProductDetailPage({params}) {
         );
     }
 
-    const {name, description, price, category, material, color, size, mainImage, inStock} = curtain;
+    const { name, description, price, category, material, size, mainImage, inStock } = curtain;
     const displayImage = selectedImage || mainImage || (images.length > 0 ? images[0].url : '/images/curtain-placeholder.jpg');
 
     return (
@@ -105,7 +103,7 @@ export default function ProductDetailPage({params}) {
             <div className="container mx-auto px-4">
                 <div className="mb-4">
                     <Link href="/products" className="cozy-link font-medium flex items-center">
-                        <FaArrowLeft className="mr-2"/> Quay lại danh sách sản phẩm
+                        <FaArrowLeft className="mr-2" /> Quay lại danh sách sản phẩm
                     </Link>
                 </div>
                 <div className="cozy-card overflow-hidden">
@@ -119,46 +117,44 @@ export default function ProductDetailPage({params}) {
                                         src={displayImage}
                                         alt={name}
                                         fill
-                                        style={{objectFit: 'cover'}}
+                                        style={{ objectFit: 'cover' }}
                                         className="cozy-img w-full h-full rounded-lg transition-transform duration-500 hover:scale-105"
                                         priority
                                     />
                                 </div>
-                                
+
                                 {/* Thumbnails for additional images */}
                                 {images.length > 1 && (
                                     <div className="flex space-x-2 mt-4 overflow-x-auto py-2">
                                         {/* Main image thumbnail */}
-                                        <div 
-                                            className={`relative w-20 h-20 min-w-[5rem] cursor-pointer rounded-md overflow-hidden border-2 ${
-                                                selectedImage === mainImage ? 'border-[#a67c52]' : 'border-transparent'
-                                            }`}
+                                        <div
+                                            className={`relative w-20 h-20 min-w-[5rem] cursor-pointer rounded-md overflow-hidden border-2 ${selectedImage === mainImage ? 'border-[#a67c52]' : 'border-transparent'
+                                                }`}
                                             onClick={() => handleSelectImage(mainImage)}
                                         >
                                             <Image
                                                 src={mainImage}
                                                 alt={`${name} - Main`}
                                                 fill
-                                                style={{objectFit: 'cover'}}
+                                                style={{ objectFit: 'cover' }}
                                             />
                                         </div>
-                                        
+
                                         {/* Other image thumbnails */}
                                         {images
                                             .filter(img => img.url !== mainImage)
                                             .map((image, index) => (
-                                                <div 
+                                                <div
                                                     key={index}
-                                                    className={`relative w-20 h-20 min-w-[5rem] cursor-pointer rounded-md overflow-hidden border-2 ${
-                                                        selectedImage === image.url ? 'border-[#a67c52]' : 'border-transparent'
-                                                    }`}
+                                                    className={`relative w-20 h-20 min-w-[5rem] cursor-pointer rounded-md overflow-hidden border-2 ${selectedImage === image.url ? 'border-[#a67c52]' : 'border-transparent'
+                                                        }`}
                                                     onClick={() => handleSelectImage(image.url)}
                                                 >
                                                     <Image
                                                         src={image.url}
                                                         alt={`${name} - ${index + 1}`}
                                                         fill
-                                                        style={{objectFit: 'cover'}}
+                                                        style={{ objectFit: 'cover' }}
                                                     />
                                                 </div>
                                             ))
@@ -167,7 +163,7 @@ export default function ProductDetailPage({params}) {
                                 )}
                             </div>
                         </div>
-                        
+
                         {/* Product Info */}
                         <div className="md:w-1/2 p-6">
                             <div className="flex justify-between items-start">
@@ -177,48 +173,36 @@ export default function ProductDetailPage({params}) {
                                 </span>
                             </div>
                             <div className="text-2xl font-bold text-[#a67c52] mb-4">
-                                {new Intl.NumberFormat('vi-VN', {style: 'currency', currency: 'VND'}).format(price)}
+                                {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price)}
                             </div>
                             <div className="mb-6">
                                 <p className="text-[#5b4636] mb-4">{description}</p>
                                 <div className="space-y-3">
                                     <div className="flex items-center">
-                                        <FaPalette className="text-[#a67c52] mr-2"/>
+                                        <FaPalette className="text-[#a67c52] mr-2" />
                                         <div className="font-semibold">Màu sắc:</div>
                                         <div className="flex items-center ml-2">
-                                            {colors && colors.length > 0 ? (
-                                                colors.map((colorOption, index) => (
-                                                    <button
-                                                        key={index}
-                                                        onClick={() => setSelectedColor(colorOption)}
-                                                        className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ease-in-out
-                                                            ${selectedColor && selectedColor.name === colorOption.name ? 'ring-2 ring-offset-1 ring-indigo-500 border-indigo-500' : 'border-gray-300 hover:border-gray-500'}
-                                                        `}
-                                                        style={{backgroundColor: colorOption?.hexCode || 'transparent'}}
-                                                        title={colorOption.name}
-                                                    >
-                                                        {/* Optional: Add a checkmark or other indicator for selected state */}
-                                                        {selectedColor && selectedColor.name === colorOption.name && (
-                                                            <span className="sr-only">Selected</span>
-                                                        )}
-                                                    </button>
-                                                ))
+                                            {selectedColor ? (
+                                                <button
+                                                    className="w-8 h-8 rounded-full border-2 transition-all duration-200 ease-in-out
+                                                        border-indigo-500"
+                                                    style={{ backgroundColor: selectedColor.hexCode || 'transparent' }}
+                                                    title={selectedColor.name}
+                                                >
+                                                    <span className="sr-only">Selected</span>
+                                                </button>
                                             ) : (
-                                                <div 
-                                                    className="w-8 h-8 rounded-full border-2 border-gray-300"
-                                                    style={{backgroundColor: color?.hexCode || 'transparent'}}
-                                                    title={color?.name}
-                                                ></div>
+                                                <div className="w-8 h-8 rounded-full border-2 border-gray-300"></div>
                                             )}
                                         </div>
                                     </div>
                                     <div className="flex items-center">
-                                        <FaTag className="text-[#a67c52] mr-2"/>
+                                        <FaTag className="text-[#a67c52] mr-2" />
                                         <span className="text-[#5b4636]">Chất liệu: </span>
                                         <span className="ml-2">{material}</span>
                                     </div>
                                     <div className="flex items-center">
-                                        <FaRuler className="text-[#a67c52] mr-2"/>
+                                        <FaRuler className="text-[#a67c52] mr-2" />
                                         <span className="text-[#5b4636]">Kích thước: </span>
                                         <span className="ml-2">{size.width}cm x {size.height}cm</span>
                                     </div>
@@ -230,7 +214,7 @@ export default function ProductDetailPage({params}) {
                                         <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd"
                                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                                clipRule="evenodd"/>
+                                                clipRule="evenodd" />
                                         </svg>
                                         Còn hàng
                                     </span>
@@ -241,7 +225,7 @@ export default function ProductDetailPage({params}) {
                                         <svg className="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd"
                                                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                                clipRule="evenodd"/>
+                                                clipRule="evenodd" />
                                         </svg>
                                         Hết hàng
                                     </span>
@@ -268,7 +252,7 @@ export default function ProductDetailPage({params}) {
                                         onClick={handleAddToCart}
                                         className="cozy-btn flex items-center"
                                     >
-                                        <FaShoppingCart className="mr-2"/> Thêm vào giỏ hàng
+                                        <FaShoppingCart className="mr-2" /> Thêm vào giỏ hàng
                                     </button>
                                 </div>
                             )}
