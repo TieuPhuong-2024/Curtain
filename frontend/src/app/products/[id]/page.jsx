@@ -5,8 +5,10 @@ import { use, useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getCurtainById, getImagesByCurtainId } from '@/lib/api';
-import { FaArrowLeft, FaPalette, FaRuler, FaShoppingCart, FaTag } from 'react-icons/fa';
+import { FaArrowLeft, FaPalette, FaRuler, FaShoppingCart, FaTag, FaImages } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import Lightbox from 'yet-another-react-lightbox';
+import 'yet-another-react-lightbox/styles.css';
 
 export default function ProductDetailPage({ params }) {
     const { id } = use(params);
@@ -18,6 +20,8 @@ export default function ProductDetailPage({ params }) {
     const [error, setError] = useState(null);
     const [quantity, setQuantity] = useState(1);
     const [selectedColor, setSelectedColor] = useState(null);
+    const [lightboxOpen, setLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -66,6 +70,44 @@ export default function ProductDetailPage({ params }) {
         setSelectedImage(imageUrl);
     };
 
+    // Prepare slides for lightbox
+    const prepareSlides = () => {
+        const slides = [];
+        
+        // Add main image first if available
+        if (curtain?.mainImage) {
+            slides.push({ 
+                type: 'image',
+                src: curtain.mainImage 
+            });
+        }
+        
+        // Add other images
+        if (images && images.length > 0) {
+            images.forEach(image => {
+                if (image.url !== curtain?.mainImage) {
+                    slides.push({
+                        type: 'image',
+                        src: image.url
+                    });
+                }
+            });
+        }
+        
+        return slides;
+    };
+
+    const handleOpenLightbox = (index = 0) => {
+        setLightboxIndex(index);
+        setLightboxOpen(true);
+        document.body.style.overflow = 'hidden';
+    };
+    
+    const handleCloseLightbox = () => {
+        setLightboxOpen(false);
+        document.body.style.overflow = 'auto';
+    };
+
     if (loading) {
         return (
             <div className="cozy-bg min-h-screen py-8">
@@ -97,6 +139,14 @@ export default function ProductDetailPage({ params }) {
 
     const { name, description, price, category, material, size, mainImage, inStock } = curtain;
     const displayImage = selectedImage || mainImage || (images.length > 0 ? images[0].url : '/images/curtain-placeholder.jpg');
+    const slides = prepareSlides();
+
+    // Find index of currently selected image for lightbox
+    const getCurrentImageIndex = () => {
+        if (!displayImage) return 0;
+        
+        return slides.findIndex(slide => slide.src === displayImage) || 0;
+    };
 
     return (
         <div className="cozy-bg min-h-screen py-8">
@@ -112,7 +162,8 @@ export default function ProductDetailPage({ params }) {
                         <div className="md:w-1/2">
                             <div className="flex flex-col">
                                 {/* Main displayed image */}
-                                <div className="relative h-96 md:h-[500px] overflow-hidden">
+                                <div className="relative h-96 md:h-[500px] overflow-hidden group cursor-pointer"
+                                     onClick={() => handleOpenLightbox(getCurrentImageIndex())}>
                                     <Image
                                         src={displayImage}
                                         alt={name}
@@ -121,6 +172,9 @@ export default function ProductDetailPage({ params }) {
                                         className="cozy-img w-full h-full rounded-lg transition-transform duration-500 hover:scale-105"
                                         priority
                                     />
+                                    <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                        <FaImages className="text-white text-4xl" />
+                                    </div>
                                 </div>
 
                                 {/* Thumbnails for additional images */}
@@ -269,6 +323,34 @@ export default function ProductDetailPage({ params }) {
                     </div>
                 </div>
             </div>
+
+            {/* Lightbox for full-size image viewing */}
+            <Lightbox
+                open={lightboxOpen}
+                close={handleCloseLightbox}
+                slides={slides}
+                index={lightboxIndex}
+                render={{
+                    slide: ({ slide }) => {
+                        if (slide.type === 'image') {
+                            return (
+                                <img
+                                    src={slide.src}
+                                    alt={name}
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '100%',
+                                        objectFit: 'contain',
+                                        display: 'block',
+                                        margin: 'auto'
+                                    }}
+                                />
+                            );
+                        }
+                        return null;
+                    }
+                }}
+            />
         </div>
     );
 }
