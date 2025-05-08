@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaPlus, FaEdit, FaTrash, FaSearch, FaEye } from 'react-icons/fa';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import { getProjects, deleteProject } from '@/lib/api';
 
 export default function AdminProjects() {
     const [projects, setProjects] = useState([]);
@@ -21,8 +21,8 @@ export default function AdminProjects() {
     const fetchProjects = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/projects`);
-            setProjects(response.data);
+            const projectsData = await getProjects();
+            setProjects(projectsData);
             setLoading(false);
         } catch (error) {
             console.error('Error fetching projects:', error);
@@ -33,7 +33,7 @@ export default function AdminProjects() {
 
     const handleDelete = async (id) => {
         try {
-            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`);
+            await deleteProject(id);
             toast.success('Xóa công trình thành công!');
             setConfirmDelete(null);
             fetchProjects();

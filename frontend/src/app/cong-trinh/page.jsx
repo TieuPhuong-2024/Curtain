@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import Link from "next/link";
+import { getProjects, getProjectsByType } from "../../lib/api";
 import Image from "next/image";
 import { FaSearch, FaHardHat, FaBuilding, FaStar, FaArrowRight } from "react-icons/fa";
 
@@ -22,9 +22,7 @@ export default function ThiCongLapRemPage() {
             try {
                 setLoading(true);
                 setError(null);
-                const response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
-
-                const allProjects = response.data;
+                const allProjects = await getProjects();
                 setProjects(allProjects);
 
                 const trulyFeaturedProjects = allProjects.filter(p => p.featured === true);
@@ -49,15 +47,15 @@ export default function ThiCongLapRemPage() {
         setLoading(true);
 
         try {
-            let response;
+            let filteredProjects;
 
             if (filter === "all") {
-                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + '/projects');
+                filteredProjects = await getProjects();
             } else {
-                response = await axios.get(process.env.NEXT_PUBLIC_API_URL + `/projects/type/${filter}`);
+                filteredProjects = await getProjectsByType(filter);
             }
 
-            setProjects(response.data);
+            setProjects(filteredProjects);
             setLoading(false);
         } catch (err) {
             setError("Không thể lọc dữ liệu. Vui lòng thử lại sau.");
