@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { FaMapMarkerAlt, FaArrowLeft, FaImages } from 'react-icons/fa';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
+import { renderCKEditorContent } from '@/utils/ckeditorConverter';
+import '@/app/styles/content-styles.css';
 
 export default function ProjectDetailPage() {
     const router = useRouter();
@@ -86,7 +88,7 @@ export default function ProjectDetailPage() {
             document.body.style.overflow = 'hidden';
         }
     };
-    
+
     const handleCloseLightbox = () => {
         setLightboxOpen(false);
         document.body.style.overflow = 'auto';
@@ -107,24 +109,24 @@ export default function ProjectDetailPage() {
                     {project.thumbnail && (
                         <div className="relative h-80 md:h-96 lg:h-[500px] w-full cursor-pointer group"
                             onClick={() => handleOpenLightbox('image', 0)} >
-                                <Image 
-                                    src={project.thumbnail}
-                                    alt={`${project.title} - Ảnh thumbnail`}
-                                    fill
-                                    style={{objectFit: 'cover'}}
-                                    className="group-hover:opacity-90 transition-opacity duration-300"
-                                    priority
-                                    sizes="100vw"
-                                />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                    <FaImages className="text-white text-4xl" />
-                                </div>
+                            <Image
+                                src={project.thumbnail}
+                                alt={`${project.title} - Ảnh thumbnail`}
+                                fill
+                                style={{ objectFit: 'cover' }}
+                                className="group-hover:opacity-90 transition-opacity duration-300"
+                                priority
+                                sizes="100vw"
+                            />
+                            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                <FaImages className="text-white text-4xl" />
+                            </div>
                         </div>
                     )}
 
                     <div className="p-6 md:p-10">
                         <h1 className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">{project.title}</h1>
-                        
+
                         <div className="flex flex-wrap items-center text-gray-600 mb-6 space-x-4 text-sm">
                             <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium">{project.type}</span>
                             {project.location && (
@@ -140,16 +142,13 @@ export default function ProjectDetailPage() {
                             </p>
                         )}
 
-                        {project.detailedContent ? (
-                            <div 
-                                className="prose prose-lg max-w-none text-gray-800 leading-relaxed mb-8 ck-content"
-                                dangerouslySetInnerHTML={{ __html: project.detailedContent }}
+                        {/* Cong trinh content */}
+                        <div className="prose prose-lg max-w-none mb-12 post-content">
+                            <div
+                                className="ck-content"
+                                dangerouslySetInnerHTML={{ __html: renderCKEditorContent(project.detailedContent) }}
                             />
-                        ) : (
-                            <p className="text-gray-700 text-lg leading-relaxed mb-8">
-                                {project.description}
-                            </p>
-                        )}
+                        </div>
 
                         <div className="pt-8 border-t border-gray-200 text-center">
                             <h3 className="text-xl font-semibold text-blue-800 mb-4">Bạn có dự án tương tự?</h3>
