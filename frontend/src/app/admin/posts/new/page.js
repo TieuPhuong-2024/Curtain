@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ImageUploader from '@/components/ImageUploader';
 import { createPost, uploadImage, uploadVideo } from '@/lib/api';
+import Link from 'next/link';
+import { FaSave } from 'react-icons/fa';
 
 // Custom upload adapter for CKEditor
 class MyUploadAdapter {
@@ -49,12 +51,7 @@ let ClassicEditor;
 
 export default function NewPost() {
   const router = useRouter();
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [tags, setTags] = useState('');
-  const [status, setStatus] = useState('draft');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
   const [editorLoaded, setEditorLoaded] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -182,7 +179,7 @@ export default function NewPost() {
               />
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({...prev, featuredImage: null}))}
+                onClick={() => setFormData(prev => ({ ...prev, featuredImage: null }))}
                 className="cursor-pointer absolute inset-0 bg-black bg-opacity-50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
               >
                 Xóa
@@ -267,19 +264,18 @@ export default function NewPost() {
 
         {/* Submit Button */}
         <div className="mt-6 flex items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="cursor-pointer bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          <Link
+            href="/admin/posts"
+            className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded-md mr-2"
           >
             Hủy
-          </button>
+          </Link>
           <button
             type="submit"
             disabled={loading}
-            className="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline flex items-center"
+            className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
           >
-            {loading ? (
+            <FaSave className='mr-2' /> {loading ? (
               <>
                 <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -288,7 +284,7 @@ export default function NewPost() {
                 Đang xử lý...
               </>
             ) : (
-              'Tạo bài viết'
+              'Lưu'
             )}
           </button>
         </div>
