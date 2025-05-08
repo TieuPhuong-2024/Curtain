@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { FaArrowLeft, FaUpload, FaPlus, FaTimes, FaEdit } from 'react-icons/fa';
+import { FaUpload, FaPlus, FaTimes, FaEdit } from 'react-icons/fa';
 import { createCurtain, getCategories, uploadImage, getColors, createColor, getColorById, updateColor } from '@/lib/api';
 
 export default function AddCurtain() {
