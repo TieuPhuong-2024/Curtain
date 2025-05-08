@@ -5,6 +5,43 @@ import { useRouter, useParams } from 'next/navigation';
 import { getPostById, updatePost } from '@/lib/api';
 import ImageUploader from '@/components/ImageUploader';
 import { toast } from 'react-toastify';
+import { uploadImage, uploadVideo } from '@/lib/api';
+
+// Custom upload adapter for CKEditor
+class MyUploadAdapter {
+  constructor(loader) {
+    this.loader = loader;
+  }
+
+  upload() {
+    return this.loader.file
+      .then(file => {
+        // Check file type to determine upload method
+        if (file.type.startsWith('video/')) {
+          return uploadVideo(file);
+        } else {
+          return uploadImage(file);
+        }
+      })
+      .then(response => {
+        if (response && response.url) {
+          return { default: response.url };
+        }
+        return Promise.reject('Upload failed');
+      });
+  }
+
+  abort() {
+    // Abort upload implementation
+  }
+}
+
+// Custom upload adapter plugin
+function MyCustomUploadAdapterPlugin(editor) {
+  editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+    return new MyUploadAdapter(loader);
+  };
+}
 
 // CKEditor imports for direct use
 let CKEditor;
@@ -232,6 +269,28 @@ export default function EditPost() {
               onChange={handleEditorChange}
               config={{
                 placeholder: "Nhập nội dung bài viết tại đây...",
+                extraPlugins: [MyCustomUploadAdapterPlugin],
+                toolbar: {
+                  items: [
+                    'heading', '|',
+                    'bold', 'italic', 'link', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'insertTable', '|',
+                    'imageUpload', 'mediaEmbed', '|',
+                    'undo', 'redo'
+                  ]
+                },
+                image: {
+                  toolbar: [
+                    'imageStyle:full',
+                    'imageStyle:side',
+                    '|',
+                    'imageTextAlternative'
+                  ]
+                },
+                mediaEmbed: {
+                  previewsInData: true
+                }
               }}
             />
           ) : (
