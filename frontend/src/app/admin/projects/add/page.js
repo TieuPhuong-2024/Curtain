@@ -4,10 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaSave } from 'react-icons/fa';
 import Link from 'next/link';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import ImageUploader from '@/components/ImageUploader';
-import { uploadImage, uploadVideo } from '@/lib/api';
+import { uploadImage, uploadVideo, createProject } from '@/lib/api';
 
 // Custom upload adapter for CKEditor
 class MyUploadAdapter {
@@ -133,13 +132,9 @@ export default function AddProject() {
 
         try {
             setLoading(true);
-            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/projects`, payload, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.data) {
+            const result = await createProject(payload);
+            
+            if (result) {
                 toast.success('Thêm công trình thành công!');
                 router.push('/admin/projects');
             }
