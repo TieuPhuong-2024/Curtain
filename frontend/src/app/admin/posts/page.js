@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { getPosts, deletePost } from '@/lib/api';
 import PostCard from '@/components/PostCard';
 import { useRouter } from 'next/navigation';
-import { FaPlus } from 'react-icons/fa';
+import { FaEdit, FaPlus, FaTrash } from 'react-icons/fa';
 
 export default function AdminPosts() {
   const [posts, setPosts] = useState([]);
@@ -115,13 +115,13 @@ export default function AdminPosts() {
                       onClick={() => router.push(`/admin/posts/${post._id}`)}
                       className="cursor-pointer bg-blue-600 text-white p-2 rounded hover:bg-blue-700 text-sm"
                     >
-                      Edit
+                      <FaEdit />
                     </button>
                     <button
                       onClick={() => handleDelete(post._id)}
                       className="cursor-pointer bg-red-600 text-white p-2 rounded hover:bg-red-700 text-sm"
                     >
-                      Delete
+                      <FaTrash />
                     </button>
                   </div>
                 </div>

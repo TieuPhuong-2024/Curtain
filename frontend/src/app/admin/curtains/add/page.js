@@ -486,7 +486,7 @@ export default function AddCurtain() {
                                     <button
                                         type="button"
                                         onClick={handleFileButtonClick}
-                                        className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center"
+                                        className="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md flex items-center"
                                     >
                                         <FaUpload className="mr-2" /> Tải lên
                                     </button>
@@ -512,7 +512,7 @@ export default function AddCurtain() {
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveMainImage}
-                                                className="cursor-pointer absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:opacity-100"
+                                                className="cursor-pointer absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:bg-red-600"
                                                 title="Xóa ảnh này"
                                             >
                                                 <FaTimes size={14} />
@@ -548,7 +548,7 @@ export default function AddCurtain() {
                             <button
                                 type="button"
                                 onClick={handleAdditionalFileButtonClick}
-                                className="cursor-pointer bg-gray-200 text-gray-700 px-4 py-2 rounded-md flex items-center"
+                                className="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-md flex items-center"
                             >
                                 <FaPlus className="mr-2" /> Thêm hình ảnh phụ
                             </button>
@@ -577,7 +577,7 @@ export default function AddCurtain() {
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveAdditionalImage(index)}
-                                            className="cursor-pointer absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:opacity-100"
+                                            className="cursor-pointer absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-80 hover:bg-red-600"
                                             title="Xóa ảnh này"
                                         >
                                             <FaTimes size={14} />

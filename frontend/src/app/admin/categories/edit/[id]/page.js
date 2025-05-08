@@ -1,8 +1,9 @@
 "use client";
-import {useEffect, useState} from "react";
-import {useParams, useRouter} from "next/navigation";
-import {getCategories, updateCategory, uploadImage} from '@/lib/api';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { getCategories, updateCategory, uploadImage } from '@/lib/api';
 import Image from "next/image";
+import { FaTimes } from "react-icons/fa";
 
 export default function EditCategoryPage() {
     const router = useRouter();
@@ -10,11 +11,11 @@ export default function EditCategoryPage() {
     const id = params?.id;
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
-    const [image, setImage] = useState(""); 
-    const [imageFile, setImageFile] = useState(null); 
-    const [loading, setLoading] = useState(true); 
-    const [saving, setSaving] = useState(false); 
-    const [uploadingImage, setUploadingImage] = useState(false); 
+    const [image, setImage] = useState("");
+    const [imageFile, setImageFile] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [uploadingImage, setUploadingImage] = useState(false);
     const [error, setError] = useState("");
 
     useEffect(() => {
@@ -25,7 +26,7 @@ export default function EditCategoryPage() {
                 if (category) {
                     setName(category.name || "");
                     setDescription(category.description || "");
-                    setImage(category.image || ""); 
+                    setImage(category.image || "");
                 } else {
                     setError("Không tìm thấy danh mục");
                 }
@@ -40,16 +41,16 @@ export default function EditCategoryPage() {
 
         const reader = new FileReader();
         reader.onload = () => {
-            setImage(reader.result); 
+            setImage(reader.result);
         };
         reader.readAsDataURL(file);
-        
-        setImageFile(file); 
+
+        setImageFile(file);
     };
 
     const handleRemoveImage = () => {
-        setImage(""); 
-        setImageFile(null); 
+        setImage("");
+        setImageFile(null);
         const fileInput = document.getElementById('file-upload');
         if (fileInput) {
             fileInput.value = '';
@@ -57,12 +58,12 @@ export default function EditCategoryPage() {
     };
 
     const handleImageUpload = async () => {
-        if (!imageFile) return image; 
-        
+        if (!imageFile) return image;
+
         try {
             setUploadingImage(true);
             const uploadedImage = await uploadImage(imageFile);
-            return uploadedImage.url; 
+            return uploadedImage.url;
         } catch (err) {
             setError("Không thể tải lên hình ảnh. " + err.message);
             return null;
@@ -75,9 +76,9 @@ export default function EditCategoryPage() {
         e.preventDefault();
         setSaving(true);
         setError("");
-        
+
         try {
-            let finalImageUrl = image; 
+            let finalImageUrl = image;
 
             if (imageFile) {
                 const newUrl = await handleImageUpload();
@@ -88,10 +89,10 @@ export default function EditCategoryPage() {
                     return;
                 }
             } else if (image === "") {
-                 finalImageUrl = "";
+                finalImageUrl = "";
             }
-            
-            await updateCategory(id, {name, description, image: finalImageUrl});
+
+            await updateCategory(id, { name, description, image: finalImageUrl });
             router.push("/admin/categories");
         } catch (err) {
             setError(err.message);
@@ -106,7 +107,7 @@ export default function EditCategoryPage() {
             <p className="text-lg text-gray-600">Đang tải dữ liệu...</p>
         </div>
     );
-    
+
     if (error && !loading) return (
         <div className="max-w-lg mx-auto my-10 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative" role="alert">
             <strong className="font-bold">Lỗi!</strong>
@@ -131,7 +132,7 @@ export default function EditCategoryPage() {
                         autoFocus
                     />
                 </div>
-                
+
                 <div>
                     <label htmlFor="category-description" className="block mb-2 text-sm font-medium text-gray-700">Mô tả:</label>
                     <textarea
@@ -142,11 +143,11 @@ export default function EditCategoryPage() {
                         placeholder="Nhập mô tả danh mục (không bắt buộc)"
                     />
                 </div>
-                
+
                 <div>
                     <label className="block mb-2 text-sm font-medium text-gray-700">Hình ảnh đại diện:</label>
-                    
-                    <div 
+
+                    <div
                         className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center bg-gray-50 hover:border-indigo-500 transition-all duration-300 ease-in-out cursor-pointer mb-3 relative overflow-hidden"
                         onClick={(e) => {
                             if (e.target !== e.currentTarget && e.target.tagName !== 'DIV' && e.target.tagName !== 'SPAN' && e.target.tagName !== 'svg' && e.target.tagName !== 'path' && e.target.tagName !== 'polyline' && e.target.tagName !== 'line') {
@@ -176,24 +177,22 @@ export default function EditCategoryPage() {
                             className="absolute top-0 left-0 opacity-0 w-full h-full cursor-pointer z-[-1]"
                         />
                     </div>
-                    
+
                     {image && (
                         <div className="mt-4 relative h-48 w-full group">
-                            <Image 
-                                src={image} 
+                            <Image
+                                src={image}
                                 alt="Category preview"
                                 fill
                                 className="object-cover rounded-lg shadow-md"
                             />
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 onClick={handleRemoveImage}
-                                className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full hover:bg-red-600 transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"
+                                className="cursor-pointer absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center"
                                 aria-label="Remove image"
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                </svg>
+                                <FaTimes />
                             </button>
                         </div>
                     )}
@@ -208,9 +207,9 @@ export default function EditCategoryPage() {
                         Đang tải ảnh lên...
                     </div>
                 )}
-                
-                {error && !saving && <p className="text-red-500 text-sm text-center">{error}</p>} 
-                
+
+                {error && !saving && <p className="text-red-500 text-sm text-center">{error}</p>}
+
                 <div className="flex items-center justify-end space-x-4 pt-2">
                     <button
                         type="button"

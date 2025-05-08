@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { FaSave, FaArrowLeft } from 'react-icons/fa';
+import { FaSave, FaArrowLeft, FaTimes } from 'react-icons/fa';
 import Link from 'next/link';
 import { toast } from 'react-toastify';
 import ImageUploader from '@/components/ImageUploader';
@@ -290,7 +290,7 @@ export default function EditProject() {
                                 onClick={handleRemoveThumbnail}
                                 className="cursor-pointer absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 text-xs"
                             >
-                                ×
+                                <FaTimes />
                             </button>
                         </div>
                     )}
