@@ -5,14 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
-import { FaMapMarkerAlt, FaCalendarAlt, FaUser, FaCheckCircle, FaArrowLeft, FaImages, FaVideo } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaArrowLeft, FaImages } from 'react-icons/fa';
 import Lightbox from 'yet-another-react-lightbox';
 import 'yet-another-react-lightbox/styles.css';
 
 export default function ProjectDetailPage() {
     const router = useRouter();
     const params = useParams();
-    const projectId = params?.projectId;
+    const projectId = params?.id;
 
     const [project, setProject] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ export default function ProjectDetailPage() {
         <main className="min-h-screen bg-gray-50 py-12">
             <div className="container mx-auto px-4">
                 <button
-                    onClick={() => router.back()}
+                    onClick={() => router.push('/cong-trinh')}
                     className="cursor-pointer mb-8 inline-flex items-center text-blue-600 hover:text-blue-800 transition-colors font-medium"
                 >
                     <FaArrowLeft className="mr-2" /> Quay lại danh sách công trình
