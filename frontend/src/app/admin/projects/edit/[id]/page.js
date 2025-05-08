@@ -4,11 +4,10 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { FaSave, FaArrowLeft } from 'react-icons/fa';
 import Link from 'next/link';
-import axios from 'axios';
 import { toast } from 'react-toastify';
 import ImageUploader from '@/components/ImageUploader';
 import Image from 'next/image';
-import { uploadImage, uploadVideo } from '@/lib/api';
+import { uploadImage, uploadVideo, getProjectById, updateProject } from '@/lib/api';
 
 // Custom upload adapter for CKEditor
 class MyUploadAdapter {
@@ -87,8 +86,7 @@ export default function EditProject() {
             setLoadingData(true);
             const fetchProject = async () => {
                 try {
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`);
-                    const projectData = response.data;
+                    const projectData = await getProjectById(id);
                     console.log('Fetched project data:', projectData); // Add logging for debugging
 
                     // Kiểm tra nếu projectData có chứa thumbnail và featured
@@ -166,7 +164,7 @@ export default function EditProject() {
         };
 
         try {
-            const response = await axios.put(`${process.env.NEXT_PUBLIC_API_URL}/projects/${id}`, payload);
+            await updateProject(id, payload);
             toast.success('Cập nhật công trình thành công!');
             router.push('/admin/projects');
         } catch (error) {

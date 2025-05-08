@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import axios from 'axios';
 import Image from 'next/image';
+import { getProjectById } from '../../../lib/api';
 import Link from 'next/link';
 import { FaMapMarkerAlt, FaArrowLeft, FaImages } from 'react-icons/fa';
 import Lightbox from 'yet-another-react-lightbox';
@@ -25,8 +25,8 @@ export default function ProjectDetailPage() {
             const fetchProjectDetails = async () => {
                 try {
                     setLoading(true);
-                    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`);
-                    setProject(response.data);
+                    const projectData = await getProjectById(projectId);
+                    setProject(projectData);
                     setLoading(false);
                 } catch (err) {
                     console.error("Error fetching project details:", err);
