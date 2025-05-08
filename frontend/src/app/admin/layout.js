@@ -84,20 +84,11 @@ export default function AdminLayout({children}) {
                         </li>
                         <li>
                             <Link 
-                                href="/admin/posts" 
+                                href="/admin/curtains" 
                                 className="flex items-center py-3 px-4 hover:bg-gray-700"
                                 onClick={handleNavClick}
                             >
-                                Quản lý Bài viết
-                            </Link>
-                        </li>
-                        <li>
-                            <Link 
-                                href="/admin/banners" 
-                                className="flex items-center py-3 px-4 hover:bg-gray-700"
-                                onClick={handleNavClick}
-                            >
-                                Quản lý Banner
+                                Quản lý rèm cửa
                             </Link>
                         </li>
                         <li>
@@ -111,20 +102,11 @@ export default function AdminLayout({children}) {
                         </li>
                         <li>
                             <Link 
-                                href="/admin/curtains" 
+                                href="/admin/banners" 
                                 className="flex items-center py-3 px-4 hover:bg-gray-700"
                                 onClick={handleNavClick}
                             >
-                                Quản lý Rèm
-                            </Link>
-                        </li>
-                        <li>
-                            <Link 
-                                href="/admin/contacts" 
-                                className="flex items-center py-3 px-4 hover:bg-gray-700"
-                                onClick={handleNavClick}
-                            >
-                                Quản lý Liên hệ
+                                Quản lý Banner
                             </Link>
                         </li>
                         <li>
@@ -134,6 +116,24 @@ export default function AdminLayout({children}) {
                                 onClick={handleNavClick}
                             >
                                 Quản lý công trình
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/admin/contacts" 
+                                className="flex items-center py-3 px-4 hover:bg-gray-700"
+                                onClick={handleNavClick}
+                            >
+                                Quản lý liên hệ
+                            </Link>
+                        </li>
+                        <li>
+                            <Link 
+                                href="/admin/posts" 
+                                className="flex items-center py-3 px-4 hover:bg-gray-700"
+                                onClick={handleNavClick}
+                            >
+                                Quản lý bài viết
                             </Link>
                         </li>
                         <li>

@@ -288,9 +288,9 @@ export default function EditProject() {
                             <button
                                 type="button"
                                 onClick={handleRemoveThumbnail}
-                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 text-xs"
+                                className="cursor-pointer absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 text-xs"
                             >
-                                X
+                                ×
                             </button>
                         </div>
                     )}
@@ -366,7 +366,7 @@ export default function EditProject() {
                 </div>
 
                 <div className="mt-8 flex justify-end space-x-3">
-                    <Link href="/admin/projects" className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition">
+                    <Link href="/admin/projects" className="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2 hover:bg-gray-400">
                         Hủy
                     </Link>
                     <button
@@ -374,7 +374,7 @@ export default function EditProject() {
                         disabled={loading || loadingData}
                         className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-blue-700 transition disabled:opacity-50"
                     >
-                        <FaSave className="mr-2" /> {loading ? 'Đang cập nhật...' : 'Lưu thay đổi'}
+                        <FaSave className="mr-2" /> {loading ? 'Đang cập nhật...' : 'Cập nhật'}
                     </button>
                 </div>
             </form>

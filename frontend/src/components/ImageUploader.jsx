@@ -103,7 +103,7 @@ const ImageUploader = ({ onUpload, isMultiple = true }) => {
 
   return (
     <div className="mb-4">
-      <label className="block font-medium mb-1">Ảnh</label>
+      {/* <label className="block font-medium mb-1">Ảnh</label> */}
 
       {/* Preview images */}
       {previews.length > 0 && (
