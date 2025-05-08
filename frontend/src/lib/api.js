@@ -253,6 +253,53 @@ export const uploadImage = async (imageFile) => {
     }
 };
 
+// Upload video from device
+export const uploadVideo = async (videoFile) => {
+    try {
+        console.log('uploadVideo function called with:', videoFile.name);
+        const formData = new FormData();
+        formData.append('video', videoFile);
+        
+        console.log('Sending to:', `${API_URL}/upload/video`);
+        
+        const response = await uploadApi.post('/upload/video', formData);
+        console.log('Raw upload response:', response);
+        
+        // Chuẩn hóa kết quả trả về cho CKEditor
+        let result;
+        
+        if (response && response.data) {
+            // Đảm bảo kết quả trả về có url
+            if (response.data.url) {
+                result = {
+                    url: response.data.url,
+                    default: response.data.url
+                };
+            } else if (typeof response.data === 'string') {
+                result = {
+                    url: response.data,
+                    default: response.data
+                };
+            } else {
+                result = {
+                    url: typeof response.data === 'object' 
+                        ? JSON.stringify(response.data) 
+                        : String(response.data),
+                    default: API_URL + '/upload/video-error'
+                };
+            }
+        } else {
+            throw new Error('No data in upload response');
+        }
+        
+        console.log('Normalized video upload result:', result);
+        return result;
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        throw error;
+    }
+};
+
 // Image APIs
 export const getImagesByCurtainId = async (curtainId) => {
     try {
