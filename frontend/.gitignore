@@ -73,3 +73,5 @@ public/workbox-*.js.map
 
 # Storybook
 storybook-static
+
+.dockerignore
