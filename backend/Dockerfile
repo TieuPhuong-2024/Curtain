@@ -1,13 +1,13 @@
-FROM node:18-alpine
-
+FROM node:18-alpine AS builder
 WORKDIR /app
-
 COPY package*.json ./
-
-RUN npm install
-
+RUN npm install --production --no-cache && npm cache clean --force
 COPY . .
+# Add any build steps here if you have them, e.g., RUN npm run build
 
+FROM node:18-alpine
+WORKDIR /app
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app ./
 EXPOSE 5000
-
 CMD ["npm", "run", "dev"]
