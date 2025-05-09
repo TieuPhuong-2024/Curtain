@@ -6,6 +6,7 @@ import { getProjects, getProjectsByType } from "../../lib/api";
 import Image from "next/image";
 import { FaSearch, FaHardHat, FaBuilding, FaStar, FaArrowRight } from "react-icons/fa";
 
+
 export default function ThiCongLapRemPage() {
     const [projects, setProjects] = useState([]);
     const [featuredProjects, setFeaturedProjects] = useState([]);
@@ -177,19 +178,19 @@ export default function ThiCongLapRemPage() {
                 <div className="container mx-auto px-4">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                         <div className="py-4">
-                            <div className="text-3xl md:text-4xl font-bold">500+</div>
+                            <div className="text-3xl md:text-4xl font-bold">{process.env.NEXT_PUBLIC_PROJECTS_COMPLETED}</div>
                             <div className="mt-2 text-blue-200">Dự án đã hoàn thành</div>
                         </div>
                         <div className="py-4">
-                            <div className="text-3xl md:text-4xl font-bold">300+</div>
+                            <div className="text-3xl md:text-4xl font-bold">{process.env.NEXT_PUBLIC_HAPPY_CUSTOMERS}</div>
                             <div className="mt-2 text-blue-200">Khách hàng hài lòng</div>
                         </div>
                         <div className="py-4">
-                            <div className="text-3xl md:text-4xl font-bold">10+</div>
+                            <div className="text-3xl md:text-4xl font-bold">{process.env.NEXT_PUBLIC_YEARS_OF_EXPERIENCE}</div>
                             <div className="mt-2 text-blue-200">Năm kinh nghiệm</div>
                         </div>
                         <div className="py-4">
-                            <div className="text-3xl md:text-4xl font-bold">20+</div>
+                            <div className="text-3xl md:text-4xl font-bold">{process.env.NEXT_PUBLIC_TYPES_OF_CURTAINS}</div>
                             <div className="mt-2 text-blue-200">Loại rèm cửa</div>
                         </div>
                     </div>
