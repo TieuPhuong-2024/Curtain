@@ -53,7 +53,9 @@ const CategorySlider = ({ categories, productCounts = {} }) => {
         {/* Categories slider container */}
         <div
           ref={sliderRef}
-          className="flex overflow-x-auto gap-4 py-4 px-4 md:px-2 hide-scrollbar"
+          className={`flex overflow-x-auto gap-4 py-4 px-4 md:px-2 hide-scrollbar ${
+            categories.length === 1 ? 'justify-center' : ''
+          }`}
           onScroll={handleScroll}
         >
           {categories.map(category => (
